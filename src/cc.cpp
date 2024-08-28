@@ -22,6 +22,7 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
     loadNetwork();
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
+    rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
 }
 
 Eigen::VectorQd CustomController::getControl()
@@ -35,27 +36,41 @@ void CustomController::loadNetwork()
     rl_action_.setZero();
 
 
-    string cur_path = "/home/kim/tocabi_ws/src/tocabi_cc/";
+    string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
 
     if (is_on_robot_)
     {
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
     std::ifstream file[14];
-    file[0].open(cur_path+"weight/a2c_network_actor_mlp_0_weight.txt", std::ios::in);
-    file[1].open(cur_path+"weight/a2c_network_actor_mlp_0_bias.txt", std::ios::in);
-    file[2].open(cur_path+"weight/a2c_network_actor_mlp_2_weight.txt", std::ios::in);
-    file[3].open(cur_path+"weight/a2c_network_actor_mlp_2_bias.txt", std::ios::in);
-    file[4].open(cur_path+"weight/a2c_network_mu_weight.txt", std::ios::in);
-    file[5].open(cur_path+"weight/a2c_network_mu_bias.txt", std::ios::in);
-    file[6].open(cur_path+"weight/obs_mean_fixed.txt", std::ios::in);
-    file[7].open(cur_path+"weight/obs_variance_fixed.txt", std::ios::in);
-    file[8].open(cur_path+"weight/a2c_network_critic_mlp_0_weight.txt", std::ios::in);
-    file[9].open(cur_path+"weight/a2c_network_critic_mlp_0_bias.txt", std::ios::in);
-    file[10].open(cur_path+"weight/a2c_network_critic_mlp_2_weight.txt", std::ios::in);
-    file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
-    file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
-    file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
+    // file[0].open(cur_path+"weight/a2c_network_actor_mlp_0_weight.txt", std::ios::in);
+    // file[1].open(cur_path+"weight/a2c_network_actor_mlp_0_bias.txt", std::ios::in);
+    // file[2].open(cur_path+"weight/a2c_network_actor_mlp_2_weight.txt", std::ios::in);
+    // file[3].open(cur_path+"weight/a2c_network_actor_mlp_2_bias.txt", std::ios::in);
+    // file[4].open(cur_path+"weight/a2c_network_mu_weight.txt", std::ios::in);
+    // file[5].open(cur_path+"weight/a2c_network_mu_bias.txt", std::ios::in);
+    // file[6].open(cur_path+"weight/obs_mean_fixed.txt", std::ios::in);
+    // file[7].open(cur_path+"weight/obs_variance_fixed.txt", std::ios::in);
+    // file[8].open(cur_path+"weight/a2c_network_critic_mlp_0_weight.txt", std::ios::in);
+    // file[9].open(cur_path+"weight/a2c_network_critic_mlp_0_bias.txt", std::ios::in);
+    // file[10].open(cur_path+"weight/a2c_network_critic_mlp_2_weight.txt", std::ios::in);
+    // file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
+    // file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
+    // file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
+    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_weight.txt", std::ios::in);
+    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_bias.txt", std::ios::in);
+    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_weight.txt", std::ios::in);
+    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_bias.txt", std::ios::in);
+    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_weight.txt", std::ios::in);
+    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_bias.txt", std::ios::in);
+    file[6].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_mean.txt", std::ios::in);
+    file[7].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_var.txt", std::ios::in);
+    file[8].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_weight.txt", std::ios::in);
+    file[9].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_bias.txt", std::ios::in);
+    file[10].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_weight.txt", std::ios::in);
+    file[11].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_bias.txt", std::ios::in);
+    file[12].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_weight.txt", std::ios::in);
+    file[13].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_bias.txt", std::ios::in);
 
 
     if(!file[0].is_open())
@@ -184,7 +199,7 @@ void CustomController::loadNetwork()
         file[7] >> temp;
         if(temp != '\n')
         {
-            state_var_(row, col) = temp;
+            state_var_(row, col) = temp + 1.e-4;
             col ++;
             if (col == state_var_.cols())
             {
@@ -327,8 +342,8 @@ void CustomController::initVariable()
                     10, 10,
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
-    q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
-                0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
+    q_init_ << 0.0, 0.0, -0.28, 0.6, -0.32, 0.0,
+                0.0, 0.0, -0.28, 0.6, -0.32, 0.0,
                 0.0, 0.0, 0.0,
                 0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
                 0.0, 0.0,
@@ -411,31 +426,71 @@ void CustomController::processNoise()
     time_pre_ = time_cur_;
 }
 
-void CustomController::processObservation()
+void CustomController::processObservation() // [linvel, angvel, proj_grav, commands, dof_pos, dof_vel, actions]
 {
+
     int data_idx = 0;
 
     Eigen::Quaterniond q;
     q.x() = rd_cc_.q_virtual_(3);
     q.y() = rd_cc_.q_virtual_(4);
     q.z() = rd_cc_.q_virtual_(5);
-    q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);    
+    q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
-    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+    Vector3_t base_lin_vel, base_ang_vel;
+    base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
+    base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
 
-    state_cur_(data_idx) = euler_angle_(0);
+    // for (int i=0; i<6; i++)
+    // {
+    //     state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
+    //     data_idx++;
+    // }
+
+    for (int i = 0; i < 3; i++){
+        state_cur_(data_idx) = base_lin_vel(i);
+        data_idx++;
+    }
+
+    for (int i = 0; i < 3; i++){
+        state_cur_(data_idx) = base_ang_vel(i);
+        data_idx++;
+    }
+ 
+    Vector3_t grav, projected_grav, forward_vec;
+    grav << 0, 0, -1.;
+    forward_vec << 1., 0, 0;
+    projected_grav = q.conjugate()*grav;
+    
+    // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+
+    state_cur_(data_idx) = projected_grav(0);
     data_idx++;
 
-    state_cur_(data_idx) = euler_angle_(1);
+    state_cur_(data_idx) = projected_grav(1);
     data_idx++;
 
-    state_cur_(data_idx) = euler_angle_(2);
+    state_cur_(data_idx) = projected_grav(2);
     data_idx++;
 
+    // std::cout << "start time : " << start_time_ << std::endl;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 5e6, 0.0, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    // std::cout << "command : " << state_cur_(data_idx) << std::endl;
+    // state_cur_(data_idx) = 0.5;//target_vel_x_;
+    data_idx++;
+
+    state_cur_(data_idx) = target_vel_y_; //0.0;//target_vel_y_;
+    data_idx++;
+
+    Vector3_t forward = q * forward_vec;
+    double heading = atan2(forward(1), forward(0));
+    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    // state_cur_(data_idx) = 0.0;//target_vel_yaw;
+    data_idx++;
 
     for (int i = 0; i < num_actuator_action; i++)
     {
-        state_cur_(data_idx) = q_noise_(i);
+        state_cur_(data_idx) = q_noise_(i) - q_init_(i);
         data_idx++;
     }
 
@@ -452,25 +507,17 @@ void CustomController::processObservation()
         data_idx++;
     }
 
-    float squat_duration = 1.7995;
-    phase_ = std::fmod((rd_cc_.control_time_us_-start_time_)/1e6 + action_dt_accumulate_, squat_duration) / squat_duration;
+    // float squat_duration = 1.7995;
+    // phase_ = std::fmod((rd_cc_.control_time_us_-start_time_)/1e6 + action_dt_accumulate_, squat_duration) / squat_duration;
 
-    state_cur_(data_idx) = sin(2*M_PI*phase_);
-    data_idx++;
-    state_cur_(data_idx) = cos(2*M_PI*phase_);
-    data_idx++;
+    // state_cur_(data_idx) = sin(2*M_PI*phase_);
+    // data_idx++;
+    // state_cur_(data_idx) = cos(2*M_PI*phase_);
+    // data_idx++;
     
-    state_cur_(data_idx) = 0.0;//target_vel_x_;
-    data_idx++;
 
-    state_cur_(data_idx) = 0.0;//target_vel_y_;
-    data_idx++;
 
-    for (int i=0; i<6; i++)
-    {
-        state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
-        data_idx++;
-    }
+
 
     // state_cur_(data_idx) = -rd_cc_.LF_FT(2);
     // data_idx++;
@@ -495,60 +542,109 @@ void CustomController::processObservation()
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
         data_idx++;
     }
-    state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(num_actuator_action), 0.0, 1.0);
-    data_idx++;
-    
+    // state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(num_actuator_action), 0.0, 1.0);
+    // data_idx++;
     state_buffer_.block(0, 0, num_cur_state*(num_state_skip*num_state_hist-1),1) = state_buffer_.block(num_cur_state, 0, num_cur_state*(num_state_skip*num_state_hist-1),1);
-    state_buffer_.block(num_cur_state*(num_state_skip*num_state_hist-1), 0, num_cur_state,1) = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
-
-    // Internal State First
-    for (int i = 0; i < num_state_hist; i++)
-    {
-        state_.block(num_cur_internal_state*i, 0, num_cur_internal_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_internal_state, 1);
+    MatrixXd tmp = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
+    for (int i = 0; i < num_cur_state; i++){
+        tmp(i) = DyrosMath::minmax_cut(tmp(i), -10., 10.);
     }
-    // Action History Second
-    for (int i = 0; i < num_state_hist-1; i++)
-    {
-        state_.block(num_state_hist*num_cur_internal_state + num_action*i, 0, num_action, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)) + num_cur_internal_state, 0, num_action, 1);
-    }
+    state_buffer_.block(num_cur_state*(num_state_skip*num_state_hist-1), 0, num_cur_state,1) = tmp;
 
+    // // Internal State First
+    // for (int i = 0; i < num_state_hist; i++)
+    // {
+    //     state_.block(num_cur_internal_state*i, 0, num_cur_internal_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_internal_state, 1);
+    // }
+    // // Action History Second
+    // for (int i = 0; i < num_state_hist-1; i++)
+    // {
+    //     state_.block(num_state_hist*num_cur_internal_state + num_action*i, 0, num_action, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)) + num_cur_internal_state, 0, num_action, 1);
+    // }
+    for (int i = 0; i < num_state_hist; i++){
+        state_.block(num_cur_state*i, 0, num_cur_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_state, 1);
+    }
 }
 
+// // RELU
+// void CustomController::feedforwardPolicy()
+// {
+//     hidden_layer1_ = policy_net_w0_ * state_ + policy_net_b0_;
+//     for (int i = 0; i < num_hidden; i++) 
+//     {
+//         if (hidden_layer1_(i) < 0)
+//             hidden_layer1_(i) = 0.0;
+//     }
+
+//     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
+//     for (int i = 0; i < num_hidden; i++) 
+//     {
+//         if (hidden_layer2_(i) < 0)
+//             hidden_layer2_(i) = 0.0;
+//     }
+
+//     rl_action_ = action_net_w_ * hidden_layer2_ + action_net_b_;
+
+//     value_hidden_layer1_ = value_net_w0_ * state_ + value_net_b0_;
+//     for (int i = 0; i < num_hidden; i++) 
+//     {
+//         if (value_hidden_layer1_(i) < 0)
+//             value_hidden_layer1_(i) = 0.0;
+//     }
+
+//     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
+//     for (int i = 0; i < num_hidden; i++) 
+//     {
+//         if (value_hidden_layer2_(i) < 0)
+//             value_hidden_layer2_(i) = 0.0;
+//     }
+
+//     value_ = (value_net_w_ * value_hidden_layer2_ + value_net_b_)(0);
+    
+// }
+
+// ELU VERSION
 void CustomController::feedforwardPolicy()
 {
+    // First hidden layer for policy network
     hidden_layer1_ = policy_net_w0_ * state_ + policy_net_b0_;
     for (int i = 0; i < num_hidden; i++) 
     {
         if (hidden_layer1_(i) < 0)
-            hidden_layer1_(i) = 0.0;
+            hidden_layer1_(i) = std::exp(hidden_layer1_(i)) - 1.0;
     }
 
+    // Second hidden layer for policy network
     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
     for (int i = 0; i < num_hidden; i++) 
     {
         if (hidden_layer2_(i) < 0)
-            hidden_layer2_(i) = 0.0;
+            hidden_layer2_(i) = std::exp(hidden_layer2_(i)) - 1.0;
     }
 
+    // Output layer for policy network
     rl_action_ = action_net_w_ * hidden_layer2_ + action_net_b_;
 
+    // First hidden layer for value network
     value_hidden_layer1_ = value_net_w0_ * state_ + value_net_b0_;
     for (int i = 0; i < num_hidden; i++) 
     {
         if (value_hidden_layer1_(i) < 0)
-            value_hidden_layer1_(i) = 0.0;
+            value_hidden_layer1_(i) = std::exp(value_hidden_layer1_(i)) - 1.0;
     }
 
+    // Second hidden layer for value network
     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
     for (int i = 0; i < num_hidden; i++) 
     {
         if (value_hidden_layer2_(i) < 0)
-            value_hidden_layer2_(i) = 0.0;
+            value_hidden_layer2_(i) = std::exp(value_hidden_layer2_(i)) - 1.0;
     }
 
+    // Output layer for value network
     value_ = (value_net_w_ * value_hidden_layer2_ + value_net_b_)(0);
-    
 }
+
 
 void CustomController::computeSlow()
 {
@@ -562,7 +658,8 @@ void CustomController::computeSlow()
             q_noise_pre_ = q_noise_ = q_init_ = rd_cc_.q_virtual_.segment(6,MODEL_DOF);
             time_cur_ = start_time_ / 1e6;
             time_pre_ = time_cur_ - 0.005;
-            time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
+            // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
+            time_inference_pre_ = rd_cc_.control_time_us_ - (1/124.9)*1e6;
 
             rd_.tc_init = false;
             std::cout<<"cc mode 7"<<std::endl;
@@ -580,12 +677,14 @@ void CustomController::computeSlow()
         processNoise();
 
         // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
-        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/250.0 - 1/10000.0)
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/125.0 - 1/10000.0) // 250 is the control frequency
+        // if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/250.0 - 1/10000.0) // 250 is the control frequency
         {
             processObservation();
             feedforwardPolicy();
             
-            action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
+            // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
+            action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
 
             if (value_ < 50.0)
             {
@@ -601,7 +700,6 @@ void CustomController::computeSlow()
             if (is_write_file_)
             {
                     writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
-                    writeFile << phase_ << "\t";
                     writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
                     writeFile << rd_cc_.LF_FT.transpose() << "\t";
@@ -627,7 +725,8 @@ void CustomController::computeSlow()
 
         for (int i = 0; i < num_actuator_action; i++)
         {
-            torque_rl_(i) = DyrosMath::minmax_cut(rl_action_(i)*torque_bound_(i), -torque_bound_(i), torque_bound_(i));
+            // WH
+            torque_rl_(i) = DyrosMath::minmax_cut(DyrosMath::minmax_cut(rl_action_(i), -1., 1.) *torque_bound_(i), -torque_bound_(i), torque_bound_(i));
         }
         for (int i = num_actuator_action; i < MODEL_DOF; i++)
         {
@@ -636,22 +735,23 @@ void CustomController::computeSlow()
         
         if (rd_cc_.control_time_us_ < start_time_ + 0.1e6)
         {
+
             for (int i = 0; i <MODEL_DOF; i++)
             {
                 torque_spline_(i) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 0.1e6, torque_init_(i), torque_rl_(i), 0.0, 0.0);
             }
-            rd_.torque_desired = torque_spline_;
+            rd_.torque_desired = torque_spline_;    
         }
         else
         {
              rd_.torque_desired = torque_rl_;
+            
         }
 
         if (stop_by_value_thres_)
         {
-            rd_.torque_desired = kp_ * (q_stop_ - q_noise_) - kv_*q_vel_noise_;
+            // rd_.torque_desired = kp_ * (q_stop_ - q_noise_) - kv_*q_vel_noise_;
         }
-
 
     }
 }
@@ -679,4 +779,10 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
     target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], -0.2, 0.5);
     target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
+}
+
+void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
+    target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
+    target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
+    target_heading_ = DyrosMath::minmax_cut(command->heading * 0.8, -0.8, 0.8);
 }

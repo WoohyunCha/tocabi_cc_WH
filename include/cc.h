@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
+#include <tocabi_msgs/RLCommand.h>
 
 class CustomController
 {
@@ -30,14 +31,14 @@ public:
     void initVariable();
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
-    static const int num_action = 13;
+    static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 50;
-    static const int num_cur_internal_state = 37;
-    static const int num_state_skip = 3;
-    static const int num_state_hist = 5;
-    static const int num_state = num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
-    static const int num_hidden = 256;
+    static const int num_cur_state = 48;
+    static const int num_cur_internal_state = 36;
+    static const int num_state_skip = 2;
+    static const int num_state_hist = 10;
+    static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
+    static const int num_hidden = 512;
 
     Eigen::MatrixXd policy_net_w0_;
     Eigen::MatrixXd policy_net_b0_;
@@ -106,8 +107,14 @@ public:
     void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
     ros::Subscriber joy_sub_;
 
+    // slider command
+    void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
+    ros::Subscriber rl_command_sub_;
+
+
     double target_vel_x_ = 0.0;
     double target_vel_y_ = 0.0;
+    double target_heading_ = 0.0;
 
 private:
     Eigen::VectorQd ControlVal_;
