@@ -23,12 +23,17 @@ public:
     RobotData &rd_;
     RobotData rd_cc_;
 
-    //////////////////////////////////////////// Donghyeon RL /////////////////////////////////////////
     void loadNetwork();
     void processNoise();
+    void processBias();
+    void initBias();
+    Eigen::Matrix<double, MODEL_DOF, 1> q_bias_;
     void processObservation();
     void feedforwardPolicy();
+    MatrixXd conv_layer(const MatrixXd &input, const MatrixXd &weights, const MatrixXd &biases, int kernel_size, int stride);
+    void feedforwardEncoder();
     void initVariable();
+
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
     static const int num_action = 12;
@@ -60,6 +65,25 @@ public:
     Eigen::MatrixXd value_hidden_layer2_;
     double value_;
 
+    Eigen::MatrixXd morph_net_w0_;
+    Eigen::MatrixXd morph_net_b0_;
+    Eigen::MatrixXd morph_net_w2_;
+    Eigen::MatrixXd morph_net_b2_;
+    Eigen::MatrixXd morph_net_w_;
+    Eigen::MatrixXd morph_net_b_;
+    Eigen::MatrixXd morph_hidden_layer1_;
+    Eigen::MatrixXd morph_hidden_layer2_;
+    Eigen::MatrixXd morphnet_input_;
+    Eigen::MatrixXd morphnet_output_;    
+    static const int morph_num_hidden_1 = 512;
+    static const int morph_num_hidden_2 = 256;   
+    static const int morph_params_dim = 4;
+    static const int morph_history_len_ = 5;
+    static const int morph_history_skip_ = 1;     
+    static const bool morphnet = true;
+    void loadMorphnet();
+    void feedforwardMorphnet();
+
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
     float stop_start_time_;
@@ -70,7 +94,49 @@ public:
     Eigen::MatrixXd state_mean_;
     Eigen::MatrixXd state_var_;
 
+    // encoder
+    static const bool use_encoder_ = true;
+    bool encoder_initialized = false;
+    
+    Eigen::MatrixXd state_history_;
+    Eigen::MatrixXd encoder_input_;
+    Eigen::MatrixXd encoder_output_;
+    static const int history_len_ = 50;
+    static const int history_skip_ = 5;
+    static const int encoder_dim_ = 8;
+    static const int encoder_conv1_kernel_ = 6;
+    static const int encoder_conv1_stride_ = 3;
+    static const int encoder_conv1_output_channel_ = 32;
+    static const int encoder_conv1_input_channel_ = num_cur_state;
+    static const int encoder_conv1_output_size_ = (history_len_-encoder_conv1_kernel_) / encoder_conv1_stride_ + 1;
+
+    static const int encoder_conv2_kernel_ = 4;
+    static const int encoder_conv2_stride_ = 2;
+    static const int encoder_conv2_output_channel_ = 16;
+    static const int encoder_conv2_input_channel_ = encoder_conv1_output_channel_;
+    static const int encoder_conv2_output_size_ = (encoder_conv1_output_size_-encoder_conv2_kernel_) / encoder_conv2_stride_ + 1;
+
+    static const int encoder_fc_input_ = 16*encoder_conv2_output_size_;
+
+    Eigen::MatrixXd encoder_conv1_w_;
+    Eigen::MatrixXd encoder_conv1_b_;
+    Eigen::MatrixXd encoder_hidden_layer1_;
+    Eigen::MatrixXd encoder_conv2_w_;
+    Eigen::MatrixXd encoder_conv2_b_;
+    Eigen::MatrixXd encoder_hidden_layer2_;
+    Eigen::MatrixXd encoder_fc_w_;
+    Eigen::MatrixXd encoder_fc_b_;
+    void loadEncoderNetwork();
+
+    Eigen::MatrixXd policy_input_;
+    static const int policy_input_dim_ = (morphnet) 
+                                     ? num_state + morph_params_dim
+                                     : (use_encoder_) 
+                                       ? num_state + encoder_dim_
+                                       : num_state;
     std::ofstream writeFile;
+    std::ofstream actuator_data_file;
+    bool actuator_net_log = true;
 
     float phase_ = 0.0;
 
@@ -115,6 +181,7 @@ public:
     double target_vel_x_ = 0.0;
     double target_vel_y_ = 0.0;
     double target_heading_ = 0.0;
+    double heading = 0.0;
 
 private:
     Eigen::VectorQd ControlVal_;
