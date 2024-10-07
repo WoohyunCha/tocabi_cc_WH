@@ -333,7 +333,8 @@ void CustomController::initVariable()
     value_hidden_layer1_.resize(num_hidden1, 1);
     value_hidden_layer2_.resize(num_hidden2, 1);
     
-    state_cur_.resize(num_cur_state, 1);
+    // state_cur_.resize(num_cur_state, 1);
+    state_cur_ = MatrixXd::Zero(num_cur_state, 1);
     state_.resize(num_state, 1);
     state_buffer_.resize(num_cur_state*num_state_skip*num_state_hist, 1);
     state_mean_.resize(num_cur_state, 1);
