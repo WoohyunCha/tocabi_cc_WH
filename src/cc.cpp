@@ -76,7 +76,6 @@ void CustomController::loadNetwork()
     file[12].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_weight.txt", std::ios::in);
     file[13].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_bias.txt", std::ios::in);
 
-
     if(!file[0].is_open())
     {
         std::cout<<"Can not find the weight file"<<std::endl;
@@ -315,24 +314,24 @@ void CustomController::loadNetwork()
 void CustomController::initVariable()
 {    
     
-    policy_net_w0_.resize(num_hidden, policy_input_dim_);
-    policy_net_b0_.resize(num_hidden, 1);
-    policy_net_w2_.resize(num_hidden, num_hidden);
-    policy_net_b2_.resize(num_hidden, 1);
-    action_net_w_.resize(num_action, num_hidden);
+    policy_net_w0_.resize(num_hidden1, policy_input_dim_);
+    policy_net_b0_.resize(num_hidden1, 1);
+    policy_net_w2_.resize(num_hidden2, num_hidden1);
+    policy_net_b2_.resize(num_hidden2, 1);
+    action_net_w_.resize(num_action, num_hidden2);
     action_net_b_.resize(num_action, 1);
-    hidden_layer1_.resize(num_hidden, 1);
-    hidden_layer2_.resize(num_hidden, 1);
+    hidden_layer1_.resize(num_hidden1, 1);
+    hidden_layer2_.resize(num_hidden2, 1);
     rl_action_.resize(num_action, 1);
 
-    value_net_w0_.resize(num_hidden, policy_input_dim_);
-    value_net_b0_.resize(num_hidden, 1);
-    value_net_w2_.resize(num_hidden, num_hidden);
-    value_net_b2_.resize(num_hidden, 1);
-    value_net_w_.resize(1, num_hidden);
+    value_net_w0_.resize(num_hidden1, policy_input_dim_);
+    value_net_b0_.resize(num_hidden1, 1);
+    value_net_w2_.resize(num_hidden2, num_hidden1);
+    value_net_b2_.resize(num_hidden2, 1);
+    value_net_w_.resize(1, num_hidden2);
     value_net_b_.resize(1, 1);
-    value_hidden_layer1_.resize(num_hidden, 1);
-    value_hidden_layer2_.resize(num_hidden, 1);
+    value_hidden_layer1_.resize(num_hidden1, 1);
+    value_hidden_layer2_.resize(num_hidden2, 1);
     
     state_cur_.resize(num_cur_state, 1);
     state_.resize(num_state, 1);
@@ -553,17 +552,18 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = target_vel_x_; // DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 0e6, 0.0, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    state_cur_(data_idx) = target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
     data_idx++;
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    // state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
     // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
@@ -733,7 +733,7 @@ void CustomController::feedforwardPolicy()
     // First hidden layer for policy network
     hidden_layer1_ = policy_net_w0_ * policy_input_ + policy_net_b0_;
     std::cout << "hidden layer 1" << std::endl;
-    for (int i = 0; i < num_hidden; i++) 
+    for (int i = 0; i < num_hidden1; i++) 
     {
         if (hidden_layer1_(i) < 0)
             hidden_layer1_(i) = std::exp(hidden_layer1_(i)) - 1.0;
@@ -742,7 +742,7 @@ void CustomController::feedforwardPolicy()
     // Second hidden layer for policy network
     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
     std::cout << "hidden layer 2" << std::endl;
-    for (int i = 0; i < num_hidden; i++) 
+    for (int i = 0; i < num_hidden2; i++) 
     {
         if (hidden_layer2_(i) < 0)
             hidden_layer2_(i) = std::exp(hidden_layer2_(i)) - 1.0;
@@ -755,7 +755,7 @@ void CustomController::feedforwardPolicy()
     // First hidden layer for value network
     value_hidden_layer1_ = value_net_w0_ * policy_input_ + value_net_b0_;
     std::cout << "value layer 1" << std::endl;
-    for (int i = 0; i < num_hidden; i++) 
+    for (int i = 0; i < num_hidden1; i++) 
     {
         if (value_hidden_layer1_(i) < 0)
             value_hidden_layer1_(i) = std::exp(value_hidden_layer1_(i)) - 1.0;
@@ -765,7 +765,7 @@ void CustomController::feedforwardPolicy()
     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
     std::cout << "value layer 2" << std::endl;
 
-    for (int i = 0; i < num_hidden; i++) 
+    for (int i = 0; i < num_hidden2; i++) 
     {
         if (value_hidden_layer2_(i) < 0)
             value_hidden_layer2_(i) = std::exp(value_hidden_layer2_(i)) - 1.0;
@@ -1103,7 +1103,7 @@ void CustomController::computeSlow()
 
         // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
         // With encoder, 
-        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/125.0 - 2/10000.0) // 250 is the control frequency
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/125.0 - 4/10000.0) // 125 is the control frequency
         // if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/250.0 - 1/10000.0) // 250 is the control frequency
         {
             // auto start_time = std::chrono::high_resolution_clock::now();
@@ -1152,10 +1152,10 @@ void CustomController::computeSlow()
                     writeFile << rd_cc_.q_dot_virtual_.transpose() << "\t";
                     writeFile << rd_cc_.q_virtual_.transpose() << "\t";
                     writeFile << heading << "\t";
-                    if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
 
-                    writeFile << value_ << "\t" << stop_by_value_thres_;
-                
+                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                    writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
+                    if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
                     writeFile << std::endl;
 
                     time_write_pre_ = rd_cc_.control_time_us_;
@@ -1235,5 +1235,10 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
     target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
-    target_heading_ = DyrosMath::minmax_cut(command->heading * 1.57, -1.57, 1.57);
+    target_heading_ = DyrosMath::minmax_cut(command->heading * 3.14, -3.14, 3.14);
+    pre_target_vel_x_ = state_cur_(9);
+    pre_target_vel_y_ = state_cur_(10);
+    pre_target_vel_yaw_ = state_cur_(11);
+
+
 }

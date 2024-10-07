@@ -43,26 +43,34 @@ public:
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
-    static const int num_hidden = 512;
+    static const int num_hidden1 = 512;
+    static const int num_hidden2 = 512;
+    static const int num_hidden3 = 128;
 
     Eigen::MatrixXd policy_net_w0_;
     Eigen::MatrixXd policy_net_b0_;
     Eigen::MatrixXd policy_net_w2_;
     Eigen::MatrixXd policy_net_b2_;
+    Eigen::MatrixXd policy_net_w4_;
+    Eigen::MatrixXd policy_net_b4_;
     Eigen::MatrixXd action_net_w_;
     Eigen::MatrixXd action_net_b_;
     Eigen::MatrixXd hidden_layer1_;
     Eigen::MatrixXd hidden_layer2_;
+    Eigen::MatrixXd hidden_layer3_;
     Eigen::MatrixXd rl_action_;
 
     Eigen::MatrixXd value_net_w0_;
     Eigen::MatrixXd value_net_b0_;
     Eigen::MatrixXd value_net_w2_;
     Eigen::MatrixXd value_net_b2_;
+    Eigen::MatrixXd value_net_w4_;
+    Eigen::MatrixXd value_net_b4_;
     Eigen::MatrixXd value_net_w_;
     Eigen::MatrixXd value_net_b_;
     Eigen::MatrixXd value_hidden_layer1_;
     Eigen::MatrixXd value_hidden_layer2_;
+    Eigen::MatrixXd value_hidden_layer3_;
     double value_;
 
     Eigen::MatrixXd morph_net_w0_;
@@ -80,7 +88,7 @@ public:
     static const int morph_params_dim = 4;
     static const int morph_history_len_ = 5;
     static const int morph_history_skip_ = 1;     
-    static const bool morphnet = true;
+    static const bool morphnet =true;
     void loadMorphnet();
     void feedforwardMorphnet();
 
@@ -179,8 +187,11 @@ public:
 
 
     double target_vel_x_ = 0.0;
+    double pre_target_vel_x_ = 0.0;
     double target_vel_y_ = 0.0;
+    double pre_target_vel_y_ = 0.0;
     double target_heading_ = 0.0;
+    double pre_target_vel_yaw_ = 0.0;
     double heading = 0.0;
 
 private:
