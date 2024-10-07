@@ -1129,10 +1129,10 @@ void CustomController::computeSlow()
             {
                 if (stop_by_value_thres_ == false)
                 {
-                    // stop_by_value_thres_ = true;
-                    // stop_start_time_ = rd_cc_.control_time_us_;
-                    // q_stop_ = q_noise_;
-                    // std::cout << "Stop by Value Function" << std::endl;
+                    stop_by_value_thres_ = true;
+                    stop_start_time_ = rd_cc_.control_time_us_;
+                    q_stop_ = q_noise_;
+                    std::cout << "Stop by Value Function" << std::endl;
                 }
             }
 
