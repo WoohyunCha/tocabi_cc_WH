@@ -88,7 +88,7 @@ public:
     static const int morph_params_dim = 4;
     static const int morph_history_len_ = 5;
     static const int morph_history_skip_ = 1;     
-    static const bool morphnet =true;
+    static const bool morphnet = true;
     void loadMorphnet();
     void feedforwardMorphnet();
 

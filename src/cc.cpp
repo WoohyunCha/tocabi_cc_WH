@@ -1126,7 +1126,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
             std::cout << "Value : " << value_ << std::endl;
-            if (value_ < 50.0)
+            if (value_ < 60.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
