@@ -5,7 +5,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-#include <tocabi_msgs/RLCommand.h>
+// #include <tocabi_msgs/RLCommand.h>
 
 class CustomController
 {
@@ -91,6 +91,7 @@ public:
     static const bool morphnet = true;
     void loadMorphnet();
     void feedforwardMorphnet();
+    double wrap_to_pi(double angles);
 
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
@@ -148,7 +149,7 @@ public:
 
     float phase_ = 0.0;
 
-    bool is_on_robot_ = false;
+    bool is_on_robot_ = true;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
@@ -182,7 +183,7 @@ public:
     ros::Subscriber joy_sub_;
 
     // slider command
-    void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
+    // void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
     ros::Subscriber rl_command_sub_;
 
 
