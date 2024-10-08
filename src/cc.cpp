@@ -26,7 +26,7 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
     loadNetwork();
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
-    rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
+    // rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
 }
 
 Eigen::VectorQd CustomController::getControl()
@@ -61,20 +61,20 @@ void CustomController::loadNetwork()
     // file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
     // file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
     // file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_bias.txt", std::ios::in);
-    file[6].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_mean.txt", std::ios::in);
-    file[7].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_var.txt", std::ios::in);
-    file[8].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_weight.txt", std::ios::in);
-    file[9].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_bias.txt", std::ios::in);
-    file[10].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_weight.txt", std::ios::in);
-    file[11].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_bias.txt", std::ios::in);
-    file[12].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_weight.txt", std::ios::in);
-    file[13].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_bias.txt", std::ios::in);
+    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/0_weight.txt", std::ios::in);
+    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/0_bias.txt", std::ios::in);
+    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/2_weight.txt", std::ios::in);
+    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/2_bias.txt", std::ios::in);
+    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/4_weight.txt", std::ios::in);
+    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/4_bias.txt", std::ios::in);
+    file[6].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/normalizer/running_mean.txt", std::ios::in);
+    file[7].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/normalizer/running_var.txt", std::ios::in);
+    file[8].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/0_weight.txt", std::ios::in);
+    file[9].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/0_bias.txt", std::ios::in);
+    file[10].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/2_weight.txt", std::ios::in);
+    file[11].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/2_bias.txt", std::ios::in);
+    file[12].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/4_weight.txt", std::ios::in);
+    file[13].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/4_bias.txt", std::ios::in);
 
     if(!file[0].is_open())
     {
@@ -553,18 +553,18 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .5, 0.0, 0.0);// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = 0.;
     data_idx++;
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    // state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*wrap_to_pi(target_heading_ - heading), -1., 1.);
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
     // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
@@ -837,12 +837,12 @@ void CustomController::loadEncoderNetwork()
     }
 
     std::ifstream file[6];
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv1_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv1_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/fc2_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/fc2_bias.txt", std::ios::in);
+    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv1_weight.txt", std::ios::in);
+    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv1_bias.txt", std::ios::in);
+    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv2_weight.txt", std::ios::in);
+    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv2_bias.txt", std::ios::in);
+    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/fc2_weight.txt", std::ios::in);
+    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/fc2_bias.txt", std::ios::in);
 
     if (!file[0].is_open()) {
         std::cout << "Cannot find the weight file" << std::endl;
@@ -954,12 +954,12 @@ void CustomController::loadMorphnet()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
     std::ifstream file[6];
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear1_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear1_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/head_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/head_bias.txt", std::ios::in);
+    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear1_weight.txt", std::ios::in);
+    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear1_bias.txt", std::ios::in);
+    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear2_weight.txt", std::ios::in);
+    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear2_bias.txt", std::ios::in);
+    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/head_weight.txt", std::ios::in);
+    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/head_bias.txt", std::ios::in);
 
 
     if(!file[0].is_open())
@@ -1126,7 +1126,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
             std::cout << "Value : " << value_ << std::endl;
-            if (value_ < 60.0)
+            if (value_ < 100.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -1162,13 +1162,13 @@ void CustomController::computeSlow()
                     time_write_pre_ = rd_cc_.control_time_us_;
 
                     // Data for actuator net training
-                    if (actuator_net_log){
-                        actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
-                        actuator_data_file << std::endl;
-                    }
+                    // if (actuator_net_log){
+                    //     actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
+                    //     actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
+                    //     actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
+                    //     actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
+                    //     actuator_data_file << std::endl;
+                    // }
 
             }
             
@@ -1233,13 +1233,21 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
 }
 
-void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
-    target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
-    target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
-    target_heading_ = DyrosMath::minmax_cut(command->heading * 3.14, -3.14, 3.14);
-    pre_target_vel_x_ = state_cur_(9);
-    pre_target_vel_y_ = state_cur_(10);
-    pre_target_vel_yaw_ = state_cur_(11);
-
-
+double CustomController::wrap_to_pi(double angles){
+    angles = fmod(angles, 2*M_PI);
+    if (angles > M_PI){
+        angles -= 2*M_PI;
+    }
+    return angles;
 }
+
+// void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
+//     target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
+//     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
+//     target_heading_ = DyrosMath::minmax_cut(command->heading * 3.14, -3.14, 3.14);
+//     pre_target_vel_x_ = state_cur_(9);
+//     pre_target_vel_y_ = state_cur_(10);
+//     pre_target_vel_yaw_ = state_cur_(11);
+
+
+// }
