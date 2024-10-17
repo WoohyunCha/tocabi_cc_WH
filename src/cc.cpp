@@ -416,6 +416,8 @@ void CustomController::initVariable()
 
     // Woohyun
     initBias();
+    base_lin_vel.setZero();
+    base_ang_vel.setZero();
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -516,7 +518,6 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     q.z() = rd_cc_.q_virtual_(5);
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
-    Vector3_t base_lin_vel, base_ang_vel;
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
     base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
 
@@ -558,13 +559,14 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = 0.; //target_vel_y_; //0.0;//target_vel_y_;
     data_idx++;
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    // state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -.5, .5);
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
     // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
@@ -1150,7 +1152,7 @@ void CustomController::computeSlow()
                     writeFile << rd_cc_.torque_desired.transpose()  << "\t";
                     writeFile << q_noise_.transpose() << "\t";
                     writeFile << q_dot_lpf_.transpose() << "\t";
-                    writeFile << rd_cc_.q_dot_virtual_.transpose() << "\t";
+                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
                     writeFile << rd_cc_.q_virtual_.transpose() << "\t";
                     writeFile << heading << "\t";
 
@@ -1236,7 +1238,12 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
     target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
-    target_heading_ = DyrosMath::minmax_cut(command->heading * 3.14, -3.14, 3.14);
+    target_heading_ = DyrosMath::minmax_cut(command->heading * 3., -3., 3.);
+
+    if (target_vel_x_ <= 0.2) target_vel_x_ = 0.;
+    if (abs(target_vel_y_) <= 0.2) target_vel_y_ = 0.;
+    if (abs(target_heading_) <= 0.2) target_heading_ = 0.;
+
     pre_target_vel_x_ = state_cur_(9);
     pre_target_vel_y_ = state_cur_(10);
     pre_target_vel_yaw_ = state_cur_(11);

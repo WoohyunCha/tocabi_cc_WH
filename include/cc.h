@@ -88,7 +88,7 @@ public:
     static const int morph_params_dim = 4;
     static const int morph_history_len_ = 5;
     static const int morph_history_skip_ = 1;     
-    static const bool morphnet = true;
+    static const bool morphnet = false;
     void loadMorphnet();
     void feedforwardMorphnet();
 
@@ -184,7 +184,7 @@ public:
     // slider command
     void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
     ros::Subscriber rl_command_sub_;
-
+    Vector3_t base_lin_vel, base_ang_vel;
 
     double target_vel_x_ = 0.0;
     double pre_target_vel_x_ = 0.0;
