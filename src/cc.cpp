@@ -541,16 +541,23 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
     
-    // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-
-    state_cur_(data_idx) = projected_grav(0);
+    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+    state_cur_(data_idx) = wrap_to_pi(euler_angle_(0));
+    data_idx++;
+    state_cur_(data_idx) = wrap_to_pi(euler_angle_(1));
+    data_idx++;
+    state_cur_(data_idx) = wrap_to_pi(euler_angle_(2));
     data_idx++;
 
-    state_cur_(data_idx) = projected_grav(1);
-    data_idx++;
+    // state_cur_(data_idx) = projected_grav(0);
+    // data_idx++;
 
-    state_cur_(data_idx) = projected_grav(2);
-    data_idx++;
+    // state_cur_(data_idx) = projected_grav(1);
+    // data_idx++;
+
+    // state_cur_(data_idx) = projected_grav(2);
+    // data_idx++;
+
 
     // std::cout << "start time : " << start_time_ << std::endl;
     state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .5, 0.0, 0.0);// .5;//target_vel_x_;
