@@ -1,10 +1,18 @@
-clear all; close all; clc;
+close all; clc;
 d1 = load('data.csv');
-% d2 = load('data_low_frictionloss.csv');
+d2 = load('data_yongarry.txt');
+d3 = load('data_yongarry_standstill.txt');
 
-control_hz = 125;
 plot_start_time = 2;
-plot_end_time = 13;
+plot_end_time = 10;
+
+torque_data_yongarry = d2(:, 13:20);
+plot_indices_yongarry = 250*plot_start_time:250*plot_end_time;
+
+torque_data_yongarry_standstill = [d3(:, 10:21); d3(:, 10:21)];
+grf_data_yongarry_standstill = [d3(:, 8:9);d3(:, 8:9)];
+control_hz = 125;
+
 plot_indices = control_hz*plot_start_time:control_hz*plot_end_time;
 
 figure(1);
@@ -44,14 +52,42 @@ end_index = start_index + q_virtual_len - 1;
 q_virtual = d1(:, start_index:end_index);
 
 start_index = end_index+1;
-heading = d1(:, start_index);
+heading_len = 1;
+end_index = start_index + heading_len - 1;
+heading = d1(:, start_index:end_index);
+
+start_index = end_index+1;
+value_len = 1;
+end_index = start_index + value_len - 1;
+value_data = d1(:, start_index:end_index);
+
+start_index = end_index+1;
+flag_len = 1;
+end_index = start_index + flag_len - 1;
+flag_data = d1(:, start_index:end_index);
+
+start_index = end_index+1;
+command_len = 3;
+end_index = start_index + command_len - 1;
+command_data = d1(:, start_index:end_index);
+
+start_index = end_index+1;
+latent_len = 512;
+end_index = start_index + latent_len - 1;
+latent_data = d1(:, start_index:end_index);
+
+writematrix(latent_data, 'latent3.csv');
 
 data_len = size(d1, 1); % number of rows in d1
 time = zeros(data_len);
 for i=2:size(d1,1)-1
     time(i) = time(i-1) + inference_dt(i);
-
 end
+time_yongarry = zeros(size(d2, 1));
+for i=2:size(d2,1)-1
+    time_yongarry(i) = time_yongarry(i-1) + 1/250;
+end
+
 figure(1)
 sgtitle("Foot Force Measurements in Global Frame")
 for i = 1:foot_force_len
@@ -79,11 +115,12 @@ for i = 1:foot_force_len
         title("Z moment")
     end
 end
-% 
+
+
 % figure(2)
 % sgtitle('Morph params')
 % start_index = end_index+1;
-% end_index = start_index+4;
+% end_index = start_index+3;
 % morph_params = d1(:, start_index:end_index);
 % for i = 1:4
 %     subplot(1,4,i);
@@ -93,17 +130,56 @@ end
 
 figure(3)
 sgtitle('Velocity and Heading');
-subplot(1,3,1);
+subplot(2,2,1);
 lin_vel_data = q_dot_virtual(:, 1);
 plot(time(plot_indices), lin_vel_data(plot_indices));
+hold on;
+plot(time(plot_indices), command_data(plot_indices, 1));
+legend('Measured', 'Target');
 title('Linear velocity')
-subplot(1,3,2);
-ang_vel_data = q_dot_virtual(:, 2);
+subplot(2,2,2);
+
+lin_vel_data = q_dot_virtual(:, 2);  % Your input signal
+alpha = 0.01;  % Adjust alpha (smoothing factor) based on desired filtering strength
+lin_vel_data_lpf = causal_lpf(lin_vel_data, alpha);
+
+plot(time(plot_indices),lin_vel_data(plot_indices));
+
+title('Y drift velocity');
+subplot(2,2,3);
+ang_vel_data = q_dot_virtual(:, 6);
 plot(time(plot_indices), ang_vel_data(plot_indices));
-title('Angular velocity');
-subplot(1,3,3);
+hold on;
+plot(time(plot_indices), command_data(plot_indices, 2));
+title('Angular velocity')
+legend('Measured', 'Target');
+subplot(2,2,4);
 plot(time(plot_indices), heading(plot_indices));
+hold on;
+plot(time(plot_indices), command_data(plot_indices, 3));
+legend('Measured', 'Target');
 title('Heading')
+
+figure(4)
+plot(time(plot_indices), value_data(plot_indices));
+title('Value function');
+
+figure(5)
+sgtitle("Command joint torques");
+for i=1:12
+    subplot(2,6,i);
+    plot(time(plot_indices), command_torque(plot_indices, i));
+    hold on;
+    plot(time_yongarry(plot_indices_yongarry), torque_data_yongarry_standstill(plot_indices_yongarry, i));
+    legend('WH', 'yongarry');
+end
+
+figure(6)
+sgtitle ("Joint velocities");
+for i=1:12
+    subplot(2,6,i);
+    plot(time(plot_indices), q_dot_lpf_(plot_indices, i));
+end
 
 % figure();
 % for i=1:12
@@ -139,3 +215,32 @@ title('Heading')
 %     hold on
 % plot(d3(:,1),d3(:,106+i))
 % end
+
+function lin_vel_data_lpf = causal_lpf(lin_vel_data, alpha)
+    % Initialize the filtered data array
+    lin_vel_data_lpf = zeros(size(lin_vel_data));
+    
+    % Set the first element equal to the input signal
+    lin_vel_data_lpf(1) = lin_vel_data(1);
+    
+    % Apply the causal low-pass filter
+    for t = 2:length(lin_vel_data)
+        lin_vel_data_lpf(t) = alpha * lin_vel_data(t) + (1 - alpha) * lin_vel_data_lpf(t-1);
+    end
+end
+
+
+figure(2)
+sgtitle("Compare GRF with yongarry");
+subplot(1,2,1);
+plot(time(plot_indices), -Lfoot_force_global(plot_indices, 3));
+hold on;
+plot(time_yongarry(plot_indices_yongarry), grf_data_yongarry_standstill(plot_indices_yongarry, 1));
+legend("WH", "yongarry");
+title("Left foot Z direction GRF");
+subplot(1,2,2);
+plot(time(plot_indices), -Rfoot_force_global(plot_indices, 3));
+hold on;
+plot(time_yongarry(plot_indices_yongarry), grf_data_yongarry_standstill(plot_indices_yongarry, 2));
+legend("WH", "yongarry");
+title("Right foot Z direction GRF");
