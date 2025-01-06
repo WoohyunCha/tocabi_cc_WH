@@ -542,19 +542,25 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
     
-    // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-
-    state_cur_(data_idx) = projected_grav(0);
+    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    data_idx++;
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    data_idx++;
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
     data_idx++;
 
-    state_cur_(data_idx) = projected_grav(1);
-    data_idx++;
+    // state_cur_(data_idx) = projected_grav(0);
+    // data_idx++;
 
-    state_cur_(data_idx) = projected_grav(2);
-    data_idx++;
+    // state_cur_(data_idx) = projected_grav(1);
+    // data_idx++;
+
+    // state_cur_(data_idx) = projected_grav(2);
+    // data_idx++;
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
@@ -565,7 +571,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -.5, .5);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
@@ -1159,6 +1165,7 @@ void CustomController::computeSlow()
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
                     writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
                     if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
+                    // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
                     time_write_pre_ = rd_cc_.control_time_us_;
@@ -1238,7 +1245,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
     target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
-    target_heading_ = DyrosMath::minmax_cut(command->heading * 3., -3., 3.);
+    target_heading_ = DyrosMath::minmax_cut(command->heading * 1.5, -1.5, 1.5);
 
     if (target_vel_x_ <= 0.2) target_vel_x_ = 0.;
     if (abs(target_vel_y_) <= 0.2) target_vel_y_ = 0.;
