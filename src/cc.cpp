@@ -64,20 +64,20 @@ void CustomController::loadNetwork()
     // file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
     // file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
     // file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
-    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/0_weight.txt", std::ios::in);
-    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/0_bias.txt", std::ios::in);
-    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/2_weight.txt", std::ios::in);
-    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/2_bias.txt", std::ios::in);
-    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/4_weight.txt", std::ios::in);
-    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/policy/4_bias.txt", std::ios::in);
-    file[6].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/normalizer/running_mean.txt", std::ios::in);
-    file[7].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/normalizer/running_var.txt", std::ios::in);
-    file[8].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/0_weight.txt", std::ios::in);
-    file[9].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/0_bias.txt", std::ios::in);
-    file[10].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/2_weight.txt", std::ios::in);
-    file[11].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/2_bias.txt", std::ios::in);
-    file[12].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/4_weight.txt", std::ios::in);
-    file[13].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/critic/4_bias.txt", std::ios::in);
+    file[0].open(base_path  + "policy/0_weight.txt", std::ios::in);
+    file[1].open(base_path  + "policy/0_bias.txt", std::ios::in);
+    file[2].open(base_path  + "policy/2_weight.txt", std::ios::in);
+    file[3].open(base_path  + "policy/2_bias.txt", std::ios::in);
+    file[4].open(base_path  + "policy/4_weight.txt", std::ios::in);
+    file[5].open(base_path  + "policy/4_bias.txt", std::ios::in);
+    file[6].open(base_path  + "normalizer/running_mean.txt", std::ios::in);
+    file[7].open(base_path  + "normalizer/running_var.txt", std::ios::in);
+    file[8].open(base_path  + "critic/0_weight.txt", std::ios::in);
+    file[9].open(base_path  + "critic/0_bias.txt", std::ios::in);
+    file[10].open(base_path  + "critic/2_weight.txt", std::ios::in);
+    file[11].open(base_path  + "critic/2_bias.txt", std::ios::in);
+    file[12].open(base_path  + "critic/4_weight.txt", std::ios::in);
+    file[13].open(base_path  + "critic/4_bias.txt", std::ios::in);
 
     if(!file[0].is_open())
     {
@@ -847,12 +847,12 @@ void CustomController::loadEncoderNetwork()
     }
 
     std::ifstream file[6];
-    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv1_weight.txt", std::ios::in);
-    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv1_bias.txt", std::ios::in);
-    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv2_weight.txt", std::ios::in);
-    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/conv2_bias.txt", std::ios::in);
-    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/fc2_weight.txt", std::ios::in);
-    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/fc2_bias.txt", std::ios::in);
+    file[0].open(base_path  + "encoder/conv1_weight.txt", std::ios::in);
+    file[1].open(base_path  + "encoder/conv1_bias.txt", std::ios::in);
+    file[2].open(base_path  + "encoder/conv2_weight.txt", std::ios::in);
+    file[3].open(base_path  + "encoder/conv2_bias.txt", std::ios::in);
+    file[4].open(base_path  + "encoder/fc2_weight.txt", std::ios::in);
+    file[5].open(base_path  + "encoder/fc2_bias.txt", std::ios::in);
 
     if (!file[0].is_open()) {
         std::cout << "Cannot find the weight file" << std::endl;
@@ -964,12 +964,12 @@ void CustomController::loadMorphnet()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
     std::ifstream file[6];
-    file[0].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear1_weight.txt", std::ios::in);
-    file[1].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear1_bias.txt", std::ios::in);
-    file[2].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear2_weight.txt", std::ios::in);
-    file[3].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/linear2_bias.txt", std::ios::in);
-    file[4].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/head_weight.txt", std::ios::in);
-    file[5].open("/home/dyros/catkin_ws/src/tocabi_cc/weight/1008_KR_weights/encoder/head_bias.txt", std::ios::in);
+    file[0].open(base_path  + "encoder/linear1_weight.txt", std::ios::in);
+    file[1].open(base_path  + "encoder/linear1_bias.txt", std::ios::in);
+    file[2].open(base_path  + "encoder/linear2_weight.txt", std::ios::in);
+    file[3].open(base_path  + "encoder/linear2_bias.txt", std::ios::in);
+    file[4].open(base_path  + "encoder/head_weight.txt", std::ios::in);
+    file[5].open(base_path  + "encoder/head_bias.txt", std::ios::in);
 
 
     if(!file[0].is_open())
@@ -1261,3 +1261,30 @@ double CustomController::wrap_to_pi(double angles){
 
 
 // }
+
+
+std::string CustomController::loadPathFromConfig(const std::string &config_file)
+{
+    std::ifstream file(config_file);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Cannot open configuration file: " + config_file);
+    }
+
+    std::string line, key, value;
+    while (std::getline(file, line))
+    {
+        std::istringstream line_stream(line);
+        if (std::getline(line_stream, key, '=') && std::getline(line_stream, value))
+        {
+            if (key == "weights_path")
+            {
+                file.close();
+                return value; // Return the weights path
+            }
+        }
+    }
+
+    file.close();
+    throw std::runtime_error("weights_path not found in configuration file.");
+}
