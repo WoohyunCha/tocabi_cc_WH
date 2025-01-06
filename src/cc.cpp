@@ -23,7 +23,10 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
         if (actuator_net_log) actuator_data_file << "START OF EPISODE\n";  // Mark the end of the data stream
     }
     initVariable();
+    std::cout << "Load network start\n" << std::endl;
+
     loadNetwork();
+    std::cout << "Load network end\n" << std::endl;
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
     rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
@@ -46,6 +49,10 @@ void CustomController::loadNetwork()
     {
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
+
+    base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
+
+
     std::ifstream file[14];
     // file[0].open(cur_path+"weight/a2c_network_actor_mlp_0_weight.txt", std::ios::in);
     // file[1].open(cur_path+"weight/a2c_network_actor_mlp_0_bias.txt", std::ios::in);
@@ -61,20 +68,20 @@ void CustomController::loadNetwork()
     // file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
     // file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
     // file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/0_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/policy/4_bias.txt", std::ios::in);
-    file[6].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_mean.txt", std::ios::in);
-    file[7].open("/home/cha/isaac_ws/AMP_for_hardware/logs/normalizer/running_var.txt", std::ios::in);
-    file[8].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_weight.txt", std::ios::in);
-    file[9].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/0_bias.txt", std::ios::in);
-    file[10].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_weight.txt", std::ios::in);
-    file[11].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/2_bias.txt", std::ios::in);
-    file[12].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_weight.txt", std::ios::in);
-    file[13].open("/home/cha/isaac_ws/AMP_for_hardware/logs/critic/4_bias.txt", std::ios::in);
+    file[0].open(base_path + "policy/0_weight.txt", std::ios::in);
+    file[1].open(base_path + "policy/0_bias.txt", std::ios::in);
+    file[2].open(base_path + "policy/2_weight.txt", std::ios::in);
+    file[3].open(base_path + "policy/2_bias.txt", std::ios::in);
+    file[4].open(base_path + "policy/4_weight.txt", std::ios::in);
+    file[5].open(base_path + "policy/4_bias.txt", std::ios::in);
+    file[6].open(base_path + "normalizer/running_mean.txt", std::ios::in);
+    file[7].open(base_path + "normalizer/running_var.txt", std::ios::in);
+    file[8].open(base_path + "critic/0_weight.txt", std::ios::in);
+    file[9].open(base_path + "critic/0_bias.txt", std::ios::in);
+    file[10].open(base_path + "critic/2_weight.txt", std::ios::in);
+    file[11].open(base_path + "critic/2_bias.txt", std::ios::in);
+    file[12].open(base_path + "critic/4_weight.txt", std::ios::in);
+    file[13].open(base_path + "critic/4_bias.txt", std::ios::in);
 
     if(!file[0].is_open())
     {
@@ -313,7 +320,8 @@ void CustomController::loadNetwork()
 
 void CustomController::initVariable()
 {    
-    
+    // Load the path from the configuration file
+
     policy_net_w0_.resize(num_hidden1, policy_input_dim_);
     policy_net_b0_.resize(num_hidden1, 1);
     policy_net_w2_.resize(num_hidden2, num_hidden1);
@@ -845,12 +853,12 @@ void CustomController::loadEncoderNetwork()
     }
 
     std::ifstream file[6];
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv1_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv1_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/conv2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/fc2_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/fc2_bias.txt", std::ios::in);
+    file[0].open(base_path + "encoder/conv1_weight.txt", std::ios::in);
+    file[1].open(base_path + "encoder/conv1_bias.txt", std::ios::in);
+    file[2].open(base_path + "encoder/conv2_weight.txt", std::ios::in);
+    file[3].open(base_path + "encoder/conv2_bias.txt", std::ios::in);
+    file[4].open(base_path + "encoder/fc2_weight.txt", std::ios::in);
+    file[5].open(base_path + "encoder/fc2_bias.txt", std::ios::in);
 
     if (!file[0].is_open()) {
         std::cout << "Cannot find the weight file" << std::endl;
@@ -962,12 +970,12 @@ void CustomController::loadMorphnet()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
     std::ifstream file[6];
-    file[0].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear1_weight.txt", std::ios::in);
-    file[1].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear1_bias.txt", std::ios::in);
-    file[2].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear2_weight.txt", std::ios::in);
-    file[3].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/linear2_bias.txt", std::ios::in);
-    file[4].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/head_weight.txt", std::ios::in);
-    file[5].open("/home/cha/isaac_ws/AMP_for_hardware/logs/encoder/head_bias.txt", std::ios::in);
+    file[0].open(base_path  + "encoder/linear1_weight.txt", std::ios::in);
+    file[1].open(base_path  + "encoder/linear1_bias.txt", std::ios::in);
+    file[2].open(base_path  + "encoder/linear2_weight.txt", std::ios::in);
+    file[3].open(base_path  + "encoder/linear2_bias.txt", std::ios::in);
+    file[4].open(base_path  + "encoder/head_weight.txt", std::ios::in);
+    file[5].open(base_path  + "encoder/head_bias.txt", std::ios::in);
 
 
     if(!file[0].is_open())
@@ -1256,4 +1264,32 @@ void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr&
     pre_target_vel_yaw_ = state_cur_(11);
 
 
+}
+
+
+
+std::string CustomController::loadPathFromConfig(const std::string &config_file)
+{
+    std::ifstream file(config_file);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Cannot open configuration file: " + config_file);
+    }
+
+    std::string line, key, value;
+    while (std::getline(file, line))
+    {
+        std::istringstream line_stream(line);
+        if (std::getline(line_stream, key, '=') && std::getline(line_stream, value))
+        {
+            if (key == "weights_path")
+            {
+                file.close();
+                return value; // Return the weights path
+            }
+        }
+    }
+
+    file.close();
+    throw std::runtime_error("weights_path not found in configuration file.");
 }

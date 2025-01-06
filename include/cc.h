@@ -194,6 +194,10 @@ public:
     double pre_target_vel_yaw_ = 0.0;
     double heading = 0.0;
 
+    std::string base_path = "";
+    std::string loadPathFromConfig(const std::string &config_file);
+
+
 private:
     Eigen::VectorQd ControlVal_;
 };
