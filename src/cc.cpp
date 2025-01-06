@@ -46,6 +46,9 @@ void CustomController::loadNetwork()
     {
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
+
+    base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
+
     std::ifstream file[14];
     // file[0].open(cur_path+"weight/a2c_network_actor_mlp_0_weight.txt", std::ios::in);
     // file[1].open(cur_path+"weight/a2c_network_actor_mlp_0_bias.txt", std::ios::in);
