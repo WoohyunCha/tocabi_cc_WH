@@ -1,6 +1,7 @@
 close all; clc;
 
-%% Load Data. Do only once
+% %% Load Data. Do only once
+% %% Load DR data
 % clear all;
 % dr_act_4_data = load('DR/actuator_gap/0.4ms/data.csv');
 % dr_act_6_data = load('DR/actuator_gap/0.6ms/data.csv');
@@ -10,8 +11,8 @@ close all; clc;
 % dr_mod_6_data = load('DR/model_gap/0.6ms/data.csv');
 % dr_nom_4_data = load('DR/nominal/0.4ms/data.csv');
 % dr_nom_6_data = load('DR/nominal/0.6ms/data.csv');
-% 
-% %% Load noise lim 50 data
+% %%
+% %% Load noise data
 % erfi_50_act_4_data = load('ERFI_50_uniform/actuator_gap/0.4/data.csv');
 % erfi_50_act_6_data = load('ERFI_50_uniform/actuator_gap/0.6/data.csv');
 % erfi_50_env_4_data = load('ERFI_50_uniform/environment_gap/0.4/data.csv');
@@ -21,72 +22,52 @@ close all; clc;
 % erfi_50_nom_4_data = load('ERFI_50_uniform/nominal/0.4/data.csv');
 % erfi_50_nom_6_data = load('ERFI_50_uniform/nominal/0.6/data.csv');
 % 
-% nn_50_act_4_data = load('NN_exp_50_gaussian_1.5/actuator_gap/0.4/data.csv');
-% nn_50_act_6_data = load('NN_exp_50_gaussian_1.5/actuator_gap/0.6/data.csv');
-% nn_50_env_4_data = load('NN_exp_50_gaussian_1.5/environment_gap/0.4/data.csv');
-% nn_50_env_6_data = load('NN_exp_50_gaussian_1.5/environment_gap/0.6/data.csv');
-% nn_50_mod_4_data = load('NN_exp_50_gaussian_1.5/model_gap/0.4/data.csv');
-% nn_50_mod_6_data = load('NN_exp_50_gaussian_1.5/model_gap/0.6/data.csv');
-% nn_50_nom_4_data = load('NN_exp_50_gaussian_1.5/nominal/0.4/data.csv');
-% nn_50_nom_6_data = load('NN_exp_50_gaussian_1.5/nominal/0.6/data.csv');
+% erfi_beta_50_act_4_data = load('ERFI_50_beta/actuator_gap/0.4/data.csv');
+% erfi_beta_50_act_6_data = load('ERFI_50_beta/actuator_gap/0.6/data.csv');
+% erfi_beta_50_env_4_data = load('ERFI_50_beta/environment_gap/0.4/data.csv');
+% erfi_beta_50_env_6_data = load('ERFI_50_beta/environment_gap/0.6/data.csv');
+% erfi_beta_50_mod_4_data = load('ERFI_50_beta/model_gap/0.4/data.csv');
+% erfi_beta_50_mod_6_data = load('ERFI_50_beta/model_gap/0.6/data.csv');
+% erfi_beta_50_nom_4_data = load('ERFI_50_beta/nominal/0.4/data.csv');
+% erfi_beta_50_nom_6_data = load('ERFI_50_beta/nominal/0.6/data.csv');
 % 
-% nq_50_act_4_data = load('NN_nq_50_gaussian_1.5/actuator_gap/0.4/data.csv');
-% nq_50_act_6_data = load('NN_nq_50_gaussian_1.5/actuator_gap/0.6/data.csv');
-% nq_50_env_4_data = load('NN_nq_50_gaussian_1.5/environment_gap/0.4/data.csv');
-% nq_50_env_6_data = load('NN_nq_50_gaussian_1.5/environment_gap/0.6/data.csv');
-% nq_50_mod_4_data = load('NN_nq_50_gaussian_1.5/model_gap/0.4/data.csv');
-% nq_50_mod_6_data = load('NN_nq_50_gaussian_1.5/model_gap/0.6/data.csv');
-% nq_50_nom_4_data = load('NN_nq_50_gaussian_1.5/nominal/0.4/data.csv');
-% nq_50_nom_6_data = load('NN_nq_50_gaussian_1.5/nominal/0.6/data.csv');
+% erfi_80_act_4_data = load('ERFI_80_uniform/actuator_gap/0.4/data.csv');
+% erfi_80_act_6_data = load('ERFI_80_uniform/actuator_gap/0.6/data.csv');
+% erfi_80_env_4_data = load('ERFI_80_uniform/environment_gap/0.4/data.csv');
+% erfi_80_env_6_data = load('ERFI_80_uniform/environment_gap/0.6/data.csv');
+% erfi_80_mod_4_data = load('ERFI_80_uniform/model_gap/0.4/data.csv');
+% erfi_80_mod_6_data = load('ERFI_80_uniform/model_gap/0.6/data.csv');
+% erfi_80_nom_4_data = load('ERFI_80_uniform/nominal/0.4/data.csv');
+% erfi_80_nom_6_data = load('ERFI_80_uniform/nominal/0.6/data.csv');
 % 
-% q_50_act_4_data = load('NN_50_gaussian_1.5/actuator_gap/0.4/data.csv');
-% q_50_act_6_data = load('NN_50_gaussian_1.5/actuator_gap/0.6/data.csv');
-% q_50_env_4_data = load('NN_50_gaussian_1.5/environment_gap/0.4/data.csv');
-% q_50_env_6_data = load('NN_50_gaussian_1.5/environment_gap/0.6/data.csv');
-% q_50_mod_4_data = load('NN_50_gaussian_1.5/model_gap/0.4/data.csv');
-% q_50_mod_6_data = load('NN_50_gaussian_1.5/model_gap/0.6/data.csv');
-% q_50_nom_4_data = load('NN_50_gaussian_1.5/nominal/0.4/data.csv');
-% q_50_nom_6_data = load('NN_50_gaussian_1.5/nominal/0.6/data.csv');
+% erfi_beta_80_act_4_data = load('ERFI_80_beta/actuator_gap/0.4/data.csv');
+% erfi_beta_80_act_6_data = load('ERFI_80_beta/actuator_gap/0.6/data.csv');
+% erfi_beta_80_env_4_data = load('ERFI_80_beta/environment_gap/0.4/data.csv');
+% erfi_beta_80_env_6_data = load('ERFI_80_beta/environment_gap/0.6/data.csv');
+% erfi_beta_80_mod_4_data = load('ERFI_80_beta/model_gap/0.4/data.csv');
+% erfi_beta_80_mod_6_data = load('ERFI_80_beta/model_gap/0.6/data.csv');
+% erfi_beta_80_nom_4_data = load('ERFI_80_beta/nominal/0.4/data.csv');
+% erfi_beta_80_nom_6_data = load('ERFI_80_beta/nominal/0.6/data.csv');
 % 
-% %% Load noise lim 30 data
-% % erfi_30_act_4_data = load('ERFI_30_uniform/actuator_gap/0.4/data.csv');
-% % erfi_30_act_6_data = load('ERFI_30_uniform/actuator_gap/0.6/data.csv');
-% % erfi_30_env_4_data = load('ERFI_30_uniform/environment_gap/0.4/data.csv');
-% % erfi_30_env_6_data = load('ERFI_30_uniform/environment_gap/0.6/data.csv');
-% % erfi_30_mod_4_data = load('ERFI_30_uniform/model_gap/0.4/data.csv');
-% % erfi_30_mod_6_data = load('ERFI_30_uniform/model_gap/0.6/data.csv');
-% % erfi_30_nom_4_data = load('ERFI_30_uniform/nominal/0.4/data.csv');
-% % erfi_30_nom_6_data = load('ERFI_30_uniform/nominal/0.6/data.csv');
-% % 
-% % nn_30_act_4_data = load('NN_exp_30_gaussian_1.5/actuator_gap/0.4/data.csv');
-% % nn_30_act_6_data = load('NN_exp_30_gaussian_1.5/actuator_gap/0.6/data.csv');
-% % nn_30_env_4_data = load('NN_exp_30_gaussian_1.5/environment_gap/0.4/data.csv');
-% % nn_30_env_6_data = load('NN_exp_30_gaussian_1.5/environment_gap/0.6/data.csv');
-% % nn_30_mod_4_data = load('NN_exp_30_gaussian_1.5/model_gap/0.4/data.csv');
-% % nn_30_mod_6_data = load('NN_exp_30_gaussian_1.5/model_gap/0.6/data.csv');
-% % nn_30_nom_4_data = load('NN_exp_30_gaussian_1.5/nominal/0.4/data.csv');
-% % nn_30_nom_6_data = load('NN_exp_30_gaussian_1.5/nominal/0.6/data.csv');
-% % 
-% % nq_30_act_4_data = load('NN_nq_30_gaussian_1.5/actuator_gap/0.4/data.csv');
-% % nq_30_act_6_data = load('NN_nq_30_gaussian_1.5/actuator_gap/0.6/data.csv');
-% % nq_30_env_4_data = load('NN_nq_30_gaussian_1.5/environment_gap/0.4/data.csv');
-% % nq_30_env_6_data = load('NN_nq_30_gaussian_1.5/environment_gap/0.6/data.csv');
-% % nq_30_mod_4_data = load('NN_nq_30_gaussian_1.5/model_gap/0.4/data.csv');
-% % nq_30_mod_6_data = load('NN_nq_30_gaussian_1.5/model_gap/0.6/data.csv');
-% % nq_30_nom_4_data = load('NN_nq_30_gaussian_1.5/nominal/0.4/data.csv');
-% % nq_30_nom_6_data = load('NN_nq_30_gaussian_1.5/nominal/0.6/data.csv');
-% % 
-% % q_30_act_4_data = load('NN_30_gaussian_1.5/actuator_gap/0.4/data.csv');
-% % q_30_act_6_data = load('NN_30_gaussian_1.5/actuator_gap/0.6/data.csv');
-% % q_30_env_4_data = load('NN_30_gaussian_1.5/environment_gap/0.4/data.csv');
-% % q_30_env_6_data = load('NN_30_gaussian_1.5/environment_gap/0.6/data.csv');
-% % q_30_mod_4_data = load('NN_30_gaussian_1.5/model_gap/0.4/data.csv');
-% % q_30_mod_6_data = load('NN_30_gaussian_1.5/model_gap/0.6/data.csv');
-% % q_30_nom_4_data = load('NN_30_gaussian_1.5/nominal/0.4/data.csv');
-% % q_30_nom_6_data = load('NN_30_gaussian_1.5/nominal/0.6/data.csv');
+% nq_50_act_4_data = load('NQ_50_gaussian_1.5/actuator_gap/0.4/data.csv');
+% nq_50_act_6_data = load('NQ_50_gaussian_1.5/actuator_gap/0.6/data.csv');
+% nq_50_env_4_data = load('NQ_50_gaussian_1.5/environment_gap/0.4/data.csv');
+% nq_50_env_6_data = load('NQ_50_gaussian_1.5/environment_gap/0.6/data.csv');
+% nq_50_mod_4_data = load('NQ_50_gaussian_1.5/model_gap/0.4/data.csv');
+% nq_50_mod_6_data = load('NQ_50_gaussian_1.5/model_gap/0.6/data.csv');
+% nq_50_nom_4_data = load('NQ_50_gaussian_1.5/nominal/0.4/data.csv');
+% nq_50_nom_6_data = load('NQ_50_gaussian_1.5/nominal/0.6/data.csv');
+% 
+% nq_80_act_4_data = load('NQ_80_gaussian_1.5/actuator_gap/0.4/data.csv');
+% nq_80_act_6_data = load('NQ_80_gaussian_1.5/actuator_gap/0.6/data.csv');
+% nq_80_env_4_data = load('NQ_80_gaussian_1.5/environment_gap/0.4/data.csv');
+% nq_80_env_6_data = load('NQ_80_gaussian_1.5/environment_gap/0.6/data.csv');
+% nq_80_mod_4_data = load('NQ_80_gaussian_1.5/model_gap/0.4/data.csv');
+% nq_80_mod_6_data = load('NQ_80_gaussian_1.5/model_gap/0.6/data.csv');
+% nq_80_nom_4_data = load('NQ_80_gaussian_1.5/nominal/0.4/data.csv');
+% nq_80_nom_6_data = load('NQ_80_gaussian_1.5/nominal/0.6/data.csv');
 % 
 % 
-% %% Load noise lim 20 data
 % erfi_20_act_4_data = load('ERFI_20_uniform/actuator_gap/0.4/data.csv');
 % erfi_20_act_6_data = load('ERFI_20_uniform/actuator_gap/0.6/data.csv');
 % erfi_20_env_4_data = load('ERFI_20_uniform/environment_gap/0.4/data.csv');
@@ -96,41 +77,43 @@ close all; clc;
 % erfi_20_nom_4_data = load('ERFI_20_uniform/nominal/0.4/data.csv');
 % erfi_20_nom_6_data = load('ERFI_20_uniform/nominal/0.6/data.csv');
 % 
-% nn_20_act_4_data = load('NN_exp_20_gaussian_1.5/actuator_gap/0.4/data.csv');
-% nn_20_act_6_data = load('NN_exp_20_gaussian_1.5/actuator_gap/0.6/data.csv');
-% nn_20_env_4_data = load('NN_exp_20_gaussian_1.5/environment_gap/0.4/data.csv');
-% nn_20_env_6_data = load('NN_exp_20_gaussian_1.5/environment_gap/0.6/data.csv');
-% nn_20_mod_4_data = load('NN_exp_20_gaussian_1.5/model_gap/0.4/data.csv');
-% nn_20_mod_6_data = load('NN_exp_20_gaussian_1.5/model_gap/0.6/data.csv');
-% nn_20_nom_4_data = load('NN_exp_20_gaussian_1.5/nominal/0.4/data.csv');
-% nn_20_nom_6_data = load('NN_exp_20_gaussian_1.5/nominal/0.6/data.csv');
+% erfi_beta_20_act_4_data = load('ERFI_20_uniform/actuator_gap/0.4/data.csv');
+% erfi_beta_20_act_6_data = load('ERFI_20_uniform/actuator_gap/0.6/data.csv');
+% erfi_beta_20_env_4_data = load('ERFI_20_uniform/environment_gap/0.4/data.csv');
+% erfi_beta_20_env_6_data = load('ERFI_20_uniform/environment_gap/0.6/data.csv');
+% erfi_beta_20_mod_4_data = load('ERFI_20_uniform/model_gap/0.4/data.csv');
+% erfi_beta_20_mod_6_data = load('ERFI_20_uniform/model_gap/0.6/data.csv');
+% erfi_beta_20_nom_4_data = load('ERFI_20_uniform/nominal/0.4/data.csv');
+% erfi_beta_20_nom_6_data = load('ERFI_20_uniform/nominal/0.6/data.csv');
 % 
-% nq_20_act_4_data = load('NN_nq_20_gaussian_1.5/actuator_gap/0.4/data.csv');
-% nq_20_act_6_data = load('NN_nq_20_gaussian_1.5/actuator_gap/0.6/data.csv');
-% nq_20_env_4_data = load('NN_nq_20_gaussian_1.5/environment_gap/0.4/data.csv');
-% nq_20_env_6_data = load('NN_nq_20_gaussian_1.5/environment_gap/0.6/data.csv');
-% nq_20_mod_4_data = load('NN_nq_20_gaussian_1.5/model_gap/0.4/data.csv');
-% nq_20_mod_6_data = load('NN_nq_20_gaussian_1.5/model_gap/0.6/data.csv');
-% nq_20_nom_4_data = load('NN_nq_20_gaussian_1.5/nominal/0.4/data.csv');
-% nq_20_nom_6_data = load('NN_nq_20_gaussian_1.5/nominal/0.6/data.csv');
+% nq_20_act_4_data = load('NQ_20_gaussian_1.5/actuator_gap/0.4/data.csv');
+% nq_20_act_6_data = load('NQ_20_gaussian_1.5/actuator_gap/0.6/data.csv');
+% nq_20_env_4_data = load('NQ_20_gaussian_1.5/environment_gap/0.4/data.csv');
+% nq_20_env_6_data = load('NQ_20_gaussian_1.5/environment_gap/0.6/data.csv');
+% nq_20_mod_4_data = load('NQ_20_gaussian_1.5/model_gap/0.4/data.csv');
+% nq_20_mod_6_data = load('NQ_20_gaussian_1.5/model_gap/0.6/data.csv');
+% nq_20_nom_4_data = load('NQ_20_gaussian_1.5/nominal/0.4/data.csv');
+% nq_20_nom_6_data = load('NQ_20_gaussian_1.5/nominal/0.6/data.csv');
 % 
-% q_20_act_4_data = load('NN_20_gaussian_1.5/actuator_gap/0.4/data.csv');
-% q_20_act_6_data = load('NN_20_gaussian_1.5/actuator_gap/0.6/data.csv');
-% q_20_env_4_data = load('NN_20_gaussian_1.5/environment_gap/0.4/data.csv');
-% q_20_env_6_data = load('NN_20_gaussian_1.5/environment_gap/0.6/data.csv');
-% q_20_mod_4_data = load('NN_20_gaussian_1.5/model_gap/0.4/data.csv');
-% q_20_mod_6_data = load('NN_20_gaussian_1.5/model_gap/0.6/data.csv');
-% q_20_nom_4_data = load('NN_20_gaussian_1.5/nominal/0.4/data.csv');
-% q_20_nom_6_data = load('NN_20_gaussian_1.5/nominal/0.6/data.csv');
-
-% Load and process each data file
-
-
-% Helper function to parse data with the same structure
-% Load and process each data file
-
-
-
+% 
+% hy_50_act_4_data = load('Hybrid_50/actuator_gap/0.4/data.csv');
+% hy_50_act_6_data = load('Hybrid_50/actuator_gap/0.6/data.csv');
+% hy_50_env_4_data = load('Hybrid_50/environment_gap/0.4/data.csv');
+% hy_50_env_6_data = load('Hybrid_50/environment_gap/0.6/data.csv');
+% hy_50_mod_4_data = load('Hybrid_50/model_gap/0.4/data.csv');
+% hy_50_mod_6_data = load('Hybrid_50/model_gap/0.6/data.csv');
+% hy_50_nom_4_data = load('Hybrid_50/nominal/0.4/data.csv');
+% hy_50_nom_6_data = load('Hybrid_50/nominal/0.6/data.csv');
+% 
+% hy_100_act_4_data = load('Hybrid_100/actuator_gap/0.4/data.csv');
+% hy_100_act_6_data = load('Hybrid_100/actuator_gap/0.6/data.csv');
+% hy_100_env_4_data = load('Hybrid_100/environment_gap/0.4/data.csv');
+% hy_100_env_6_data = load('Hybrid_100/environment_gap/0.6/data.csv');
+% hy_100_mod_4_data = load('Hybrid_100/model_gap/0.4/data.csv');
+% hy_100_mod_6_data = load('Hybrid_100/model_gap/0.6/data.csv');
+% hy_100_nom_4_data = load('Hybrid_100/nominal/0.4/data.csv');
+% hy_100_nom_6_data = load('Hybrid_100/nominal/0.6/data.csv');
+% %%
 %% Helper function to parse data with the same structure and save to workspace
 function process_data(file_data, prefix)
     % Define the lengths of each data segment
@@ -206,7 +189,7 @@ end
 % 
 % 
 % end
-
+%%
 %% Process each data file
 process_data(dr_act_4_data, 'dr_act_4');
 process_data(dr_act_6_data, 'dr_act_6');
@@ -226,14 +209,14 @@ process_data(erfi_50_mod_6_data, 'erfi_50_mod_6');
 process_data(erfi_50_nom_4_data, 'erfi_50_nom_4');
 process_data(erfi_50_nom_6_data, 'erfi_50_nom_6');
 
-process_data(nn_50_act_4_data, 'nn_50_act_4');
-process_data(nn_50_act_6_data, 'nn_50_act_6');
-process_data(nn_50_env_4_data, 'nn_50_env_4');
-process_data(nn_50_env_6_data, 'nn_50_env_6');
-process_data(nn_50_mod_4_data, 'nn_50_mod_4');
-process_data(nn_50_mod_6_data, 'nn_50_mod_6');
-process_data(nn_50_nom_4_data, 'nn_50_nom_4');
-process_data(nn_50_nom_6_data, 'nn_50_nom_6');
+process_data(erfi_beta_50_act_4_data, 'erfi_beta_50_act_4');
+process_data(erfi_beta_50_act_6_data, 'erfi_beta_50_act_6');
+process_data(erfi_beta_50_env_4_data, 'erfi_beta_50_env_4');
+process_data(erfi_beta_50_env_6_data, 'erfi_beta_50_env_6');
+process_data(erfi_beta_50_mod_4_data, 'erfi_beta_50_mod_4');
+process_data(erfi_beta_50_mod_6_data, 'erfi_beta_50_mod_6');
+process_data(erfi_beta_50_nom_4_data, 'erfi_beta_50_nom_4');
+process_data(erfi_beta_50_nom_6_data, 'erfi_beta_50_nom_6');
 
 process_data(nq_50_act_4_data, 'nq_50_act_4');
 process_data(nq_50_act_6_data, 'nq_50_act_6');
@@ -244,52 +227,33 @@ process_data(nq_50_mod_6_data, 'nq_50_mod_6');
 process_data(nq_50_nom_4_data, 'nq_50_nom_4');
 process_data(nq_50_nom_6_data, 'nq_50_nom_6');
 
-process_data(q_50_act_4_data, 'q_50_act_4');
-process_data(q_50_act_6_data, 'q_50_act_6');
-process_data(q_50_env_4_data, 'q_50_env_4');
-process_data(q_50_env_6_data, 'q_50_env_6');
-process_data(q_50_mod_4_data, 'q_50_mod_4');
-process_data(q_50_mod_6_data, 'q_50_mod_6');
-process_data(q_50_nom_4_data, 'q_50_nom_4');
-process_data(q_50_nom_6_data, 'q_50_nom_6');
 
+process_data(erfi_80_act_4_data, 'erfi_80_act_4');
+process_data(erfi_80_act_6_data, 'erfi_80_act_6');
+process_data(erfi_80_env_4_data, 'erfi_80_env_4');
+process_data(erfi_80_env_6_data, 'erfi_80_env_6');
+process_data(erfi_80_mod_4_data, 'erfi_80_mod_4');
+process_data(erfi_80_mod_6_data, 'erfi_80_mod_6');
+process_data(erfi_80_nom_4_data, 'erfi_80_nom_4');
+process_data(erfi_80_nom_6_data, 'erfi_80_nom_6');
 
-process_data(erfi_30_act_4_data, 'erfi_30_act_4');
-process_data(erfi_30_act_6_data, 'erfi_30_act_6');
-process_data(erfi_30_env_4_data, 'erfi_30_env_4');
-process_data(erfi_30_env_6_data, 'erfi_30_env_6');
-process_data(erfi_30_mod_4_data, 'erfi_30_mod_4');
-process_data(erfi_30_mod_6_data, 'erfi_30_mod_6');
-process_data(erfi_30_nom_4_data, 'erfi_30_nom_4');
-process_data(erfi_30_nom_6_data, 'erfi_30_nom_6');
-% 
-% process_data(nn_30_act_4_data, 'nn_30_act_4');
-% process_data(nn_30_act_6_data, 'nn_30_act_6');
-% process_data(nn_30_env_4_data, 'nn_30_env_4');
-% process_data(nn_30_env_6_data, 'nn_30_env_6');
-% process_data(nn_30_mod_4_data, 'nn_30_mod_4');
-% process_data(nn_30_mod_6_data, 'nn_30_mod_6');
-% process_data(nn_30_nom_4_data, 'nn_30_nom_4');
-% process_data(nn_30_nom_6_data, 'nn_30_nom_6');
-% 
-% process_data(nq_30_act_4_data, 'nq_30_act_4');
-% process_data(nq_30_act_6_data, 'nq_30_act_6');
-% process_data(nq_30_env_4_data, 'nq_30_env_4');
-% process_data(nq_30_env_6_data, 'nq_30_env_6');
-% process_data(nq_30_mod_4_data, 'nq_30_mod_4');
-% process_data(nq_30_mod_6_data, 'nq_30_mod_6');
-% process_data(nq_30_nom_4_data, 'nq_30_nom_4');
-% process_data(nq_30_nom_6_data, 'nq_30_nom_6');
-% 
-% process_data(q_30_act_4_data, 'q_30_act_4');
-% process_data(q_30_act_6_data, 'q_30_act_6');
-% process_data(q_30_env_4_data, 'q_30_env_4');
-% process_data(q_30_env_6_data, 'q_30_env_6');
-% process_data(q_30_mod_4_data, 'q_30_mod_4');
-% process_data(q_30_mod_6_data, 'q_30_mod_6');
-% process_data(q_30_nom_4_data, 'q_30_nom_4');
-% process_data(q_30_nom_6_data, 'q_30_nom_6');
+process_data(erfi_beta_80_act_4_data, 'erfi_beta_80_act_4');
+process_data(erfi_beta_80_act_6_data, 'erfi_beta_80_act_6');
+process_data(erfi_beta_80_env_4_data, 'erfi_beta_80_env_4');
+process_data(erfi_beta_80_env_6_data, 'erfi_beta_80_env_6');
+process_data(erfi_beta_80_mod_4_data, 'erfi_beta_80_mod_4');
+process_data(erfi_beta_80_mod_6_data, 'erfi_beta_80_mod_6');
+process_data(erfi_beta_80_nom_4_data, 'erfi_beta_80_nom_4');
+process_data(erfi_beta_80_nom_6_data, 'erfi_beta_80_nom_6');
 
+process_data(nq_80_act_4_data, 'nq_80_act_4');
+process_data(nq_80_act_6_data, 'nq_80_act_6');
+process_data(nq_80_env_4_data, 'nq_80_env_4');
+process_data(nq_80_env_6_data, 'nq_80_env_6');
+process_data(nq_80_mod_4_data, 'nq_80_mod_4');
+process_data(nq_80_mod_6_data, 'nq_80_mod_6');
+process_data(nq_80_nom_4_data, 'nq_80_nom_4');
+process_data(nq_80_nom_6_data, 'nq_80_nom_6');
 
 process_data(erfi_20_act_4_data, 'erfi_20_act_4');
 process_data(erfi_20_act_6_data, 'erfi_20_act_6');
@@ -300,14 +264,14 @@ process_data(erfi_20_mod_6_data, 'erfi_20_mod_6');
 process_data(erfi_20_nom_4_data, 'erfi_20_nom_4');
 process_data(erfi_20_nom_6_data, 'erfi_20_nom_6');
 
-process_data(nn_20_act_4_data, 'nn_20_act_4');
-process_data(nn_20_act_6_data, 'nn_20_act_6');
-process_data(nn_20_env_4_data, 'nn_20_env_4');
-process_data(nn_20_env_6_data, 'nn_20_env_6');
-process_data(nn_20_mod_4_data, 'nn_20_mod_4');
-process_data(nn_20_mod_6_data, 'nn_20_mod_6');
-process_data(nn_20_nom_4_data, 'nn_20_nom_4');
-process_data(nn_20_nom_6_data, 'nn_20_nom_6');
+process_data(erfi_beta_20_act_4_data, 'erfi_beta_20_act_4');
+process_data(erfi_beta_20_act_6_data, 'erfi_beta_20_act_6');
+process_data(erfi_beta_20_env_4_data, 'erfi_beta_20_env_4');
+process_data(erfi_beta_20_env_6_data, 'erfi_beta_20_env_6');
+process_data(erfi_beta_20_mod_4_data, 'erfi_beta_20_mod_4');
+process_data(erfi_beta_20_mod_6_data, 'erfi_beta_20_mod_6');
+process_data(erfi_beta_20_nom_4_data, 'erfi_beta_20_nom_4');
+process_data(erfi_beta_20_nom_6_data, 'erfi_beta_20_nom_6');
 
 process_data(nq_20_act_4_data, 'nq_20_act_4');
 process_data(nq_20_act_6_data, 'nq_20_act_6');
@@ -318,16 +282,55 @@ process_data(nq_20_mod_6_data, 'nq_20_mod_6');
 process_data(nq_20_nom_4_data, 'nq_20_nom_4');
 process_data(nq_20_nom_6_data, 'nq_20_nom_6');
 
-process_data(q_20_act_4_data, 'q_20_act_4');
-process_data(q_20_act_6_data, 'q_20_act_6');
-process_data(q_20_env_4_data, 'q_20_env_4');
-process_data(q_20_env_6_data, 'q_20_env_6');
-process_data(q_20_mod_4_data, 'q_20_mod_4');
-process_data(q_20_mod_6_data, 'q_20_mod_6');
-process_data(q_20_nom_4_data, 'q_20_nom_4');
-process_data(q_20_nom_6_data, 'q_20_nom_6');
+process_data(hy_50_act_4_data, 'hy_50_act_4');
+process_data(hy_50_act_6_data, 'hy_50_act_6');
+process_data(hy_50_env_4_data, 'hy_50_env_4');
+process_data(hy_50_env_6_data, 'hy_50_env_6');
+process_data(hy_50_mod_4_data, 'hy_50_mod_4');
+process_data(hy_50_mod_6_data, 'hy_50_mod_6');
+process_data(hy_50_nom_4_data, 'hy_50_nom_4');
+process_data(hy_50_nom_6_data, 'hy_50_nom_6');
 
+process_data(hy_100_act_4_data, 'hy_100_act_4');
+process_data(hy_100_act_6_data, 'hy_100_act_6');
+process_data(hy_100_env_4_data, 'hy_100_env_4');
+process_data(hy_100_env_6_data, 'hy_100_env_6');
+process_data(hy_100_mod_4_data, 'hy_100_mod_4');
+process_data(hy_100_mod_6_data, 'hy_100_mod_6');
+process_data(hy_100_nom_4_data, 'hy_100_nom_4');
+process_data(hy_100_nom_6_data, 'hy_100_nom_6');
 
+%%
+%% Final baselines
+
+process_data(dr_act_4_data, 'DR_act_4');
+process_data(dr_act_6_data, 'DR_act_6');
+process_data(dr_env_4_data, 'DR_env_4');
+process_data(dr_env_6_data, 'DR_env_6');
+process_data(dr_mod_4_data, 'DR_mod_4');
+process_data(dr_mod_6_data, 'DR_mod_6');
+process_data(dr_nom_4_data, 'DR_nom_4');
+process_data(dr_nom_6_data, 'DR_nom_6');
+
+process_data(erfi_beta_50_act_4_data, 'ERFI_act_4');
+process_data(erfi_beta_50_act_6_data, 'ERFI_act_6');
+process_data(erfi_beta_50_env_4_data, 'ERFI_env_4');
+process_data(erfi_beta_50_env_6_data, 'ERFI_env_6');
+process_data(erfi_beta_50_mod_4_data, 'ERFI_mod_4');
+process_data(erfi_beta_50_mod_6_data, 'ERFI_mod_6');
+process_data(erfi_beta_50_nom_4_data, 'ERFI_nom_4');
+process_data(erfi_beta_50_nom_6_data, 'ERFI_nom_6');
+
+process_data(nq_50_act_4_data, 'OUR_act_4');
+process_data(nq_50_act_6_data, 'OUR_act_6');
+process_data(nq_50_env_4_data, 'OUR_env_4');
+process_data(nq_50_env_6_data, 'OUR_env_6');
+process_data(nq_50_mod_4_data, 'OUR_mod_4');
+process_data(nq_50_mod_6_data, 'OUR_mod_6');
+process_data(nq_50_nom_4_data, 'OUR_nom_4');
+process_data(nq_50_nom_6_data, 'OUR_nom_6');
+%%
+%% Set plotting params
 
 plot_start_time = 0.008;
 plot_end_time = 10;
@@ -338,1444 +341,16 @@ single_column_size = [4, 1.5]; % [width, height] in inches for single column
 double_column_size = [7, 3]; % [width, height] in inches for double column
 double_column_single_row_size = [7,1.5];
 double_column_eight_row_size = [7, 12];
+single_column_eight_row_size = [4, 12];
 ylimit = [0, 0.7];
 sgtitle_fontsize = 10;
 subtitle_fontsize = 6;
 label_fontsize = 4;
 legend_fontsize = 4;
 tick_fontsize = 4;
-
-%% Compare Performance in Nominal Setting 
-figure('Name', 'Nominal performance comparison, (DR, ERFI, Ours)');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;
-plot(dr_nom_4_time(plot_indices), dr_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(dr_nom_4_time(plot_indices), dr_nom_4_command_data(plot_indices, 1));
-title('DR', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-
-nexttile;
-plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_command_data(plot_indices, 1));
-title('ERFI', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
-
-nexttile;
-plot(nn_50_nom_4_time(plot_indices), nn_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_50_nom_4_time(plot_indices), nn_50_nom_4_command_data(plot_indices, 1));
-title('Our method', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-lgd.Position(1) = lgd.Position(1) + 0.02;
-lgd.Position(2) = lgd.Position(2) - 0.01;
-
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-nexttile;
-plot(dr_nom_6_time(plot_indices), dr_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(dr_nom_6_time(plot_indices), dr_nom_6_command_data(plot_indices, 1));
-% title('DR', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(erfi_50_nom_6_time(plot_indices), erfi_50_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(erfi_50_nom_6_time(plot_indices), erfi_50_nom_6_command_data(plot_indices, 1));
-% title('ERFI', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(nn_50_nom_6_time(plot_indices), nn_50_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_50_nom_6_time(plot_indices), nn_50_nom_6_command_data(plot_indices, 1));
-% title('NN', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.05, 0.5, 0]);
-
-
-%% Compare DR, ERFI, and our method under actuator gap
-figure('Name', 'Actuator gap, (DR, ERFI, Ours)');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
-
-t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(dr_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_act_4_time(plot_indices), dr_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_act_4_time(plot_indices), dr_act_4_command_data(plot_indices, 1));
-    title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_command_data(plot_indices, 1));
-    title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_act_4_time(plot_indices), nn_50_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_act_4_time(plot_indices), nn_50_act_4_command_data(plot_indices, 1));
-    title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    lgd.Position(1) = lgd.Position(1) + 0.02;
-    lgd.Position(2) = lgd.Position(2) - 0.01;
-end
-
-% 0.6m/s
-nexttile;
-if size(dr_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_act_6_time(plot_indices), dr_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_act_6_time(plot_indices), dr_act_6_command_data(plot_indices, 1));
-    % title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_command_data(plot_indices, 1));
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_act_6_time(plot_indices), nn_50_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_act_6_time(plot_indices), nn_50_act_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
-
-
-%% Compare DR, ERFI, and our method under model gap%%%
-figure('Name', 'Model gap, (DR, ERFI, Ours)');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
-
-t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(dr_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_mod_4_time(plot_indices), dr_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_mod_4_time(plot_indices), dr_mod_4_command_data(plot_indices, 1));
-    title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_command_data(plot_indices, 1));
-    title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_mod_4_time(plot_indices), nn_50_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_mod_4_time(plot_indices), nn_50_mod_4_command_data(plot_indices, 1));
-    title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    lgd.Position(1) = lgd.Position(1) + 0.02;
-    lgd.Position(2) = lgd.Position(2) - 0.01;
-end
-
-% 0.6m/s
-nexttile;
-if size(dr_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_mod_6_time(plot_indices), dr_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_mod_6_time(plot_indices), dr_mod_6_command_data(plot_indices, 1));
-    % title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_command_data(plot_indices, 1));
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_mod_6_time(plot_indices), nn_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_mod_6_time(plot_indices), nn_50_mod_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
-
-
-
-%% Compare DR, ERFI, and our method under environment gap%%%
-figure('Name', 'Environment gap, (DR, ERFI, Ours)');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
-
-t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(dr_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_env_4_time(plot_indices), dr_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_env_4_time(plot_indices), dr_env_4_command_data(plot_indices, 1));
-    title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_env_4_time(plot_indices), erfi_50_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_env_4_time(plot_indices), erfi_50_env_4_command_data(plot_indices, 1));
-    title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_env_4_time(plot_indices), nn_50_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_env_4_time(plot_indices), nn_50_env_4_command_data(plot_indices, 1));
-    title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    lgd.Position(1) = lgd.Position(1) + 0.02;
-    lgd.Position(2) = lgd.Position(2) - 0.01;
-end
-
-% 0.6m/s
-nexttile;
-if size(dr_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(dr_env_6_time(plot_indices), dr_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(dr_env_6_time(plot_indices), dr_env_6_command_data(plot_indices, 1));
-    % title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_env_6_time(plot_indices), erfi_50_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_env_6_time(plot_indices), erfi_50_env_6_command_data(plot_indices, 1));
-    % title('ERFI', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_env_6_time(plot_indices), nn_50_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_env_6_time(plot_indices), nn_50_env_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
-
-
-%% Evaluate NN methods per noise lim
-%% Noise lim 50, NN methods
-figure('Name', 'NN method comparison at lim 50Nm, (No quad, quad, explicit');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_eight_row_size]); % Choose single_column_size or double_column_size here
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-t = tiledlayout(8, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;
-plot(nq_50_nom_4_time(plot_indices), nq_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nq_50_nom_4_time(plot_indices), nq_50_nom_4_command_data(plot_indices, 1));
-title('No quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-
-nexttile;
-plot(q_50_nom_4_time(plot_indices), q_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(q_50_nom_4_time(plot_indices), q_50_nom_4_command_data(plot_indices, 1));
-title('Quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
-
-nexttile;
-plot(nn_50_nom_4_time(plot_indices), nn_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_50_nom_4_time(plot_indices), nn_50_nom_4_command_data(plot_indices, 1));
-title('Our method', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-lgd.Position(1) = lgd.Position(1) + 0.02;
-lgd.Position(2) = lgd.Position(2) - 0.01;
-
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-nexttile;
-plot(nq_50_nom_6_time(plot_indices), nq_50_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nq_50_nom_6_time(plot_indices), nq_50_nom_6_command_data(plot_indices, 1));
-% title('No quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(q_50_nom_6_time(plot_indices), q_50_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(q_50_nom_6_time(plot_indices), q_50_nom_6_command_data(plot_indices, 1));
-% title('q_50', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(nn_50_nom_6_time(plot_indices), nn_50_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_50_nom_6_time(plot_indices), nn_50_nom_6_command_data(plot_indices, 1));
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-
-% Compare No quadratic term, q_50, and our method under actuator gap
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_50_act_4_time(plot_indices), nq_50_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_act_4_time(plot_indices), nq_50_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_50_act_4_time(plot_indices), q_50_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_act_4_time(plot_indices), q_50_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_50_act_4_time(plot_indices), nn_50_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_act_4_time(plot_indices), nn_50_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(nq_50_act_6_time(plot_indices), nq_50_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_act_6_time(plot_indices), nq_50_act_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_50', 'FontSize', subtitle_fontsize);
-else
-    plot(q_50_act_6_time(plot_indices), q_50_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_act_6_time(plot_indices), q_50_act_6_command_data(plot_indices, 1));
-    % title('q_50', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_act_6_time(plot_indices), nn_50_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_act_6_time(plot_indices), nn_50_act_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-
-% Compare No quadratic term, q_50, and our method under model gap%%%
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_50_mod_4_time(plot_indices), nq_50_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_mod_4_time(plot_indices), nq_50_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_50_mod_4_time(plot_indices), q_50_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_mod_4_time(plot_indices), q_50_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_50_mod_4_time(plot_indices), nn_50_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_mod_4_time(plot_indices), nn_50_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_50_mod_6_time(plot_indices), nq_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_mod_6_time(plot_indices), nq_50_mod_6_command_data(plot_indices, 1));
-    % title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_50', 'FontSize', subtitle_fontsize);
-else
-    plot(q_50_mod_6_time(plot_indices), q_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_mod_6_time(plot_indices), q_50_mod_6_command_data(plot_indices, 1));
-    % title('q_50', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_mod_6_time(plot_indices), nn_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_mod_6_time(plot_indices), nn_50_mod_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-
-
-
-% Compare No quadratic term, q_50, and our method under environment gap%%%
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_50_env_4_time(plot_indices), nq_50_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_env_4_time(plot_indices), nq_50_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_50_env_4_time(plot_indices), q_50_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_env_4_time(plot_indices), q_50_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_50_env_4_time(plot_indices), nn_50_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_env_4_time(plot_indices), nn_50_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_50_env_6_time(plot_indices), nq_50_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_50_env_6_time(plot_indices), nq_50_env_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_50', 'FontSize', subtitle_fontsize);
-else
-    plot(q_50_env_6_time(plot_indices), q_50_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_50_env_6_time(plot_indices), q_50_env_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_50_env_6_time(plot_indices), nn_50_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_50_env_6_time(plot_indices), nn_50_env_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
-
-
-%% Noise lim 20, NN methods
-figure('Name', 'NN method comparison at lim 20Nm, (No quad, quad, explicit');
-set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_eight_row_size]); % Choose single_column_size or double_column_size here
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-t = tiledlayout(8, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
-nexttile;
-plot(nq_20_nom_4_time(plot_indices), nq_20_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nq_20_nom_4_time(plot_indices), nq_20_nom_4_command_data(plot_indices, 1));
-title('No quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-
-nexttile;
-plot(q_20_nom_4_time(plot_indices), q_20_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(q_20_nom_4_time(plot_indices), q_20_nom_4_command_data(plot_indices, 1));
-title('Quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
-
-nexttile;
-plot(nn_20_nom_4_time(plot_indices), nn_20_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_20_nom_4_time(plot_indices), nn_20_nom_4_command_data(plot_indices, 1));
-title('Our method', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-lgd.Position(1) = lgd.Position(1) + 0.02;
-lgd.Position(2) = lgd.Position(2) - 0.01;
-
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
-nexttile;
-plot(nq_20_nom_6_time(plot_indices), nq_20_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nq_20_nom_6_time(plot_indices), nq_20_nom_6_command_data(plot_indices, 1));
-% title('No quadratic term', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(q_20_nom_6_time(plot_indices), q_20_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(q_20_nom_6_time(plot_indices), q_20_nom_6_command_data(plot_indices, 1));
-% title('q_20', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(nn_20_nom_6_time(plot_indices), nn_20_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(nn_20_nom_6_time(plot_indices), nn_20_nom_6_command_data(plot_indices, 1));
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-
-% Compare No quadratic term, q_20, and our method under actuator gap
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_20_act_4_time(plot_indices), nq_20_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_act_4_time(plot_indices), nq_20_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_20_act_4_time(plot_indices), q_20_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_act_4_time(plot_indices), q_20_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_20_act_4_time(plot_indices), nn_20_act_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_act_4_time(plot_indices), nn_20_act_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('DR', 'FontSize', subtitle_fontsize);
-else
-    plot(nq_20_act_6_time(plot_indices), nq_20_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_act_6_time(plot_indices), nq_20_act_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_20', 'FontSize', subtitle_fontsize);
-else
-    plot(q_20_act_6_time(plot_indices), q_20_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_act_6_time(plot_indices), q_20_act_6_command_data(plot_indices, 1));
-    % title('q_20', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_20_act_6_time(plot_indices), nn_20_act_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_act_6_time(plot_indices), nn_20_act_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-
-% Compare No quadratic term, q_20, and our method under model gap%%%
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_20_mod_4_time(plot_indices), nq_20_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_mod_4_time(plot_indices), nq_20_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_20_mod_4_time(plot_indices), q_20_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_mod_4_time(plot_indices), q_20_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_20_mod_4_time(plot_indices), nn_20_mod_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_mod_4_time(plot_indices), nn_20_mod_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_20_mod_6_time(plot_indices), nq_20_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_mod_6_time(plot_indices), nq_20_mod_6_command_data(plot_indices, 1));
-    % title('DR', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_20', 'FontSize', subtitle_fontsize);
-else
-    plot(q_20_mod_6_time(plot_indices), q_20_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_mod_6_time(plot_indices), q_20_mod_6_command_data(plot_indices, 1));
-    % title('q_20', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_20_mod_6_time(plot_indices), nn_20_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_mod_6_time(plot_indices), nn_20_mod_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-
-
-
-% Compare No quadratic term, q_20, and our method under environment gap%%%
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-% 0.4m/s
-if size(nq_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_20_env_4_time(plot_indices), nq_20_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_env_4_time(plot_indices), nq_20_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(q_20_env_4_time(plot_indices), q_20_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_env_4_time(plot_indices), q_20_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nn_20_env_4_time(plot_indices), nn_20_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_env_4_time(plot_indices), nn_20_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-end
-
-% 0.6m/s
-nexttile;
-if size(nq_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(nq_20_env_6_time(plot_indices), nq_20_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nq_20_env_6_time(plot_indices), nq_20_env_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(q_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('q_20', 'FontSize', subtitle_fontsize);
-else
-    plot(q_20_env_6_time(plot_indices), q_20_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(q_20_env_6_time(plot_indices), q_20_env_6_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(nn_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(nn_20_env_6_time(plot_indices), nn_20_env_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(nn_20_env_6_time(plot_indices), nn_20_env_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
-
-han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
-han.XLabel.Visible = 'on';
-han.YLabel.Visible = 'on';
-xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
-ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
-
-%% Evaluate ERFI varying noise lim
-figure('Name', 'ERFI comparison, (20Nm, 30Nm, 50Nm');
+%%
+%% Evaluate ERFI per noise lim
+figure('Name', 'ERFI uniform');
 set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_eight_row_size]); % Choose single_column_size or double_column_size here
 % sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
 t = tiledlayout(8, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
@@ -1783,7 +358,19 @@ nexttile;
 plot(erfi_20_nom_4_time(plot_indices), erfi_20_nom_4_q_dot_virtual(plot_indices, 1));
 hold on;
 plot(erfi_20_nom_4_time(plot_indices), erfi_20_nom_4_command_data(plot_indices, 1));
-title('ERFI, 20Nm', 'FontSize', subtitle_fontsize);
+title('ERFI 20', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+nexttile;
+plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_command_data(plot_indices, 1));
+title('ERFI 50', 'FontSize', subtitle_fontsize);
 % xlabel('Time, [s]', 'FontSize', label_fontsize);
 % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
 xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -1793,23 +380,10 @@ grid on;
 % lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
 
 nexttile;
-plot(erfi_30_nom_4_time(plot_indices), erfi_30_nom_4_q_dot_virtual(plot_indices, 1));
+plot(erfi_80_nom_4_time(plot_indices), erfi_80_nom_4_q_dot_virtual(plot_indices, 1));
 hold on;
-plot(erfi_30_nom_4_time(plot_indices), erfi_30_nom_4_command_data(plot_indices, 1));
-title('ERFI, 30Nm', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
-
-nexttile;
-plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(erfi_50_nom_4_time(plot_indices), erfi_50_nom_4_command_data(plot_indices, 1));
-title('ERFI, 50Nm', 'FontSize', subtitle_fontsize);
+plot(erfi_80_nom_4_time(plot_indices), erfi_80_nom_4_command_data(plot_indices, 1));
+title('ERFI 80', 'FontSize', subtitle_fontsize);
 % xlabel('Time, [s]', 'FontSize', label_fontsize);
 % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
 xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -1820,32 +394,18 @@ lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', '
 lgd.Position(1) = lgd.Position(1) + 0.02;
 lgd.Position(2) = lgd.Position(2) - 0.01;
 
-% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
+
 nexttile;
 plot(erfi_20_nom_6_time(plot_indices), erfi_20_nom_6_q_dot_virtual(plot_indices, 1));
 hold on;
 plot(erfi_20_nom_6_time(plot_indices), erfi_20_nom_6_command_data(plot_indices, 1));
-% title('No quadratic term', 'FontSize', subtitle_fontsize);
 % xlabel('Time, [s]', 'FontSize', label_fontsize);
 % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
 xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
 ylim(ylimit); % Adjust these values to your desired y-axis range
 set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
 grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
-
-nexttile;
-plot(erfi_30_nom_6_time(plot_indices), erfi_30_nom_6_q_dot_virtual(plot_indices, 1));
-hold on;
-plot(erfi_30_nom_6_time(plot_indices), erfi_30_nom_6_command_data(plot_indices, 1));
-% title('erfi_30', 'FontSize', subtitle_fontsize);
-% xlabel('Time, [s]', 'FontSize', label_fontsize);
-% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-ylim(ylimit); % Adjust these values to your desired y-axis range
-set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-grid on;
-% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
 
 nexttile;
 plot(erfi_50_nom_6_time(plot_indices), erfi_50_nom_6_q_dot_virtual(plot_indices, 1));
@@ -1857,16 +417,30 @@ xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-
 ylim(ylimit); % Adjust these values to your desired y-axis range
 set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
 grid on;
+
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+nexttile;
+plot(erfi_80_nom_6_time(plot_indices), erfi_80_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_80_nom_6_time(plot_indices), erfi_80_nom_6_command_data(plot_indices, 1));
+% title('No quadratic term', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
 % legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
 
 
-% Compare No quadratic term, erfi_30, and our method under actuator gap
+
+% Compare No quadratic term, erfi_20, and our method under actuator gap
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
 % 0.4m/s
 if size(erfi_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
     plot(erfi_20_act_4_time(plot_indices), erfi_20_act_4_q_dot_virtual(plot_indices, 1));
     hold on;
@@ -1883,13 +457,14 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_30_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+% 0.4m/s
+if size(erfi_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_30_act_4_time(plot_indices), erfi_30_act_4_q_dot_virtual(plot_indices, 1));
+    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_30_act_4_time(plot_indices), erfi_30_act_4_command_data(plot_indices, 1));
+    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -1902,26 +477,28 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+if size(erfi_80_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_q_dot_virtual(plot_indices, 1));
+    plot(erfi_80_act_4_time(plot_indices), erfi_80_act_4_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_50_act_4_time(plot_indices), erfi_50_act_4_command_data(plot_indices, 1));
+    plot(erfi_80_act_4_time(plot_indices), erfi_80_act_4_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
     ylim(ylimit); % Adjust these values to your desired y-axis range
     set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
     grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
 % 0.6m/s
 nexttile;
 if size(erfi_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
     % title('DR', 'FontSize', subtitle_fontsize);
 else
     plot(erfi_20_act_6_time(plot_indices), erfi_20_act_6_q_dot_virtual(plot_indices, 1));
@@ -1939,15 +516,14 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_30_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+% 0.4m/s
+if size(erfi_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('erfi_30', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_30_act_6_time(plot_indices), erfi_30_act_6_q_dot_virtual(plot_indices, 1));
+    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_30_act_6_time(plot_indices), erfi_30_act_6_command_data(plot_indices, 1));
-    % title('erfi_30', 'FontSize', subtitle_fontsize);
+    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -1958,17 +534,18 @@ else
     % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
+
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+if size(erfi_80_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('erfi_20', 'FontSize', subtitle_fontsize);
 else
-    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_q_dot_virtual(plot_indices, 1));
+    plot(erfi_80_act_6_time(plot_indices), erfi_80_act_6_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_50_act_6_time(plot_indices), erfi_50_act_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
+    plot(erfi_80_act_6_time(plot_indices), erfi_80_act_6_command_data(plot_indices, 1));
+    % title('erfi_20', 'FontSize', subtitle_fontsize);
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -1976,19 +553,18 @@ else
     set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
     grid on;
     % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
+    % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
 
-% Compare No quadratic term, erfi_30, and our method under model gap%%%
+% Compare No quadratic term, erfi_20, and our method under model gap%%%
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
 % 0.4m/s
 if size(erfi_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
     plot(erfi_20_mod_4_time(plot_indices), erfi_20_mod_4_q_dot_virtual(plot_indices, 1));
     hold on;
@@ -2005,13 +581,34 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_30_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+% 0.4m/s
+if size(erfi_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_30_mod_4_time(plot_indices), erfi_30_mod_4_q_dot_virtual(plot_indices, 1));
+    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_30_mod_4_time(plot_indices), erfi_30_mod_4_command_data(plot_indices, 1));
+    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_80_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_80_mod_4_time(plot_indices), erfi_80_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_80_mod_4_time(plot_indices), erfi_80_mod_4_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -2024,13 +621,13 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+if size(erfi_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_q_dot_virtual(plot_indices, 1));
+    plot(erfi_20_mod_6_time(plot_indices), erfi_20_mod_6_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_50_mod_4_time(plot_indices), erfi_50_mod_4_command_data(plot_indices, 1));
+    plot(erfi_20_mod_6_time(plot_indices), erfi_20_mod_6_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -2039,15 +636,35 @@ else
     grid on;
 end
 
-% 0.6m/s
-nexttile;
-if size(erfi_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_20_mod_6_time(plot_indices), erfi_20_mod_6_q_dot_virtual(plot_indices, 1));
+    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_20_mod_6_time(plot_indices), erfi_20_mod_6_command_data(plot_indices, 1));
+    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;
+if size(erfi_80_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_80_mod_6_time(plot_indices), erfi_80_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_80_mod_6_time(plot_indices), erfi_80_mod_6_command_data(plot_indices, 1));
     % title('DR', 'FontSize', subtitle_fontsize);
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
@@ -2059,59 +676,16 @@ else
     % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_30_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('erfi_30', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_30_mod_6_time(plot_indices), erfi_30_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_30_mod_6_time(plot_indices), erfi_30_mod_6_command_data(plot_indices, 1));
-    % title('erfi_30', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
-
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
-else
-    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_50_mod_6_time(plot_indices), erfi_50_mod_6_command_data(plot_indices, 1));
-    % title('Our method', 'FontSize', subtitle_fontsize);
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.02;
-    % lg.Position(2) = lg.Position(2) - 0.06;
-end
 
 
 
-
-% Compare No quadratic term, erfi_30, and our method under environment gap%%%
+% Compare No quadratic term, erfi_20, and our method under environment gap%%%
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
 % 0.4m/s
 if size(erfi_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
     plot(erfi_20_env_4_time(plot_indices), erfi_20_env_4_q_dot_virtual(plot_indices, 1));
     hold on;
@@ -2126,30 +700,13 @@ else
     % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
-nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
-
-if size(erfi_30_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
-    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-else
-    plot(erfi_30_env_4_time(plot_indices), erfi_30_env_4_q_dot_virtual(plot_indices, 1));
-    hold on;
-    plot(erfi_30_env_4_time(plot_indices), erfi_30_env_4_command_data(plot_indices, 1));
-    % xlabel('Time, [s]', 'FontSize', label_fontsize);
-    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
-    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
-    ylim(ylimit); % Adjust these values to your desired y-axis range
-    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
-    grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
-end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
+% 0.4m/s
 if size(erfi_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
     plot(erfi_50_env_4_time(plot_indices), erfi_50_env_4_q_dot_virtual(plot_indices, 1));
     hold on;
@@ -2160,17 +717,19 @@ else
     ylim(ylimit); % Adjust these values to your desired y-axis range
     set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
     grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
-% 0.6m/s
-nexttile;
-if size(erfi_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_80_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_20_env_6_time(plot_indices), erfi_20_env_6_q_dot_virtual(plot_indices, 1));
+    plot(erfi_80_env_4_time(plot_indices), erfi_80_env_4_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_20_env_6_time(plot_indices), erfi_20_env_6_command_data(plot_indices, 1));
+    plot(erfi_80_env_4_time(plot_indices), erfi_80_env_4_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
@@ -2183,34 +742,1495 @@ end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
-if size(erfi_30_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+if size(erfi_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('erfi_30', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
-    plot(erfi_30_env_6_time(plot_indices), erfi_30_env_6_q_dot_virtual(plot_indices, 1));
+    plot(erfi_20_env_4_time(plot_indices), erfi_20_env_4_q_dot_virtual(plot_indices, 1));
     hold on;
-    plot(erfi_30_env_6_time(plot_indices), erfi_30_env_6_command_data(plot_indices, 1));
+    plot(erfi_20_env_4_time(plot_indices), erfi_20_env_4_command_data(plot_indices, 1));
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
     xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
     ylim(ylimit); % Adjust these values to your desired y-axis range
     set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
     grid on;
-    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
-    % lg.Position(1) = lg.Position(1) + 0.05;
 end
 
 nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
 
+% 0.4m/s
 if size(erfi_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
     text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
-    set(gca, 'XColor', 'none', 'YColor', 'none'); % Hide axes
-    % title('Our method', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
 else
     plot(erfi_50_env_6_time(plot_indices), erfi_50_env_6_q_dot_virtual(plot_indices, 1));
     hold on;
     plot(erfi_50_env_6_time(plot_indices), erfi_50_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;
+if size(erfi_80_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_80_env_6_time(plot_indices), erfi_80_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_80_env_6_time(plot_indices), erfi_80_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%
+%% Evaluate ERFI-beta per noise lim
+figure('Name', 'ERFI beta');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_eight_row_size]); % Choose single_column_size or double_column_size here
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+t = tiledlayout(8, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;
+plot(erfi_beta_20_nom_4_time(plot_indices), erfi_beta_20_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_20_nom_4_time(plot_indices), erfi_beta_20_nom_4_command_data(plot_indices, 1));
+title('erfi beta 20', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+nexttile;
+plot(erfi_beta_50_nom_4_time(plot_indices), erfi_beta_50_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_50_nom_4_time(plot_indices), erfi_beta_50_nom_4_command_data(plot_indices, 1));
+title('erfi beta 50', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+
+nexttile;
+plot(erfi_beta_80_nom_4_time(plot_indices), erfi_beta_80_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_80_nom_4_time(plot_indices), erfi_beta_80_nom_4_command_data(plot_indices, 1));
+title('erfi beta 80', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+lgd.Position(1) = lgd.Position(1) + 0.02;
+lgd.Position(2) = lgd.Position(2) - 0.01;
+
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
+
+nexttile;
+plot(erfi_beta_20_nom_6_time(plot_indices), erfi_beta_20_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_20_nom_6_time(plot_indices), erfi_beta_20_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+nexttile;
+plot(erfi_beta_50_nom_6_time(plot_indices), erfi_beta_50_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_50_nom_6_time(plot_indices), erfi_beta_50_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+nexttile;
+plot(erfi_beta_80_nom_6_time(plot_indices), erfi_beta_80_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(erfi_beta_80_nom_6_time(plot_indices), erfi_beta_80_nom_6_command_data(plot_indices, 1));
+% title('No quadratic term', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
+
+
+
+% Compare No quadratic term, erfi_beta_20, and our method under actuator gap
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_20_act_4_time(plot_indices), erfi_beta_20_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_act_4_time(plot_indices), erfi_beta_20_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_act_4_time(plot_indices), erfi_beta_50_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_act_4_time(plot_indices), erfi_beta_50_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_80_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_80_act_4_time(plot_indices), erfi_beta_80_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_act_4_time(plot_indices), erfi_beta_80_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+% 0.6m/s
+nexttile;
+if size(erfi_beta_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(erfi_beta_20_act_6_time(plot_indices), erfi_beta_20_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_act_6_time(plot_indices), erfi_beta_20_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_act_6_time(plot_indices), erfi_beta_50_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_act_6_time(plot_indices), erfi_beta_50_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_80_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('erfi_beta_20', 'FontSize', subtitle_fontsize);
+else
+    plot(erfi_beta_80_act_6_time(plot_indices), erfi_beta_80_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_act_6_time(plot_indices), erfi_beta_80_act_6_command_data(plot_indices, 1));
+    % title('erfi_beta_20', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+% Compare No quadratic term, erfi_beta_20, and our method under model gap%%%
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_20_mod_4_time(plot_indices), erfi_beta_20_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_mod_4_time(plot_indices), erfi_beta_20_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_mod_4_time(plot_indices), erfi_beta_50_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_mod_4_time(plot_indices), erfi_beta_50_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_80_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_80_mod_4_time(plot_indices), erfi_beta_80_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_mod_4_time(plot_indices), erfi_beta_80_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_20_mod_6_time(plot_indices), erfi_beta_20_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_mod_6_time(plot_indices), erfi_beta_20_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_mod_6_time(plot_indices), erfi_beta_50_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_mod_6_time(plot_indices), erfi_beta_50_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;
+if size(erfi_beta_80_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_80_mod_6_time(plot_indices), erfi_beta_80_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_mod_6_time(plot_indices), erfi_beta_80_mod_6_command_data(plot_indices, 1));
+    % title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+
+
+% Compare No quadratic term, erfi_beta_20, and our method under environment gap%%%
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_20_env_4_time(plot_indices), erfi_beta_20_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_env_4_time(plot_indices), erfi_beta_20_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_env_4_time(plot_indices), erfi_beta_50_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_env_4_time(plot_indices), erfi_beta_50_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_80_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_80_env_4_time(plot_indices), erfi_beta_80_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_env_4_time(plot_indices), erfi_beta_80_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(erfi_beta_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_20_env_6_time(plot_indices), erfi_beta_20_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_20_env_6_time(plot_indices), erfi_beta_20_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(erfi_beta_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_50_env_6_time(plot_indices), erfi_beta_50_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_50_env_6_time(plot_indices), erfi_beta_50_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;
+if size(erfi_beta_80_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(erfi_beta_80_env_6_time(plot_indices), erfi_beta_80_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(erfi_beta_80_env_6_time(plot_indices), erfi_beta_80_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%
+%% Evaluate NQ per noise lim
+figure('Name', 'NQ');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_eight_row_size]); % Choose single_column_size or double_column_size here
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+t = tiledlayout(8, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;
+plot(nq_20_nom_4_time(plot_indices), nq_20_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_20_nom_4_time(plot_indices), nq_20_nom_4_command_data(plot_indices, 1));
+title('nq 20', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+nexttile;
+plot(nq_50_nom_4_time(plot_indices), nq_50_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_50_nom_4_time(plot_indices), nq_50_nom_4_command_data(plot_indices, 1));
+title('nq 50', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+
+nexttile;
+plot(nq_80_nom_4_time(plot_indices), nq_80_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_80_nom_4_time(plot_indices), nq_80_nom_4_command_data(plot_indices, 1));
+title('nq 80', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+lgd.Position(1) = lgd.Position(1) + 0.02;
+lgd.Position(2) = lgd.Position(2) - 0.01;
+
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
+
+nexttile;
+plot(nq_20_nom_6_time(plot_indices), nq_20_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_20_nom_6_time(plot_indices), nq_20_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+nexttile;
+plot(nq_50_nom_6_time(plot_indices), nq_50_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_50_nom_6_time(plot_indices), nq_50_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+nexttile;
+plot(nq_80_nom_6_time(plot_indices), nq_80_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(nq_80_nom_6_time(plot_indices), nq_80_nom_6_command_data(plot_indices, 1));
+% title('No quadratic term', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
+
+
+
+% Compare No quadratic term, nq_20, and our method under actuator gap
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_20_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_20_act_4_time(plot_indices), nq_20_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_act_4_time(plot_indices), nq_20_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_act_4_time(plot_indices), nq_50_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_act_4_time(plot_indices), nq_50_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_80_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_80_act_4_time(plot_indices), nq_80_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_act_4_time(plot_indices), nq_80_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+% 0.6m/s
+nexttile;
+if size(nq_20_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(nq_20_act_6_time(plot_indices), nq_20_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_act_6_time(plot_indices), nq_20_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_act_6_time(plot_indices), nq_50_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_act_6_time(plot_indices), nq_50_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_80_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('nq_20', 'FontSize', subtitle_fontsize);
+else
+    plot(nq_80_act_6_time(plot_indices), nq_80_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_act_6_time(plot_indices), nq_80_act_6_command_data(plot_indices, 1));
+    % title('nq_20', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+% Compare No quadratic term, nq_20, and our method under model gap%%%
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_20_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_20_mod_4_time(plot_indices), nq_20_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_mod_4_time(plot_indices), nq_20_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_mod_4_time(plot_indices), nq_50_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_mod_4_time(plot_indices), nq_50_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_80_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_80_mod_4_time(plot_indices), nq_80_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_mod_4_time(plot_indices), nq_80_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_20_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_20_mod_6_time(plot_indices), nq_20_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_mod_6_time(plot_indices), nq_20_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_mod_6_time(plot_indices), nq_50_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_mod_6_time(plot_indices), nq_50_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;
+if size(nq_80_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_80_mod_6_time(plot_indices), nq_80_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_mod_6_time(plot_indices), nq_80_mod_6_command_data(plot_indices, 1));
+    % title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+
+
+% Compare No quadratic term, nq_20, and our method under environment gap%%%
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_20_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_20_env_4_time(plot_indices), nq_20_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_env_4_time(plot_indices), nq_20_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_env_4_time(plot_indices), nq_50_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_env_4_time(plot_indices), nq_50_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_80_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_80_env_4_time(plot_indices), nq_80_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_env_4_time(plot_indices), nq_80_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(nq_20_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_20_env_6_time(plot_indices), nq_60_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_20_env_6_time(plot_indices), nq_60_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(nq_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_50_env_6_time(plot_indices), nq_50_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_50_env_6_time(plot_indices), nq_50_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;
+if size(nq_80_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(nq_80_env_6_time(plot_indices), nq_80_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(nq_80_env_6_time(plot_indices), nq_80_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%
+%% Evaluate Hybrid per noise lim
+figure('Name', 'Hybrid');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, single_column_eight_row_size]); % Choose single_column_size or double_column_size here
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+t = tiledlayout(8, 2, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;
+plot(hy_50_nom_4_time(plot_indices), hy_50_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(hy_50_nom_4_time(plot_indices), hy_50_nom_4_command_data(plot_indices, 1));
+title('hy 50', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+nexttile;
+plot(hy_100_nom_4_time(plot_indices), hy_100_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(hy_100_nom_4_time(plot_indices), hy_100_nom_4_command_data(plot_indices, 1));
+title('hy 100', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+
+nexttile;
+plot(hy_50_nom_6_time(plot_indices), hy_50_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(hy_50_nom_6_time(plot_indices), hy_50_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+nexttile;
+plot(hy_100_nom_6_time(plot_indices), hy_100_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(hy_100_nom_6_time(plot_indices), hy_100_nom_6_command_data(plot_indices, 1));
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+
+
+% Compare No quadratic term, nq_20, and our method under actuator gap
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_50_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_50_act_4_time(plot_indices), hy_50_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_act_4_time(plot_indices), hy_50_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_act_4_time(plot_indices), hy_100_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_act_4_time(plot_indices), hy_100_act_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+% 0.6m/s
+nexttile;
+if size(hy_50_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(hy_50_act_6_time(plot_indices), hy_50_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_act_6_time(plot_indices), hy_50_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_act_6_time(plot_indices), hy_100_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_act_6_time(plot_indices), hy_100_act_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+
+
+% Compare No quadratic term, hy_50, and our method under model gap%%%
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_50_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_50_mod_4_time(plot_indices), hy_50_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_mod_4_time(plot_indices), hy_50_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_mod_4_time(plot_indices), hy_100_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_mod_4_time(plot_indices), hy_100_mod_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(hy_50_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_50_mod_6_time(plot_indices), hy_50_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_mod_6_time(plot_indices), hy_50_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_mod_6_time(plot_indices), hy_100_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_mod_6_time(plot_indices), hy_100_mod_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+% Compare No quadratic term, hy_50, and our method under environment gap%%%
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_50_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_50_env_4_time(plot_indices), hy_50_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_env_4_time(plot_indices), hy_50_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_env_4_time(plot_indices), hy_100_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_env_4_time(plot_indices), hy_100_env_4_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(hy_50_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_50_env_6_time(plot_indices), hy_50_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_50_env_6_time(plot_indices), hy_50_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(hy_100_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+else
+    plot(hy_100_env_6_time(plot_indices), hy_100_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(hy_100_env_6_time(plot_indices), hy_100_env_6_command_data(plot_indices, 1));
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%
+%% Compare Performance in Nominal Setting 
+figure('Name', 'Nominal performance comparison, (DR, ERFI, Ours)');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;
+plot(DR_nom_4_time(plot_indices), DR_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(DR_nom_4_time(plot_indices), DR_nom_4_command_data(plot_indices, 1));
+title('DR', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+
+nexttile;
+plot(ERFI_nom_4_time(plot_indices), ERFI_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(ERFI_nom_4_time(plot_indices), ERFI_nom_4_command_data(plot_indices, 1));
+title('ERFI', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast')
+
+nexttile;
+plot(OUR_nom_4_time(plot_indices), OUR_nom_4_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(OUR_nom_4_time(plot_indices), OUR_nom_4_command_data(plot_indices, 1));
+title('Our method', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+lgd.Position(1) = lgd.Position(1) + 0.02;
+lgd.Position(2) = lgd.Position(2) - 0.01;
+
+% sgtitle("Base Forward Velocity Tracking Performance in Nominal Settings", 'FontSize', sgtitle_fontsize);
+nexttile;
+plot(DR_nom_6_time(plot_indices), DR_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(DR_nom_6_time(plot_indices), DR_nom_6_command_data(plot_indices, 1));
+% title('DR', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
+
+nexttile;
+plot(ERFI_nom_6_time(plot_indices), ERFI_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(ERFI_nom_6_time(plot_indices), ERFI_nom_6_command_data(plot_indices, 1));
+% title('ERFI', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
+
+nexttile;
+plot(OUR_nom_6_time(plot_indices), OUR_nom_6_q_dot_virtual(plot_indices, 1));
+hold on;
+plot(OUR_nom_6_time(plot_indices), OUR_nom_6_command_data(plot_indices, 1));
+% title('NN', 'FontSize', subtitle_fontsize);
+% xlabel('Time, [s]', 'FontSize', label_fontsize);
+% ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+grid on;
+% legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'southeast')
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.05, 0.5, 0]);
+%%
+%% Compare DR, ERFI, and our method under actuator gap
+figure('Name', 'Actuator gap, (DR, ERFI, Ours)');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
+
+t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(DR_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_act_4_time(plot_indices), DR_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_act_4_time(plot_indices), DR_act_4_command_data(plot_indices, 1));
+    title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_act_4_time(plot_indices), ERFI_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_act_4_time(plot_indices), ERFI_act_4_command_data(plot_indices, 1));
+    title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_act_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_act_4_time(plot_indices), OUR_act_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_act_4_time(plot_indices), OUR_act_4_command_data(plot_indices, 1));
+    title('Our method', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    lgd.Position(1) = lgd.Position(1) + 0.02;
+    lgd.Position(2) = lgd.Position(2) - 0.01;
+end
+
+% 0.6m/s
+nexttile;
+if size(DR_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_act_6_time(plot_indices), DR_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_act_6_time(plot_indices), DR_act_6_command_data(plot_indices, 1));
+    % title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_act_6_time(plot_indices), ERFI_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_act_6_time(plot_indices), ERFI_act_6_command_data(plot_indices, 1));
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_act_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_act_6_time(plot_indices), OUR_act_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_act_6_time(plot_indices), OUR_act_6_command_data(plot_indices, 1));
     % title('Our method', 'FontSize', subtitle_fontsize);
     % xlabel('Time, [s]', 'FontSize', label_fontsize);
     % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
@@ -2229,3 +2249,284 @@ han.YLabel.Visible = 'on';
 xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
 ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
 
+%%
+%% Compare DR, ERFI, and our method under model gap%%%
+figure('Name', 'Model gap, (DR, ERFI, Ours)');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
+
+t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(DR_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_mod_4_time(plot_indices), DR_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_mod_4_time(plot_indices), DR_mod_4_command_data(plot_indices, 1));
+    title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_mod_4_time(plot_indices), ERFI_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_mod_4_time(plot_indices), ERFI_mod_4_command_data(plot_indices, 1));
+    title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_mod_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_mod_4_time(plot_indices), OUR_mod_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_mod_4_time(plot_indices), OUR_mod_4_command_data(plot_indices, 1));
+    title('Our method', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    lgd.Position(1) = lgd.Position(1) + 0.02;
+    lgd.Position(2) = lgd.Position(2) - 0.01;
+end
+
+% 0.6m/s
+nexttile;
+if size(DR_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_mod_6_time(plot_indices), DR_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_mod_6_time(plot_indices), DR_mod_6_command_data(plot_indices, 1));
+    % title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_mod_6_time(plot_indices), ERFI_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_mod_6_time(plot_indices), ERFI_mod_6_command_data(plot_indices, 1));
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_mod_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_mod_6_time(plot_indices), OUR_mod_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_mod_6_time(plot_indices), OUR_mod_6_command_data(plot_indices, 1));
+    % title('Our method', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.02;
+    % lg.Position(2) = lg.Position(2) - 0.06;
+end
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%
+%% Compare DR, ERFI, and our method under environment gap%%%
+figure('Name', 'Environment gap, (DR, ERFI, Ours)');
+set(gcf, 'Units', 'inches', 'Position', [1, 1, double_column_size]); % Choose single_column_size or double_column_size here
+
+t = tiledlayout(2, 3, 'TileSpacing', 'compact', 'Padding', 'normal'); % Adjust 'TileSpacing' and 'Padding' as needed
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+% 0.4m/s
+if size(DR_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_env_4_time(plot_indices), DR_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_env_4_time(plot_indices), DR_env_4_command_data(plot_indices, 1));
+    title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_env_4_time(plot_indices), ERFI_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_env_4_time(plot_indices), ERFI_env_4_command_data(plot_indices, 1));
+    title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_env_4_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_env_4_time(plot_indices), OUR_env_4_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_env_4_time(plot_indices), OUR_env_4_command_data(plot_indices, 1));
+    title('Our method', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    lgd = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    lgd.Position(1) = lgd.Position(1) + 0.02;
+    lgd.Position(2) = lgd.Position(2) - 0.01;
+end
+
+% 0.6m/s
+nexttile;
+if size(DR_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('DR', 'FontSize', subtitle_fontsize);
+else
+    plot(DR_env_6_time(plot_indices), DR_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(DR_env_6_time(plot_indices), DR_env_6_command_data(plot_indices, 1));
+    % title('DR', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(ERFI_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+else
+    plot(ERFI_env_6_time(plot_indices), ERFI_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(ERFI_env_6_time(plot_indices), ERFI_env_6_command_data(plot_indices, 1));
+    % title('ERFI', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.05;
+end
+
+nexttile;% sgtitle('Base Forward Velocity Tracking Performance under Actuator Gap', 'FontSize', sgtitle_fontsize)
+
+if size(OUR_env_6_q_dot_virtual, 1) < plot_end_time * control_hz
+    text(0.5, 0.5, 'FAILED', 'HorizontalAlignment', 'center', 'FontSize', subtitle_fontsize);
+    set(gca, 'XColor', 'k', 'YColor', 'k', 'FontSize', tick_fontsize); % Hide axes
+    % title('Our method', 'FontSize', subtitle_fontsize);
+else
+    plot(OUR_env_6_time(plot_indices), OUR_env_6_q_dot_virtual(plot_indices, 1));
+    hold on;
+    plot(OUR_env_6_time(plot_indices), OUR_env_6_command_data(plot_indices, 1));
+    % title('Our method', 'FontSize', subtitle_fontsize);
+    % xlabel('Time, [s]', 'FontSize', label_fontsize);
+    % ylabel('Velocity, [m/s]', 'FontSize', label_fontsize);
+    xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+    ylim(ylimit); % Adjust these values to your desired y-axis range
+    set(gca, 'FontSize', tick_fontsize); % This sets the font size for axis tick labels
+    grid on;
+    % lg = legend('Measured', 'Commanded', 'FontSize', legend_fontsize, 'Location', 'northeast');
+    % lg.Position(1) = lg.Position(1) + 0.02;
+    % lg.Position(2) = lg.Position(2) - 0.06;
+end
+
+han = axes(gcf, 'Visible', 'off'); % Create an invisible axes that spans the figure
+han.XLabel.Visible = 'on';
+han.YLabel.Visible = 'on';
+xlabel(han, 'Time, [s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [0.5, -0.05, 0]); % Global x-axis label
+ylabel(han, 'Velocity, [m/s]', 'FontSize', label_fontsize, 'Units', 'normalized', 'Position', [-0.07, 0.5, 0]);
+%%

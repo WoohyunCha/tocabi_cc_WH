@@ -4,7 +4,7 @@ d2 = load('data_yongarry.txt');
 d3 = load('data_yongarry_standstill.txt');
 
 plot_start_time = 2;
-plot_end_time = 10;
+plot_end_time = 8;
 
 torque_data_yongarry = d2(:, 13:20);
 plot_indices_yongarry = 250*plot_start_time:250*plot_end_time;
@@ -14,6 +14,10 @@ grf_data_yongarry_standstill = [d3(:, 8:9);d3(:, 8:9)];
 control_hz = 125;
 
 plot_indices = control_hz*plot_start_time:control_hz*plot_end_time;
+
+
+ylimit = [0, 0.7];
+
 
 figure(1);
 inference_dt_len = 1;
@@ -135,8 +139,14 @@ lin_vel_data = q_dot_virtual(:, 1);
 plot(time(plot_indices), lin_vel_data(plot_indices));
 hold on;
 plot(time(plot_indices), command_data(plot_indices, 1));
-legend('Measured', 'Target');
+hold on;
+plot(time(plot_indices), mean(lin_vel_data(plot_indices)) * ones(size(plot_indices)), '--', 'LineWidth', 1.5) % Plot the mean of lin_vel_data
+legend('Measured', 'Target', 'Mean');
 title('Linear velocity')
+xlim([plot_start_time, plot_end_time]); % Adjust these values to your desired x-axis range
+ylim(ylimit); % Adjust these values to your desired y-axis range
+grid on;
+
 subplot(2,2,2);
 
 lin_vel_data = q_dot_virtual(:, 2);  % Your input signal
@@ -152,7 +162,9 @@ plot(time(plot_indices), ang_vel_data(plot_indices));
 hold on;
 plot(time(plot_indices), command_data(plot_indices, 2));
 title('Angular velocity')
-legend('Measured', 'Target');
+hold on;
+plot(time(plot_indices), mean(ang_vel_data(plot_indices)) * ones(size(plot_indices)), '--', 'LineWidth', 1.5) % Plot the mean of lin_vel_data
+legend('Measured', 'Target', 'Mean');
 subplot(2,2,4);
 plot(time(plot_indices), heading(plot_indices));
 hold on;
