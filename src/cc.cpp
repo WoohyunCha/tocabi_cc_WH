@@ -1167,6 +1167,8 @@ void CustomController::computeSlow()
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
                     writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
                     if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
+                    writeFile << rd_cc_.imu_lin_acc.transpose() << "\t";
+                    writeFile << rd_cc_.imu_ang_vel.transpose() << "\t";
                     writeFile << std::endl;
 
                     time_write_pre_ = rd_cc_.control_time_us_;
