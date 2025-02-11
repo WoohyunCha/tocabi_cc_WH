@@ -406,6 +406,15 @@ void CustomController::initVariable()
     base_ang_vel.setZero();
     swing_state_stance_frame_.setZero(13);
     com_state_stance_frame_.setZero(13);
+
+    string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
+
+    if (is_on_robot_)
+    {
+        cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
+    }
+
+    loadCommand(cur_path + "commands.txt");
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -538,7 +547,6 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
     data_idx++;
 
-
     for (int i = 0; i < num_actuator_action; i++)
     {
         state_cur_(data_idx) = q_noise_(i) - q_init_(i);
@@ -582,8 +590,6 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
         state_cur_(data_idx) = target_com_state_stance_frame_(1);
         data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(2);
-        data_idx++;
         state_cur_(data_idx) = target_com_state_stance_frame_(5);
         data_idx++;
         state_cur_(data_idx) = target_com_state_stance_frame_(6);
@@ -610,9 +616,9 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = step_yaw_(0);
     data_idx++;
-    state_cur_(data_idx) = command_t_dsp_;
+    state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_dsp_ + (1-phase_indicator_(0))*Rcommand_t_dsp_;
     data_idx++;
-    state_cur_(data_idx) = command_t_ssp_;
+    state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_ssp_ + (1-phase_indicator_(0))*Rcommand_t_ssp_;
     data_idx++;
     state_cur_(data_idx) = foot_height_(0);
     data_idx++;
@@ -1111,7 +1117,88 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
     throw std::runtime_error("weights_path not found in configuration file.");
 }
 
+std::string CustomController::loadCommand(const std::string &command_file)
+{
+    std::ifstream file(command_file);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Cannot open command file: " + command_file);
+    }
 
+    std::string line, key, value;
+    while (std::getline(file, line))
+    {
+        // Skip empty lines (optional)
+        if (line.empty()) 
+            continue;
+
+        std::istringstream line_stream(line);
+        if (std::getline(line_stream, key, '=') && std::getline(line_stream, value))
+        {
+            // Convert 'value' string to double
+            double numericVal = std::stod(value);
+
+            // Now compare strings in if-else statements
+            if (key == "Lcommand_step_length_x_") {
+                Lcommand_step_length_x_ = numericVal;
+            } 
+            else if (key == "Lcommand_step_length_y_") {
+                Lcommand_step_length_y_ = numericVal;
+            } 
+            else if (key == "Lcommand_step_yaw_") {
+                Lcommand_step_yaw_ = numericVal;
+            } 
+            else if (key == "Lcommand_t_dsp_") {
+                Lcommand_t_dsp_ = numericVal;
+            }
+            else if (key == "Lcommand_t_ssp_") {
+                Lcommand_t_ssp_ = numericVal;
+            } 
+            else if (key == "Lcommand_foot_height_") {
+                Lcommand_foot_height_ = numericVal;
+            }
+            else if (key == "Rcommand_step_length_x_") {
+                Rcommand_step_length_x_ = numericVal;
+            }
+            else if (key == "Rcommand_step_length_y_") {
+                Rcommand_step_length_y_ = numericVal;
+            } 
+            else if (key == "Rcommand_step_yaw_") {
+                Rcommand_step_yaw_ = numericVal;
+            } 
+            else if (key == "Rcommand_t_dsp_") {
+                Rcommand_t_dsp_ = numericVal;
+            } 
+            else if (key == "Rcommand_t_ssp_") {
+                Rcommand_t_ssp_ = numericVal;
+            }
+            else if (key == "Rcommand_foot_height_") {
+                Rcommand_foot_height_ = numericVal;
+            }
+            else if (key == "weights_path") {
+                // If you have some string variable to store
+                // a path, you'd do something like:
+                // weights_path_ = value;
+            }
+            else
+            {
+                // Unrecognized key; you can ignore or warn, etc.
+                std::cerr << "Warning: unknown key '" << key << "' in " 
+                          << command_file << std::endl;
+            }
+        }
+    }
+
+    file.close();
+
+    // If you specifically require "weights_path" but haven't read it,
+    // you could throw here. Otherwise, remove this exception or change its logic.
+    // throw std::runtime_error("weights_path not found in configuration file.");
+    
+    // Return something if your function demands a std::string; 
+    // else you can make it void.
+    return {}; 
+}
 
 void CustomController::updateInitialState()
 {
@@ -1210,12 +1297,12 @@ void CustomController::updateInitialState()
 void CustomController::updateFootstepCommand(){
     if (walking_tick == 0){
         phase_indicator_ << first_stance_foot_, 1-first_stance_foot_, first_stance_foot_;
-        step_length_x_ << command_step_length_x_, command_step_length_x_, command_step_length_x_;
-        step_length_y_ << (2*phase_indicator_(0) - 1) * command_step_length_y_, (2*phase_indicator_(1)-1) * command_step_length_y_, (2*phase_indicator_(2)-1) * command_step_length_y_;
-        step_yaw_ << (2*phase_indicator_(0) - 1) * command_step_yaw_, (2*phase_indicator_(1) - 1) * command_step_yaw_, (2*phase_indicator_(2) - 1) * command_step_yaw_;
-        foot_height_ << command_foot_height_, command_foot_height_, command_foot_height_;
-        t_dsp_ << command_t_dsp_, command_t_dsp_, command_t_dsp_;
-        t_ssp_ << command_t_ssp_, command_t_ssp_, command_t_ssp_;
+        step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,  phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,  phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
+        step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_ + (1-phase_indicator_(1))*Rcommand_step_length_y_), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
+        step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
+        foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+        t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
+        t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
         t_dsp_ *= hz_;
         t_ssp_ *= hz_;
         for (int i = 0; i < number_of_foot_step; i++){
@@ -1240,12 +1327,12 @@ void CustomController::updateFootstepCommand(){
         phase_indicator_.segment(0,2) = phase_indicator_.segment(1,2);
 
         phase_indicator_(2) = 1-phase_indicator_(1);
-        step_length_x_(2) = command_step_length_x_;
-        step_length_y_(2) = (2*phase_indicator_(2)-1) * command_step_length_y_;
-        step_yaw_(2) = (2*phase_indicator_(2)-1) * command_step_yaw_;
-        t_dsp_(2) = std::floor(command_t_dsp_ * hz_);
-        t_ssp_(2) = std::floor(command_t_ssp_ * hz_);
-        foot_height_(2) = command_foot_height_;
+        step_length_x_(2) = phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
+        step_length_y_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_length_y_ + (1-phase_indicator_(2)) * Rcommand_step_length_y_);
+        step_yaw_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
+        t_dsp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
+        t_ssp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
+        foot_height_(2) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
 
         for (int i = 0; i < number_of_foot_step; i++){
             t_dsp_(i) = std::floor(t_dsp_(i));
@@ -1453,7 +1540,7 @@ void CustomController::getZmpTrajectory()
 {
     unsigned int norm_size = 0;
 
-    norm_size = 4*hz_ ; // compute zmp over the three planned steps
+    norm_size = 4.4*hz_ ; // compute zmp over the three planned steps
     addZmpOffset(); 
 
     zmpGenerator(norm_size);
@@ -2047,7 +2134,6 @@ void CustomController::getTargetState(){
     target_rfoot_state_float_frame_.translation() = (1-phase_indicator_(0))*target_com_state_stance_frame_quat_.toRotationMatrix().transpose() * (target_swing_state_stance_frame_.segment(0,3) - target_com_state_stance_frame_.segment(0,3)) + phase_indicator_(0) * target_com_state_stance_frame_quat_.toRotationMatrix().transpose()*(-target_com_state_stance_frame_.segment(0,3));
     target_rfoot_state_float_frame_.linear() = (1-phase_indicator_(0))*target_com_state_stance_frame_quat_.toRotationMatrix().transpose()*target_swing_state_stance_frame_quat_.toRotationMatrix() + phase_indicator_(0)*target_com_state_stance_frame_quat_.toRotationMatrix().transpose();
 
-    std::cout << q_leg_desired_.transpose() << std::endl;
     computeIkControl(target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_, q_leg_desired_);
 }
 

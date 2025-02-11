@@ -42,8 +42,8 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 69;
-    static const int num_cur_internal_state = 69;
+    static const int num_cur_state = 68;
+    static const int num_cur_internal_state = 68;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -179,6 +179,7 @@ public:
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
+    std::string loadCommand(const std::string &command_file);
 
 
     // BIPED WALKING PARAMETER
@@ -363,12 +364,19 @@ public:
     Eigen::VectorXd com_state_stance_frame_;
 
     // USER COMMAND
-    double command_step_length_x_ = 0.1;
-    double command_step_length_y_ = 0.22;
-    double command_step_yaw_ = 0.;
-    double command_t_dsp_ = 0.1;
-    double command_t_ssp_ = 0.8;
-    double command_foot_height_ = 0.08;
+    double Lcommand_step_length_x_ = 0.1;
+    double Lcommand_step_length_y_ = 0.22;
+    double Lcommand_step_yaw_ = 0.;
+    double Lcommand_t_dsp_ = 0.1;
+    double Lcommand_t_ssp_ = 0.8;
+    double Lcommand_foot_height_ = 0.08;
+
+    double Rcommand_step_length_x_ = 0.1;
+    double Rcommand_step_length_y_ = 0.22;
+    double Rcommand_step_yaw_ = 0.;
+    double Rcommand_t_dsp_ = 0.1;
+    double Rcommand_t_ssp_ = 0.8;
+    double Rcommand_foot_height_ = 0.08;
 
     // PREVIEW CONTROL
     void updateInitialState();
