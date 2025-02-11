@@ -14,7 +14,11 @@ public:
     Eigen::VectorQd getControl();
 
     //void taskCommandToCC(TaskCommand tc_);
-    
+
+    const double hz_ =125.;
+    double del_t = 1 / hz_;
+
+
     void computeSlow();
     void computeFast();
     void computePlanner();
@@ -38,8 +42,8 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 48;
-    static const int num_cur_internal_state = 36;
+    static const int num_cur_state = 69;
+    static const int num_cur_internal_state = 69;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -73,24 +77,6 @@ public:
     Eigen::MatrixXd value_hidden_layer3_;
     double value_;
 
-    Eigen::MatrixXd morph_net_w0_;
-    Eigen::MatrixXd morph_net_b0_;
-    Eigen::MatrixXd morph_net_w2_;
-    Eigen::MatrixXd morph_net_b2_;
-    Eigen::MatrixXd morph_net_w_;
-    Eigen::MatrixXd morph_net_b_;
-    Eigen::MatrixXd morph_hidden_layer1_;
-    Eigen::MatrixXd morph_hidden_layer2_;
-    Eigen::MatrixXd morphnet_input_;
-    Eigen::MatrixXd morphnet_output_;    
-    static const int morph_num_hidden_1 = 512;
-    static const int morph_num_hidden_2 = 256;   
-    static const int morph_params_dim = 4;
-    static const int morph_history_len_ = 5;
-    static const int morph_history_skip_ = 1;     
-    static const bool morphnet = false;
-    void loadMorphnet();
-    void feedforwardMorphnet();
 
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
@@ -137,9 +123,7 @@ public:
     void loadEncoderNetwork();
 
     Eigen::MatrixXd policy_input_;
-    static const int policy_input_dim_ = (morphnet) 
-                                     ? num_state + morph_params_dim
-                                     : (use_encoder_) 
+    static const int policy_input_dim_ =  (use_encoder_) 
                                        ? num_state + encoder_dim_
                                        : num_state;
     std::ofstream writeFile;
@@ -156,6 +140,7 @@ public:
     Eigen::Matrix<double, MODEL_DOF, 1> q_noise_;
     Eigen::Matrix<double, MODEL_DOF, 1> q_noise_pre_;
     Eigen::Matrix<double, MODEL_DOF, 1> q_vel_noise_;
+    Eigen::Vector12d q_leg_desired_;
 
     Eigen::Matrix<double, MODEL_DOF, 1> torque_init_;
     Eigen::Matrix<double, MODEL_DOF, 1> torque_spline_;
@@ -182,8 +167,6 @@ public:
     ros::Subscriber joy_sub_;
 
     // slider command
-    void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
-    ros::Subscriber rl_command_sub_;
     Vector3_t base_lin_vel, base_ang_vel;
 
     double target_vel_x_ = 0.0;
@@ -198,6 +181,226 @@ public:
     std::string loadPathFromConfig(const std::string &config_file);
 
 
+    // BIPED WALKING PARAMETER
+    void walkingParameterSetting();
+    const int number_of_foot_step = 3;
+    Eigen::Vector3d phase_indicator_;
+    Eigen::Vector3d step_length_x_;
+    Eigen::Vector3d step_length_y_;
+    Eigen::Vector3d step_yaw_;
+    Eigen::Vector3d t_dsp_;
+    Eigen::Vector3d t_ssp_;
+    Eigen::Vector3d foot_height_;
+    Eigen::Vector3d t_total_;
+    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
+    const double com_height_ = 0.7;
+
+    double t_last_;
+    double t_start_;
+    double t_temp_;  
+    double t_double1_;
+    double t_double2_;
+    double zmp_offset = 0.;
+
+
+
+    // Policy input
+    Eigen::VectorXd target_com_state_stance_frame_;
+    Eigen::VectorXd target_swing_state_stance_frame_;
+
+
+    Eigen::MatrixXd foot_step_;
+    Eigen::MatrixXd foot_step_support_frame_;
+    Eigen::MatrixXd foot_step_support_frame_offset_;
+
+    Eigen::Isometry3d pelv_support_start_;
+    Eigen::Isometry3d pelv_support_init_;
+    Eigen::Vector2d del_zmp;
+    Eigen::Vector2d cp_desired_;
+    Eigen::Vector2d cp_measured_;
+    Eigen::Vector2d cp_measured_LPF;
+    Eigen::Vector2d cp_measured_thread_;
+    Eigen::Vector2d cp_measured_mpc_;
+    Eigen::Vector3d cp_float_current_;
+
+    Eigen::Vector3d com_desired_;
+    Eigen::Vector3d com_desired_dot_;
+
+    Eigen::Vector3d com_support_init_;
+    Eigen::Vector3d com_support_init_dot_;
+    Eigen::Vector3d com_float_init_;
+    Eigen::Vector3d com_float_init_dot_;
+    Eigen::Vector3d com_float_current_;
+    Eigen::Vector3d com_float_current_dot_;
+    Eigen::Vector3d com_support_current_;
+    Eigen::Vector3d com_support_current_dot_;
+    Eigen::Vector3d com_support_current_LPF;
+    Eigen::Vector3d com_float_current_LPF;
+    Eigen::Vector3d com_support_current_prev;
+    Eigen::Vector3d com_support_cp_;
+
+    Eigen::Vector3d com_float_current_dot;
+    Eigen::Vector3d com_float_current_dot_prev;
+    Eigen::Vector3d com_float_current_dot_LPF;
+    Eigen::Vector3d com_support_current_dot_LPF;
+
+    Eigen::Vector3d pelv_rpy_current_;
+    Eigen::Vector3d rfoot_rpy_current_;
+    Eigen::Vector3d lfoot_rpy_current_;
+    Eigen::Isometry3d pelv_yaw_rot_current_from_global_;
+    Eigen::Isometry3d rfoot_roll_rot_;
+    Eigen::Isometry3d lfoot_roll_rot_;
+    Eigen::Isometry3d rfoot_pitch_rot_;
+    Eigen::Isometry3d lfoot_pitch_rot_;
+
+    Eigen::Isometry3d pelv_float_current_;
+    Eigen::Isometry3d lfoot_float_current_;
+    Eigen::Isometry3d rfoot_float_current_;
+    Eigen::Isometry3d pelv_float_init_;
+    Eigen::Isometry3d lfoot_float_init_;
+    Eigen::Isometry3d rfoot_float_init_;
+
+    Eigen::Isometry3d pelv_trajectory_support_; //local frame
+    Eigen::Isometry3d pelv_trajectory_support_fast_; //local frame
+    Eigen::Isometry3d pelv_trajectory_support_slow_; //local frame
+    
+    Eigen::Isometry3d rfoot_trajectory_support_;  //local frame
+    Eigen::Isometry3d lfoot_trajectory_support_;
+    Eigen::Isometry3d lfoot_trajectory_support_fast_;
+    Eigen::Isometry3d lfoot_trajectory_support_slow_;
+
+    Eigen::Vector3d rfoot_trajectory_euler_support_;
+    Eigen::Vector3d lfoot_trajectory_euler_support_;
+
+    Eigen::Isometry3d pelv_trajectory_float_; //pelvis frame
+
+    Eigen::Vector3d com_trajectory_float_;
+
+    Eigen::Isometry3d lfoot_trajectory_float_;
+    Eigen::Isometry3d lfoot_trajectory_float_fast_;
+    Eigen::Isometry3d lfoot_trajectory_float_slow_;
+
+    Eigen::Isometry3d rfoot_trajectory_float_;
+    Eigen::Isometry3d rfoot_trajectory_float_fast_;
+    Eigen::Isometry3d rfoot_trajectory_float_slow_;
+
+    Eigen::Vector3d pelv_support_euler_init_;
+    Eigen::Vector3d lfoot_support_euler_init_;
+    Eigen::Vector3d rfoot_support_euler_init_;
+    double wn = sqrt(GRAVITY / com_height_);
+
+    double walking_end_flag = 0;
+    
+    Eigen::Isometry3d swingfoot_float_current_; 
+    Eigen::Isometry3d supportfoot_float_current_; 
+
+    Eigen::Isometry3d pelv_support_current_;
+    Eigen::Isometry3d lfoot_support_current_;
+    Eigen::Isometry3d rfoot_support_current_;
+
+    Eigen::Isometry3d lfoot_support_init_;
+    Eigen::Isometry3d rfoot_support_init_;
+    
+    Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
+
+    Eigen::Vector6d supportfoot_support_init_offset_;
+    Eigen::Vector6d supportfoot_float_init_;
+    Eigen::Vector6d supportfoot_support_init_;
+    Eigen::Vector6d swingfoot_float_init_;
+    Eigen::Vector6d swingfoot_support_init_;
+    
+    Eigen::MatrixXd ref_zmp_;
+    Eigen::MatrixXd ref_zmp_container;
+    Eigen::MatrixXd ref_zmp_thread3;
+    Eigen::VectorXd ref_com_yaw_;
+    Eigen::VectorXd ref_com_yawvel_;
+    // PREVIEW CONTROL
+    Eigen::Vector3d x_preview_;
+    Eigen::Vector3d y_preview_;
+
+    Eigen::Vector3d xs_preview_;
+    Eigen::Vector3d ys_preview_;
+    Eigen::Vector3d xd_preview_;
+    Eigen::Vector3d yd_preview_; 
+
+    Eigen::MatrixXd Gi_preview_;
+    Eigen::MatrixXd Gx_preview_;
+    Eigen::VectorXd Gd_preview_;
+    Eigen::MatrixXd A_preview_;
+    Eigen::VectorXd B_preview_;
+    Eigen::MatrixXd C_preview_;
+    double UX_preview_, UY_preview_, EX_preview_, EY_preview_;
+
+
+    Eigen::Vector6d l_ft_;
+    Eigen::Vector6d r_ft_;
+    Eigen::Vector6d l_ft_LPF;
+    Eigen::Vector6d r_ft_LPF;
+    Eigen::Vector2d zmp_measured_mj_;
+    Eigen::Vector2d zmp_measured_LPF_;
+
+    double P_angle_i = 0;
+    double P_angle = 0;
+    double P_angle_input_dot = 0;
+    double P_angle_input = 0;
+    double R_angle = 0;
+    double R_angle_input_dot = 0;
+    double R_angle_input = 0;
+    double aa = 0; 
+    double Y_angle_input = 0;
+
+    // BOOLEAN OPERATOR
+    bool walking_enable_;
+    bool is_lfoot_support = false;
+    bool is_rfoot_support = false;
+    bool is_dsp1 = false;
+    bool is_ssp  = false;
+    bool is_dsp2 = false;
+    bool is_preview_ctrl_init = true;
+
+    // Logging
+    Eigen::VectorXd swing_state_stance_frame_;
+    Eigen::VectorXd com_state_stance_frame_;
+
+    // USER COMMAND
+    double command_step_length_x_ = 0.1;
+    double command_step_length_y_ = 0.22;
+    double command_step_yaw_ = 0.;
+    double command_t_dsp_ = 0.1;
+    double command_t_ssp_ = 0.8;
+    double command_foot_height_ = 0.08;
+
+    // PREVIEW CONTROL
+    void updateInitialState();
+    void updateFootstepCommand();
+    void getRobotState();
+    void walkingStateMachine();
+    void calculateFootStepTotal();
+    void supportToFloatPattern();
+    void floatToSupportFootstep();
+    void updateNextStepTime();
+    void resetPreviewState();
+    void computeIkControl(const Eigen::Isometry3d &float_trunk_transform, const Eigen::Isometry3d &float_lleg_transform, const Eigen::Isometry3d &float_rleg_transform, Eigen::Vector12d &q_des);
+
+    void getZmpTrajectory();
+    void addZmpOffset();
+    void zmpGenerator(const unsigned int norm_size);
+    void onestepZmp(unsigned int current_step_number, Eigen::VectorXd &temp_px, Eigen::VectorXd &temp_py, Eigen::VectorXd& temp_yaw, Eigen::VectorXd &temp_yawvel);
+
+    void getComTrajectory(); 
+    void previewcontroller(double dt, int NL, int tick, 
+                           Eigen::Vector3d &x_k, Eigen::Vector3d &y_k, double &UX, double &UY,
+                           const Eigen::MatrixXd &Gi, const Eigen::VectorXd &Gd, const Eigen::MatrixXd &Gx, 
+                           const Eigen::MatrixXd &A,  const Eigen::VectorXd &B,  const Eigen::MatrixXd &C);
+    void preview_Parameter(double dt, int NL, Eigen::MatrixXd& Gi, Eigen::VectorXd& Gd, Eigen::MatrixXd& Gx, Eigen::MatrixXd& A, Eigen::VectorXd& B, Eigen::MatrixXd& C);
+    void getComTrajectory_mpc();
+    void getFootTrajectory(); 
+    void getTargetState(); 
+
+
 private:
     Eigen::VectorQd ControlVal_;
+    unsigned int walking_tick = 0;
+    unsigned int walking_tick_container = 0;
+
 };
