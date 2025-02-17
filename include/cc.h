@@ -16,6 +16,7 @@ public:
     //void taskCommandToCC(TaskCommand tc_);
 
     const double hz_ =125.;
+    const double pd_hz_ = 2000;
     double del_t = 1 / hz_;
 
 
@@ -42,8 +43,8 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 68;
-    static const int num_cur_internal_state = 68;
+    static const int num_cur_state = 65;
+    static const int num_cur_internal_state = 65;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -193,8 +194,8 @@ public:
     Eigen::Vector3d t_ssp_;
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
-    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
-    const double com_height_ = 0.7;
+    int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
+    const double com_height_ = 0.68;
 
     double t_last_;
     double t_start_;
@@ -235,6 +236,7 @@ public:
     Eigen::Vector3d com_float_current_dot_;
     Eigen::Vector3d com_support_current_;
     Eigen::Vector3d com_support_current_dot_;
+    Eigen::Vector3d com_support_current_dot_prev_;
     Eigen::Vector3d com_support_current_LPF;
     Eigen::Vector3d com_float_current_LPF;
     Eigen::Vector3d com_support_current_prev;
@@ -360,8 +362,9 @@ public:
     bool is_preview_ctrl_init = true;
 
     // Logging
-    Eigen::VectorXd swing_state_stance_frame_;
-    Eigen::VectorXd com_state_stance_frame_;
+    Eigen::Isometry3d supportfoot_global_init_;
+    Eigen::VectorXd swing_state_firststance_frame_;
+    Eigen::VectorXd com_state_firststance_frame_;
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.1;

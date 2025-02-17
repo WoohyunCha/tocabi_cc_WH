@@ -404,8 +404,9 @@ void CustomController::initVariable()
     initBias();
     base_lin_vel.setZero();
     base_ang_vel.setZero();
-    swing_state_stance_frame_.setZero(13);
-    com_state_stance_frame_.setZero(13);
+    swing_state_firststance_frame_.setZero(13);
+    com_state_firststance_frame_.setZero(13);
+    q_leg_desired_ = q_init_.segment(0, num_actuator_action);
 
     string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
 
@@ -539,12 +540,20 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
     
-    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    // data_idx++;
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    // data_idx++;
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+    // data_idx++;
+    state_cur_(data_idx) = q.x();
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    state_cur_(data_idx) = q.y();
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+    state_cur_(data_idx) = q.z();
+    data_idx++;
+    state_cur_(data_idx) = q.w();
     data_idx++;
 
     for (int i = 0; i < num_actuator_action; i++)
@@ -566,40 +575,46 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-        state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    for (int i = 0; i < num_actuator_action; i++)
+    {
+        state_cur_(data_idx) = q_leg_desired_(i);
         data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(1);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(2);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(6);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(7);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(8);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(9);
-        data_idx++;
-        state_cur_(data_idx) = target_swing_state_stance_frame_(12);
-        data_idx++;
+    }
+
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(7);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(8);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(9);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(12);
+    // data_idx++;
 
 
-        state_cur_(data_idx) = target_com_state_stance_frame_(0);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(1);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(5);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(6);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(7);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(8);
-        data_idx++;
-        state_cur_(data_idx) = target_com_state_stance_frame_(12);
-        data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(0);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(1);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(7);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(8);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(12);
+    // data_idx++;
 
 
 
@@ -945,7 +960,6 @@ void CustomController::computeSlow()
         // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
         // With encoder, 
         if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_ - 4/10000.0) // 125 is the control frequency
-        // if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/250.0 - 1/10000.0) // 250 is the control frequency
         {
             // auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -1008,8 +1022,8 @@ void CustomController::computeSlow()
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
                     writeFile << target_swing_state_stance_frame_.transpose() << "\t";
                     writeFile << target_com_state_stance_frame_.transpose() << "\t";
-                    writeFile << swing_state_stance_frame_.transpose() << "\t";
-                    writeFile << com_state_stance_frame_.transpose() << "\t";
+                    writeFile << swing_state_firststance_frame_.transpose() << "\t";
+                    writeFile << com_state_firststance_frame_.transpose() << "\t";
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
@@ -1029,11 +1043,15 @@ void CustomController::computeSlow()
             time_inference_pre_ = rd_cc_.control_time_us_;
         }
 
+
+
         for (int i = 0; i < num_actuator_action; i++)
         {
             // WH
-            torque_rl_(i) = DyrosMath::minmax_cut(DyrosMath::minmax_cut(rl_action_(i), -1., 1.) *torque_bound_(i), -torque_bound_(i), torque_bound_(i));
-            // torque_rl_(i) += kp_(i,i) * (q_leg_desired_(i) - q_noise_(i)) - kv_(i,i)*q_vel_noise_(i);
+            torque_rl_(i) = DyrosMath::minmax_cut(rl_action_(i), -1., 1.) *torque_bound_(i) ;
+            // torque_rl_(i) = DyrosMath::minmax_cut(torque_rl_(i)  + 
+            // DyrosMath::minmax_cut(kp_(i,i) * (q_leg_desired_(i) - q_noise_(i)) - kv_(i,i)*q_vel_noise_(i),-torque_bound_(i), torque_bound_(i) ),
+            // -torque_bound_(i), torque_bound_(i));
         }
         for (int i = num_actuator_action; i < MODEL_DOF; i++)
         {
@@ -1237,10 +1255,15 @@ void CustomController::updateInitialState()
     if (foot_step_(0, 6) == 0) //right foot support
     {
         ref_frame = rfoot_float_init_;
+        supportfoot_global_init_.translation() = rd_.link_[Right_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_.link_[Right_Foot].rotm;
     }
     else if (foot_step_(0, 6) == 1)
     {
         ref_frame = lfoot_float_init_;
+        supportfoot_global_init_.translation() = rd_.link_[Left_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_.link_[Left_Foot].rotm;
+        
     }
 
     Eigen::Isometry3d ref_frame_yaw_only;
@@ -1426,22 +1449,36 @@ void CustomController::getRobotState()
     rfoot_support_current_ = DyrosMath::inverseIsometry3d(supportfoot_float_current_) * rfoot_float_current_;
 
     com_support_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_float_current_), com_float_current_);
+    com_support_current_dot_prev_ = com_support_current_dot_;
     com_support_current_dot_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_float_current_), com_float_current_dot);
     com_support_current_dot_LPF = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_float_current_), com_float_current_dot_LPF);
+    std::cout << "Support foot is : " << ((phase_indicator_(0)) ? "right" : "left") << std::endl;
+    std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
+    std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
+    std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
+    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_.link_[Right_Foot].rotm));
+    swing_state_firststance_frame_(3) = swing_quat.x();
+    swing_state_firststance_frame_(4) = swing_quat.y();
+    swing_state_firststance_frame_(5) = swing_quat.z();
+    swing_state_firststance_frame_(6) = swing_quat.w();
 
-    swing_state_stance_frame_.segment(0,3) = phase_indicator_(0)*lfoot_support_current_.translation() + (1-phase_indicator_(0))*rfoot_support_current_.translation();
-    Eigen::Quaterniond swing_quat(phase_indicator_(0)*lfoot_support_current_.linear() + (1-phase_indicator_(0))*rfoot_support_current_.linear());
-    swing_state_stance_frame_(3) = swing_quat.x();
-    swing_state_stance_frame_(4) = swing_quat.y();
-    swing_state_stance_frame_(5) = swing_quat.z();
-    swing_state_stance_frame_(6) = swing_quat.w();
+    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), rd_.link_[COM_id].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond com_quat(supportfoot_global_init_.linear().transpose() * rd_.link_[COM_id].rotm);
+    com_state_firststance_frame_(3) = com_quat.x();
+    com_state_firststance_frame_(4) = com_quat.y();
+    com_state_firststance_frame_(5) = com_quat.z();
+    com_state_firststance_frame_(6) = com_quat.w();
 
-    com_state_stance_frame_.segment(0,3) = phase_indicator_(0)*lfoot_support_current_.translation() + (1-phase_indicator_(0))*rfoot_support_current_.translation();
-    Eigen::Quaterniond com_quat(phase_indicator_(0)*lfoot_support_current_.linear() + (1-phase_indicator_(0))*rfoot_support_current_.linear());
-    com_state_stance_frame_(3) = com_quat.x();
-    com_state_stance_frame_(4) = com_quat.y();
-    com_state_stance_frame_(5) = com_quat.z();
-    com_state_stance_frame_(6) = com_quat.w();
+    x_preview_(0) = com_support_current_(0);
+    y_preview_(0) = com_support_current_(1);
+    
+    x_preview_(1) = com_support_current_dot_(0);
+    y_preview_(1) = com_support_current_dot_(1);
+
+    x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
+    y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
+
 
 
     // cp_measured_(0) = com_support_current_(0) + com_float_current_dot_LPF(0) / wn;
@@ -1845,22 +1882,59 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
 
     Eigen::Matrix4d K; K.setZero();
 
-    K(0, 0) = 71.5262553564475;
-    K(0, 1) = 2522.23947497469;
-    K(0, 2) = 712.398201438449;
-    K(0, 3) = 2.89140499765643;
-    K(1, 0) = 2522.23947497469;
-    K(1, 1) = 91356.5695769872;
-    K(1, 2) = 25812.1941547385;
-    K(1, 3) = 107.189310402563;
-    K(2, 0) = 712.398201438449;
-    K(2, 1) = 25812.1941547385;
-    K(2, 2) = 7293.19721250168;
-    K(2, 3) = 30.3233260788712;
-    K(3, 0) = 2.89140499765643;
-    K(3, 1) = 107.189310402563;
-    K(3, 2) = 30.3233260788712;
-    K(3, 3) = 0.136704094562293;
+    // // 0.7m
+    // K(0, 0) = 68.7921510770868;
+    // K(0, 1) = 2331.78394937073;
+    // K(0, 2) = 632.495145628673;
+    // K(0, 3) =2.57540412848618;
+    // K(1, 0) = 2331.78394937073;
+    // K(1, 1) = 81346.5405208585;
+    // K(1, 2) = 22074.2517082842;
+    // K(1, 3) = 92.2651171309122;
+    // K(2, 0) = 632.495145628673;
+    // K(2, 1) = 22074.2517082842;
+    // K(2, 2) = 5990.22394297225;
+    // K(2, 3) = 25.0754425025208;
+    // K(3, 0) = 2.57540412848618;
+    // K(3, 1) = 92.2651171309122;
+    // K(3, 2) = 25.0754425025208;
+    // K(3, 3) = 0.115349533788953;
+
+    // // 0.65m
+    // K(0, 0) = 66.4281134896190;
+    // K(0, 1) = 2173.13307414793;
+    // K(0, 2) = 568.379709117415;
+    // K(0, 3) = 2.32202159217899;
+    // K(1, 0) = 2173.13307414793;
+    // K(1, 1) = 73309.6668377235;
+    // K(1, 2) = 19183.2680991541;
+    // K(1, 3) = 80.7128585695845;
+    // K(2, 0) = 568.379709117415;
+    // K(2, 1) = 19183.2680991541;
+    // K(2, 2) = 5019.91885890998;
+    // K(2, 3) = 21.1593587923669;
+    // K(3, 0) = 2.32202159217899;
+    // K(3, 1) = 80.7128585695845;
+    // K(3, 2) = 21.1593587923669;
+    // K(3, 3) = 0.0993494956670487;
+
+    // 0.68m
+    K(0, 0) = 67.8563860285047;
+    K(0, 1) = 2268.31636940822;
+    K(0, 2) = 606.574465948491;
+    K(0, 3) = 2.47294507780013;
+    K(1, 0) = 2268.31636940822;
+    K(1, 1) = 78097.9429536234;
+    K(1, 2) = 20893.4283786941;
+    K(1, 3) = 87.5477908301230;
+    K(2, 0) = 606.574465948491;
+    K(2, 1) = 20893.4283786941;
+    K(2, 2) = 5589.73130292243;
+    K(2, 3) = 23.4600661791894;
+    K(3, 0) = 2.47294507780013;
+    K(3, 1) = 87.5477908301230;
+    K(3, 2) = 23.4600661791894;
+    K(3, 3) = 0.108757490098902;
 
     Eigen::MatrixXd Temp_mat;
     Eigen::MatrixXd Temp_mat_inv;
@@ -1879,11 +1953,28 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
 
     Gi.setZero(1, 1);
     Gx.setZero(1, 3);
-    Gi(0, 0) = 549.728637085655; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+    
+    // // 0.7m
+    // Gi(0, 0) = 562.367264784428; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+    // //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+    // Gx(0, 0) = 38686.4538399671;
+    // Gx(0, 1) = 10800.0433241572;
+    // Gx(0, 2) = 128.255400226113;
+
+    // // 0.65m
+    // Gi(0, 0) = 573.462734668883; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+    // //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+    // Gx(0, 0) = 38094.0476205746;
+    // Gx(0, 1) = 10274.4390649459;
+    // Gx(0, 2) = 124.583981245267;
+
+    // 0.68m
+    Gi(0, 0) = 566.740708905623; //Temp_mat_inv * B_bar_tran * K * I_bar ;
     //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
-    Gx(0, 0) = 39320.0308727818;
-    Gx(0, 1) = 11406.9383987880;
-    Gx(0, 2) = 132.433143128823;
+    Gx(0, 0) = 38456.9763214859;
+    Gx(0, 1) = 10592.0336283141;
+    Gx(0, 2) = 126.808547874660;
+
     Eigen::MatrixXd X_bar;
     Eigen::Vector4d X_bar_col;
     X_bar.setZero(4, NL);
@@ -2121,7 +2212,8 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick);
 
-    target_com_state_float_frame_.translation() << 0., 0., 0.04;
+    target_com_state_float_frame_.translation() << 0., 0., DyrosMath::minmax_cut((rd_.link_[Pelvis].rotm.transpose() * (rd_.link_[Pelvis].xpos-rd_.link_[COM_id].xpos))(2), 0., 0.03);
+    std::cout << target_com_state_float_frame_.translation() << std::endl;
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
