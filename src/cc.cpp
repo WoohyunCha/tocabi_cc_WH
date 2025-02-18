@@ -518,6 +518,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
     base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
+    // std::cout << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
 
     // for (int i=0; i<6; i++)
     // {
@@ -530,10 +531,10 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    for (int i = 0; i < 3; i++){
-        state_cur_(data_idx) = base_ang_vel(i);
-        data_idx++;
-    }
+    // for (int i = 0; i < 3; i++){
+    //     state_cur_(data_idx) = base_ang_vel(i);
+    //     data_idx++;
+    // }
  
     Vector3_t grav, projected_grav, forward_vec;
     grav << 0, 0, -1.;
@@ -1452,10 +1453,10 @@ void CustomController::getRobotState()
     com_support_current_dot_prev_ = com_support_current_dot_;
     com_support_current_dot_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_float_current_), com_float_current_dot);
     com_support_current_dot_LPF = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_float_current_), com_float_current_dot_LPF);
-    std::cout << "Support foot is : " << ((phase_indicator_(0)) ? "right" : "left") << std::endl;
-    std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
-    std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
-    std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
+    // std::cout << "Support foot is : " << ((phase_indicator_(0)) ? "right" : "left") << std::endl;
+    // std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
+    // std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
+    // std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
     swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
     Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_.link_[Right_Foot].rotm));
     swing_state_firststance_frame_(3) = swing_quat.x();
@@ -2213,7 +2214,6 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick);
 
     target_com_state_float_frame_.translation() << 0., 0., DyrosMath::minmax_cut((rd_.link_[Pelvis].rotm.transpose() * (rd_.link_[Pelvis].xpos-rd_.link_[COM_id].xpos))(2), 0., 0.03);
-    std::cout << target_com_state_float_frame_.translation() << std::endl;
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
