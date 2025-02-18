@@ -103,7 +103,7 @@ public:
     Eigen::MatrixXd state_var_;
 
     // encoder
-    static const bool use_encoder_ = false;
+    static const bool use_encoder_ = true;
     bool encoder_initialized = false;
     
     Eigen::MatrixXd state_history_;
