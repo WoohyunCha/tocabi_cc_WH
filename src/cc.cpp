@@ -517,9 +517,12 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
-    base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
-    // std::cout << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
+    base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
+    // std::cout <<"global : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
+    // base_ang_vel = q.conjugate()*base_ang_vel;
+    // std::cout << "local : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
 
+ 
     // for (int i=0; i<6; i++)
     // {
     //     state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
@@ -531,16 +534,17 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    // for (int i = 0; i < 3; i++){
-    //     state_cur_(data_idx) = base_ang_vel(i);
-    //     data_idx++;
-    // }
- 
+    for (int i = 0; i < 3; i++){
+        state_cur_(data_idx) = base_ang_vel(i);
+        data_idx++;
+    }
+
+
     Vector3_t grav, projected_grav, forward_vec;
     grav << 0, 0, -1.;
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
-    
+
     // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
     // data_idx++;
@@ -991,17 +995,17 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
             std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            // if (value_ < 60.0)
-            // {
-            //     if (stop_by_value_thres_ == false)
-            //     {
+            if (value_ < 60.0)
+            {
+                if (stop_by_value_thres_ == false)
+                {
 
-            //         // stop_by_value_thres_ = true;
-            //         stop_start_time_ = rd_cc_.control_time_us_;
-            //         q_stop_ = q_noise_;
-            //         std::cout << "Stop by Value Function : " << walking_tick << ", value : " << value_ << std::endl;
-            //     }
-            // }
+                    stop_by_value_thres_ = true;
+                    stop_start_time_ = rd_cc_.control_time_us_;
+                    q_stop_ = q_noise_;
+                    std::cout << "Stop by Value Function : " << walking_tick << ", Value : " << value_ << std::endl;
+                }
+            }
 
             if (is_write_file_)
             {
