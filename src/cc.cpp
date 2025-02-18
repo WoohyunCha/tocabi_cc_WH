@@ -527,7 +527,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
-    base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
+    base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
 
     // for (int i=0; i<6; i++)
     // {
