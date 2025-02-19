@@ -995,7 +995,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
             std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            if (value_ < 60.0)
+            if (value_ < 80.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -2217,7 +2217,7 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick);
 
-    target_com_state_float_frame_.translation() << 0., 0., DyrosMath::minmax_cut((rd_.link_[Pelvis].rotm.transpose() * (rd_.link_[Pelvis].xpos-rd_.link_[COM_id].xpos))(2), 0., 0.03);
+    target_com_state_float_frame_.translation() << 0., 0., DyrosMath::minmax_cut((rd_.link_[Pelvis].rotm.transpose() * (rd_.link_[Pelvis].xpos-rd_.link_[COM_id].xpos))(2), 0., 0.04);
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
