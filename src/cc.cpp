@@ -1034,8 +1034,7 @@ void CustomController::computeSlow()
 
                     time_write_pre_ = rd_cc_.control_time_us_;
 
-                    // Data for actuator net training
-                
+
             }
             
             time_inference_pre_ = rd_cc_.control_time_us_;
@@ -1109,6 +1108,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 std::string CustomController::loadPathFromConfig(const std::string &config_file)
 {
+    std::cout << "LOAD WEIGHT!!" << std::endl;
     std::ifstream file(config_file);
     if (!file.is_open())
     {
@@ -1135,6 +1135,7 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
 
 std::string CustomController::loadCommand(const std::string &command_file)
 {
+    std::cout << "LOAD COMMAND!!" << std::endl;
     std::ifstream file(command_file);
     if (!file.is_open())
     {
