@@ -1035,14 +1035,7 @@ void CustomController::computeSlow()
                     time_write_pre_ = rd_cc_.control_time_us_;
 
                     // Data for actuator net training
-                    if (actuator_net_log){
-                        actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
-                        actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
-                        actuator_data_file << std::endl;
-                    }
-
+                
             }
             
             time_inference_pre_ = rd_cc_.control_time_us_;

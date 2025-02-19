@@ -5,7 +5,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-#include <tocabi_msgs/RLCommand.h>
+
 
 class CustomController
 {
@@ -129,7 +129,7 @@ public:
                                        : num_state;
     std::ofstream writeFile;
     std::ofstream actuator_data_file;
-    bool actuator_net_log = true;
+    bool actuator_net_log = false;
 
     float phase_ = 0.0;
 
