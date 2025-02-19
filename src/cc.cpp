@@ -47,6 +47,8 @@ void CustomController::loadNetwork()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
 
+    std::cout << "Path : " << cur_path + "weight_directory.txt" <<std::endl;
+
     base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
 
     std::ifstream file[14];
@@ -563,7 +565,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .5, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .4, 0.0, 0.0);// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
