@@ -935,7 +935,7 @@ void CustomController::computeSlow()
             //Initialize settings for Task Control! 
             start_time_ = rd_cc_.control_time_us_;
             q_noise_pre_ = q_noise_ = q_init_ = rd_cc_.q_virtual_.segment(6,MODEL_DOF);
-            q_leg_desired_ = rd_.q_.segment(0,12);
+            q_leg_desired_ = rd_cc_.q_.segment(0,12);
             time_cur_ = start_time_ / 1e6;
             time_pre_ = time_cur_ - 0.005;
             // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
@@ -1227,47 +1227,49 @@ void CustomController::updateInitialState()
 {
 
     pelv_rpy_current_.setZero();
-    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Pelvis].rotm); //ZYX multiply
+    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Pelvis].rotm); //ZYX multiply
 
     pelv_yaw_rot_current_from_global_ = DyrosMath::rotateWithZ(pelv_rpy_current_(2));
-    pelv_yaw_rot_current_from_global_.linear() = rd_.link_[Pelvis].rotm;
+    pelv_yaw_rot_current_from_global_.linear() = rd_cc_.link_[Pelvis].rotm;
 
     rfoot_rpy_current_.setZero();
     lfoot_rpy_current_.setZero();
-    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Right_Foot].rotm);
-    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Left_Foot].rotm);
+    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm);
+    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm);
 
     rfoot_roll_rot_ = DyrosMath::rotateWithX(rfoot_rpy_current_(0));
     lfoot_roll_rot_ = DyrosMath::rotateWithX(lfoot_rpy_current_(0));
     rfoot_pitch_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(1));
     lfoot_pitch_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(1));
+    rfoot_yaw_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(2));
+    lfoot_yaw_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(2));
 
-    pelv_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Pelvis].rotm;
+    pelv_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Pelvis].rotm;
 
-    pelv_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Pelvis].xpos);
+    pelv_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Pelvis].xpos);
 
-    lfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Left_Foot].rotm;
-    lfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
+    lfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Left_Foot].rotm;
+    lfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
 
-    rfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Right_Foot].rotm;
-    rfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
+    rfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Right_Foot].rotm;
+    rfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
 
-    com_float_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos); // 지면에서 CoM 위치
-    com_float_init_dot_ = pelv_yaw_rot_current_from_global_.linear().transpose() * rd_.link_[COM_id].v;
+    com_float_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos); // 지면에서 CoM 위치
+    com_float_init_dot_ = pelv_yaw_rot_current_from_global_.linear().transpose() * rd_cc_.link_[COM_id].v;
 
     Eigen::Isometry3d ref_frame;
 
     if (foot_step_(0, 6) == 0) //right foot support
     {
         ref_frame = rfoot_float_init_;
-        supportfoot_global_init_.translation() = rd_.link_[Right_Foot].xpos;
-        supportfoot_global_init_.linear() = rd_.link_[Right_Foot].rotm;
+        supportfoot_global_init_.translation() = rd_cc_.link_[Right_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_cc_.link_[Right_Foot].rotm;
     }
     else if (foot_step_(0, 6) == 1)
     {
         ref_frame = lfoot_float_init_;
-        supportfoot_global_init_.translation() = rd_.link_[Left_Foot].xpos;
-        supportfoot_global_init_.linear() = rd_.link_[Left_Foot].rotm;
+        supportfoot_global_init_.translation() = rd_cc_.link_[Left_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_cc_.link_[Left_Foot].rotm;
         
     }
 
@@ -1277,13 +1279,31 @@ void CustomController::updateInitialState()
     ref_frame_rpy = DyrosMath::rot2Euler(ref_frame.linear());
     ref_frame_yaw_only.linear() = DyrosMath::rotateWithZ(ref_frame_rpy(2));
 
-    pelv_support_init_ = DyrosMath::inverseIsometry3d(ref_frame) * pelv_float_init_;
-    com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), com_float_init_);
-    com_support_init_dot_ = ref_frame.linear().transpose() * com_float_init_dot_;
-    pelv_support_euler_init_ = DyrosMath::rot2Euler(pelv_support_init_.linear());
+    // // original
+    // pelv_support_init_ = DyrosMath::inverseIsometry3d(ref_frame) * pelv_float_init_;
+    // com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), com_float_init_);
+    // com_support_init_dot_ = ref_frame.linear().transpose() * com_float_init_dot_;
+    // pelv_support_euler_init_ = DyrosMath::rot2Euler(pelv_support_init_.linear());
 
-    lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_float_init_);
-    rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_float_init_);
+    // lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_float_init_);
+    // rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_float_init_);
+    // rfoot_support_euler_init_ = DyrosMath::rot2Euler(rfoot_support_init_.linear());
+    // lfoot_support_euler_init_ = DyrosMath::rot2Euler(lfoot_support_init_.linear());
+
+    // yaw only
+    ref_frame = supportfoot_global_init_;
+    pelv_support_init_.translation() =DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame) , rd_cc_.link_[Pelvis].xpos);
+    pelv_support_init_.linear() = ref_frame.linear().transpose() *  rd_cc_.link_[Pelvis].rotm;
+    com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), rd_cc_.link_[COM_id].xpos);
+    com_support_init_dot_ = ref_frame.linear().transpose() * rd_cc_.link_[COM_id].v;
+    pelv_support_euler_init_ = DyrosMath::rot2Euler(ref_frame.linear().transpose() * rd_cc_.link_[Pelvis].rotm);
+    lfoot_global_init_.translation() = rd_cc_.link_[Left_Foot].xpos;
+    lfoot_global_init_.linear() = rd_cc_.link_[Left_Foot].rotm;
+    rfoot_global_init_.translation() = rd_cc_.link_[Right_Foot].xpos;
+    rfoot_global_init_.linear() - rd_cc_.link_[Right_Foot].rotm;
+
+    lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_global_init_);
+    rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_global_init_);
     rfoot_support_euler_init_ = DyrosMath::rot2Euler(rfoot_support_init_.linear());
     lfoot_support_euler_init_ = DyrosMath::rot2Euler(lfoot_support_init_.linear());
 
@@ -1381,40 +1401,43 @@ void CustomController::updateFootstepCommand(){
 
 void CustomController::getRobotState()
 {
+
+    std::cout << "pelvis xpos : " << rd_cc_.link_[Pelvis].xpos.transpose() << std::endl;
+    std::cout << "pelvis rotm: " << endl << rd_cc_.link_[Pelvis].rotm << std::endl;
     pelv_rpy_current_.setZero();
-    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Pelvis].rotm); //ZYX multiply
+    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Pelvis].rotm); //ZYX multiply
 
     R_angle = pelv_rpy_current_(0);
     P_angle = pelv_rpy_current_(1);
     pelv_yaw_rot_current_from_global_ = DyrosMath::rotateWithZ(pelv_rpy_current_(2));
-    pelv_yaw_rot_current_from_global_.linear() = rd_.link_[Pelvis].rotm;
+    pelv_yaw_rot_current_from_global_.linear() = rd_cc_.link_[Pelvis].rotm;
 
     rfoot_rpy_current_.setZero();
     lfoot_rpy_current_.setZero();
-    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Right_Foot].rotm);
-    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Left_Foot].rotm);
+    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm);
+    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm);
 
     rfoot_roll_rot_ = DyrosMath::rotateWithX(rfoot_rpy_current_(0));
     lfoot_roll_rot_ = DyrosMath::rotateWithX(lfoot_rpy_current_(0));
     rfoot_pitch_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(1));
     lfoot_pitch_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(1));
 
-    pelv_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Pelvis].rotm;
+    pelv_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Pelvis].rotm;
 
-    pelv_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Pelvis].xpos);
+    pelv_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Pelvis].xpos);
 
-    lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Left_Foot].rotm;
+    lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Left_Foot].rotm;
     // lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * DyrosMath::inverseIsometry3d(lfoot_pitch_rot_) * DyrosMath::inverseIsometry3d(lfoot_roll_rot_) * rd_.link_[Left_Foot].rotm;
-    lfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
+    lfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
 
-    rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Right_Foot].rotm;
+    rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Right_Foot].rotm;
     // rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * DyrosMath::inverseIsometry3d(rfoot_pitch_rot_) * DyrosMath::inverseIsometry3d(rfoot_roll_rot_) * rd_.link_[Right_Foot].rotm;
-    rfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
+    rfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
 
-    com_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos); // 지면에서 CoM 위치
-    com_float_current_dot = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].v);
+    com_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos); // 지면에서 CoM 위치
+    com_float_current_dot = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].v);
 
-    cp_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos + rd_.link_[COM_id].v / wn);
+    cp_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos + rd_cc_.link_[COM_id].v / wn);
 
     if (walking_tick == 0)
     {
@@ -1461,15 +1484,15 @@ void CustomController::getRobotState()
     // std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
     // std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
     // std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
-    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_.link_[Right_Foot].rotm));
+    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_cc_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_cc_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[Right_Foot].rotm));
     swing_state_firststance_frame_(3) = swing_quat.x();
     swing_state_firststance_frame_(4) = swing_quat.y();
     swing_state_firststance_frame_(5) = swing_quat.z();
     swing_state_firststance_frame_(6) = swing_quat.w();
 
-    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), rd_.link_[COM_id].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond com_quat(supportfoot_global_init_.linear().transpose() * rd_.link_[COM_id].rotm);
+    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), rd_cc_.link_[COM_id].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond com_quat(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[COM_id].rotm);
     com_state_firststance_frame_(3) = com_quat.x();
     com_state_firststance_frame_(4) = com_quat.y();
     com_state_firststance_frame_(5) = com_quat.z();
@@ -1887,59 +1910,67 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
 
     Eigen::Matrix4d K; K.setZero();
 
-    // // 0.7m
-    // K(0, 0) = 68.7921510770868;
-    // K(0, 1) = 2331.78394937073;
-    // K(0, 2) = 632.495145628673;
-    // K(0, 3) =2.57540412848618;
-    // K(1, 0) = 2331.78394937073;
-    // K(1, 1) = 81346.5405208585;
-    // K(1, 2) = 22074.2517082842;
-    // K(1, 3) = 92.2651171309122;
-    // K(2, 0) = 632.495145628673;
-    // K(2, 1) = 22074.2517082842;
-    // K(2, 2) = 5990.22394297225;
-    // K(2, 3) = 25.0754425025208;
-    // K(3, 0) = 2.57540412848618;
-    // K(3, 1) = 92.2651171309122;
-    // K(3, 2) = 25.0754425025208;
-    // K(3, 3) = 0.115349533788953;
+    if (com_height_ == 0.7){
+        K(0, 0) = 68.7921510770868;
+        K(0, 1) = 2331.78394937073;
+        K(0, 2) = 632.495145628673;
+        K(0, 3) =2.57540412848618;
+        K(1, 0) = 2331.78394937073;
+        K(1, 1) = 81346.5405208585;
+        K(1, 2) = 22074.2517082842;
+        K(1, 3) = 92.2651171309122;
+        K(2, 0) = 632.495145628673;
+        K(2, 1) = 22074.2517082842;
+        K(2, 2) = 5990.22394297225;
+        K(2, 3) = 25.0754425025208;
+        K(3, 0) = 2.57540412848618;
+        K(3, 1) = 92.2651171309122;
+        K(3, 2) = 25.0754425025208;
+        K(3, 3) = 0.115349533788953;
+    }
+
 
     // // 0.65m
-    // K(0, 0) = 66.4281134896190;
-    // K(0, 1) = 2173.13307414793;
-    // K(0, 2) = 568.379709117415;
-    // K(0, 3) = 2.32202159217899;
-    // K(1, 0) = 2173.13307414793;
-    // K(1, 1) = 73309.6668377235;
-    // K(1, 2) = 19183.2680991541;
-    // K(1, 3) = 80.7128585695845;
-    // K(2, 0) = 568.379709117415;
-    // K(2, 1) = 19183.2680991541;
-    // K(2, 2) = 5019.91885890998;
-    // K(2, 3) = 21.1593587923669;
-    // K(3, 0) = 2.32202159217899;
-    // K(3, 1) = 80.7128585695845;
-    // K(3, 2) = 21.1593587923669;
-    // K(3, 3) = 0.0993494956670487;
+    else if (com_height_ == 0.65){
+        K(0, 0) = 66.4281134896190;
+        K(0, 1) = 2173.13307414793;
+        K(0, 2) = 568.379709117415;
+        K(0, 3) = 2.32202159217899;
+        K(1, 0) = 2173.13307414793;
+        K(1, 1) = 73309.6668377235;
+        K(1, 2) = 19183.2680991541;
+        K(1, 3) = 80.7128585695845;
+        K(2, 0) = 568.379709117415;
+        K(2, 1) = 19183.2680991541;
+        K(2, 2) = 5019.91885890998;
+        K(2, 3) = 21.1593587923669;
+        K(3, 0) = 2.32202159217899;
+        K(3, 1) = 80.7128585695845;
+        K(3, 2) = 21.1593587923669;
+        K(3, 3) = 0.0993494956670487;
+    }
+
 
     // 0.68m
-    K(0, 0) = 67.8563860285047;
-    K(0, 1) = 2268.31636940822;
-    K(0, 2) = 606.574465948491;
-    K(0, 3) = 2.47294507780013;
-    K(1, 0) = 2268.31636940822;
-    K(1, 1) = 78097.9429536234;
-    K(1, 2) = 20893.4283786941;
-    K(1, 3) = 87.5477908301230;
-    K(2, 0) = 606.574465948491;
-    K(2, 1) = 20893.4283786941;
-    K(2, 2) = 5589.73130292243;
-    K(2, 3) = 23.4600661791894;
-    K(3, 0) = 2.47294507780013;
-    K(3, 1) = 87.5477908301230;
-    K(3, 2) = 23.4600661791894;
-    K(3, 3) = 0.108757490098902;
+    else if (com_height_ == 0.68){
+        K(0, 0) = 67.8563860285047;
+        K(0, 1) = 2268.31636940822;
+        K(0, 2) = 606.574465948491;
+        K(0, 3) = 2.47294507780013;
+        K(1, 0) = 2268.31636940822;
+        K(1, 1) = 78097.9429536234;
+        K(1, 2) = 20893.4283786941;
+        K(1, 3) = 87.5477908301230;
+        K(2, 0) = 606.574465948491;
+        K(2, 1) = 20893.4283786941;
+        K(2, 2) = 5589.73130292243;
+        K(2, 3) = 23.4600661791894;
+        K(3, 0) = 2.47294507780013;
+        K(3, 1) = 87.5477908301230;
+        K(3, 2) = 23.4600661791894;
+        K(3, 3) = 0.108757490098902;
+    }
+
 
     Eigen::MatrixXd Temp_mat;
     Eigen::MatrixXd Temp_mat_inv;
@@ -1959,26 +1990,33 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
     Gi.setZero(1, 1);
     Gx.setZero(1, 3);
     
-    // // 0.7m
-    // Gi(0, 0) = 562.367264784428; //Temp_mat_inv * B_bar_tran * K * I_bar ;
-    // //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
-    // Gx(0, 0) = 38686.4538399671;
-    // Gx(0, 1) = 10800.0433241572;
-    // Gx(0, 2) = 128.255400226113;
+    // 0.7m    
+    if (com_height_ == 0.7){
+        Gi(0, 0) = 562.367264784428; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+        //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+        Gx(0, 0) = 38686.4538399671;
+        Gx(0, 1) = 10800.0433241572;
+        Gx(0, 2) = 128.255400226113;
+    }
 
-    // // 0.65m
-    // Gi(0, 0) = 573.462734668883; //Temp_mat_inv * B_bar_tran * K * I_bar ;
-    // //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
-    // Gx(0, 0) = 38094.0476205746;
-    // Gx(0, 1) = 10274.4390649459;
-    // Gx(0, 2) = 124.583981245267;
+    // 0.65m
+    else if (com_height_ == 0.65){
+        Gi(0, 0) = 573.462734668883; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+        //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+        Gx(0, 0) = 38094.0476205746;
+        Gx(0, 1) = 10274.4390649459;
+        Gx(0, 2) = 124.583981245267;
+    }
 
     // 0.68m
-    Gi(0, 0) = 566.740708905623; //Temp_mat_inv * B_bar_tran * K * I_bar ;
-    //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
-    Gx(0, 0) = 38456.9763214859;
-    Gx(0, 1) = 10592.0336283141;
-    Gx(0, 2) = 126.808547874660;
+    else if (com_height_ == 0.68){
+        Gi(0, 0) = 566.740708905623; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+        //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+        Gx(0, 0) = 38456.9763214859;
+        Gx(0, 1) = 10592.0336283141;
+        Gx(0, 2) = 126.808547874660;
+    }
+
 
     Eigen::MatrixXd X_bar;
     Eigen::Vector4d X_bar_col;
@@ -2012,8 +2050,8 @@ void CustomController::previewcontroller(double dt, int NL, int tick,
     Eigen::VectorXd px, py;
     px.setZero(1); px = C * x_k;
     py.setZero(1); py = C * y_k;
-    EX_preview_ -= (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
-    EY_preview_ -= (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
+    EX_preview_ = (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
+    EY_preview_ = (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
     double sum_Gd_px_ref = 0, sum_Gd_py_ref = 0;
     for (int i = 0; i < NL; i++)
     {
@@ -2217,7 +2255,9 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick);
 
-    target_com_state_float_frame_.translation() << 0., 0., DyrosMath::minmax_cut((rd_.link_[Pelvis].rotm.transpose() * (rd_.link_[Pelvis].xpos-rd_.link_[COM_id].xpos))(2), 0., 0.03);
+    target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.1, 0.),
+    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
+    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);

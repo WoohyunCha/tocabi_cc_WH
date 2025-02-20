@@ -255,6 +255,8 @@ public:
     Eigen::Isometry3d lfoot_roll_rot_;
     Eigen::Isometry3d rfoot_pitch_rot_;
     Eigen::Isometry3d lfoot_pitch_rot_;
+    Eigen::Isometry3d rfoot_yaw_rot_;
+    Eigen::Isometry3d lfoot_yaw_rot_;
 
     Eigen::Isometry3d pelv_float_current_;
     Eigen::Isometry3d lfoot_float_current_;
@@ -262,6 +264,9 @@ public:
     Eigen::Isometry3d pelv_float_init_;
     Eigen::Isometry3d lfoot_float_init_;
     Eigen::Isometry3d rfoot_float_init_;
+    Eigen::Isometry3d pelv_global_init_;
+    Eigen::Isometry3d lfoot_global_init_;
+    Eigen::Isometry3d rfoot_global_init_;
 
     Eigen::Isometry3d pelv_trajectory_support_; //local frame
     Eigen::Isometry3d pelv_trajectory_support_fast_; //local frame
