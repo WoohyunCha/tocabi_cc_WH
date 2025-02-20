@@ -1274,8 +1274,8 @@ void CustomController::updateInitialState()
 
     lfoot_support_init_yaw_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_global_init_);
     rfoot_support_init_yaw_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_global_init_);
-    rfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(rfoot_support_init_.linear());
-    lfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(lfoot_support_init_.linear());
+    rfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(rfoot_support_init_yaw_.linear());
+    lfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(lfoot_support_init_yaw_.linear());
 
 }
 
