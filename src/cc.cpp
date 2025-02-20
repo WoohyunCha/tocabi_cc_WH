@@ -1221,47 +1221,49 @@ void CustomController::updateInitialState()
 {
 
     pelv_rpy_current_.setZero();
-    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Pelvis].rotm); //ZYX multiply
+    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Pelvis].rotm); //ZYX multiply
 
     pelv_yaw_rot_current_from_global_ = DyrosMath::rotateWithZ(pelv_rpy_current_(2));
-    pelv_yaw_rot_current_from_global_.linear() = rd_.link_[Pelvis].rotm;
+    pelv_yaw_rot_current_from_global_.linear() = rd_cc_.link_[Pelvis].rotm;
 
     rfoot_rpy_current_.setZero();
     lfoot_rpy_current_.setZero();
-    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Right_Foot].rotm);
-    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Left_Foot].rotm);
+    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm);
+    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm);
 
     rfoot_roll_rot_ = DyrosMath::rotateWithX(rfoot_rpy_current_(0));
     lfoot_roll_rot_ = DyrosMath::rotateWithX(lfoot_rpy_current_(0));
     rfoot_pitch_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(1));
     lfoot_pitch_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(1));
+    rfoot_yaw_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(2));
+    lfoot_yaw_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(2));
 
-    pelv_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Pelvis].rotm;
+    pelv_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Pelvis].rotm;
 
-    pelv_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Pelvis].xpos);
+    pelv_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Pelvis].xpos);
 
-    lfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Left_Foot].rotm;
-    lfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
+    lfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Left_Foot].rotm;
+    lfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
 
-    rfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Right_Foot].rotm;
-    rfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
+    rfoot_float_init_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Right_Foot].rotm;
+    rfoot_float_init_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
 
-    com_float_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos); // 지면에서 CoM 위치
-    com_float_init_dot_ = pelv_yaw_rot_current_from_global_.linear().transpose() * rd_.link_[COM_id].v;
+    com_float_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos); // 지면에서 CoM 위치
+    com_float_init_dot_ = pelv_yaw_rot_current_from_global_.linear().transpose() * rd_cc_.link_[COM_id].v;
 
     Eigen::Isometry3d ref_frame;
 
     if (foot_step_(0, 6) == 0) //right foot support
     {
         ref_frame = rfoot_float_init_;
-        supportfoot_global_init_.translation() = rd_.link_[Right_Foot].xpos;
-        supportfoot_global_init_.linear() = rd_.link_[Right_Foot].rotm;
+        supportfoot_global_init_.translation() = rd_cc_.link_[Right_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_cc_.link_[Right_Foot].rotm;
     }
     else if (foot_step_(0, 6) == 1)
     {
         ref_frame = lfoot_float_init_;
-        supportfoot_global_init_.translation() = rd_.link_[Left_Foot].xpos;
-        supportfoot_global_init_.linear() = rd_.link_[Left_Foot].rotm;
+        supportfoot_global_init_.translation() = rd_cc_.link_[Left_Foot].xpos;
+        supportfoot_global_init_.linear() = rd_cc_.link_[Left_Foot].rotm;
         
     }
 
@@ -1271,13 +1273,31 @@ void CustomController::updateInitialState()
     ref_frame_rpy = DyrosMath::rot2Euler(ref_frame.linear());
     ref_frame_yaw_only.linear() = DyrosMath::rotateWithZ(ref_frame_rpy(2));
 
-    pelv_support_init_ = DyrosMath::inverseIsometry3d(ref_frame) * pelv_float_init_;
-    com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), com_float_init_);
-    com_support_init_dot_ = ref_frame.linear().transpose() * com_float_init_dot_;
-    pelv_support_euler_init_ = DyrosMath::rot2Euler(pelv_support_init_.linear());
+    // // original
+    // pelv_support_init_ = DyrosMath::inverseIsometry3d(ref_frame) * pelv_float_init_;
+    // com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), com_float_init_);
+    // com_support_init_dot_ = ref_frame.linear().transpose() * com_float_init_dot_;
+    // pelv_support_euler_init_ = DyrosMath::rot2Euler(pelv_support_init_.linear());
 
-    lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_float_init_);
-    rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_float_init_);
+    // lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_float_init_);
+    // rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_float_init_);
+    // rfoot_support_euler_init_ = DyrosMath::rot2Euler(rfoot_support_init_.linear());
+    // lfoot_support_euler_init_ = DyrosMath::rot2Euler(lfoot_support_init_.linear());
+
+    // yaw only
+    ref_frame = supportfoot_global_init_;
+    pelv_support_init_.translation() =DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame) , rd_cc_.link_[Pelvis].xpos);
+    pelv_support_init_.linear() = ref_frame.linear().transpose() *  rd_cc_.link_[Pelvis].rotm;
+    com_support_init_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(ref_frame), rd_cc_.link_[COM_id].xpos);
+    com_support_init_dot_ = ref_frame.linear().transpose() * rd_cc_.link_[COM_id].v;
+    pelv_support_euler_init_ = DyrosMath::rot2Euler(ref_frame.linear().transpose() * rd_cc_.link_[Pelvis].rotm);
+    lfoot_global_init_.translation() = rd_cc_.link_[Left_Foot].xpos;
+    lfoot_global_init_.linear() = rd_cc_.link_[Left_Foot].rotm;
+    rfoot_global_init_.translation() = rd_cc_.link_[Right_Foot].xpos;
+    rfoot_global_init_.linear() - rd_cc_.link_[Right_Foot].rotm;
+
+    lfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), lfoot_global_init_);
+    rfoot_support_init_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_global_init_);
     rfoot_support_euler_init_ = DyrosMath::rot2Euler(rfoot_support_init_.linear());
     lfoot_support_euler_init_ = DyrosMath::rot2Euler(lfoot_support_init_.linear());
 
@@ -1375,40 +1395,43 @@ void CustomController::updateFootstepCommand(){
 
 void CustomController::getRobotState()
 {
+
+    std::cout << "pelvis xpos : " << rd_cc_.link_[Pelvis].xpos.transpose() << std::endl;
+    std::cout << "pelvis rotm: " << endl << rd_cc_.link_[Pelvis].rotm << std::endl;
     pelv_rpy_current_.setZero();
-    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Pelvis].rotm); //ZYX multiply
+    pelv_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Pelvis].rotm); //ZYX multiply
 
     R_angle = pelv_rpy_current_(0);
     P_angle = pelv_rpy_current_(1);
     pelv_yaw_rot_current_from_global_ = DyrosMath::rotateWithZ(pelv_rpy_current_(2));
-    pelv_yaw_rot_current_from_global_.linear() = rd_.link_[Pelvis].rotm;
+    pelv_yaw_rot_current_from_global_.linear() = rd_cc_.link_[Pelvis].rotm;
 
     rfoot_rpy_current_.setZero();
     lfoot_rpy_current_.setZero();
-    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Right_Foot].rotm);
-    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_.link_[Left_Foot].rotm);
+    rfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm);
+    lfoot_rpy_current_ = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm);
 
     rfoot_roll_rot_ = DyrosMath::rotateWithX(rfoot_rpy_current_(0));
     lfoot_roll_rot_ = DyrosMath::rotateWithX(lfoot_rpy_current_(0));
     rfoot_pitch_rot_ = DyrosMath::rotateWithY(rfoot_rpy_current_(1));
     lfoot_pitch_rot_ = DyrosMath::rotateWithY(lfoot_rpy_current_(1));
 
-    pelv_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Pelvis].rotm;
+    pelv_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Pelvis].rotm;
 
-    pelv_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Pelvis].xpos);
+    pelv_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Pelvis].xpos);
 
-    lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Left_Foot].rotm;
+    lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Left_Foot].rotm;
     // lfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * DyrosMath::inverseIsometry3d(lfoot_pitch_rot_) * DyrosMath::inverseIsometry3d(lfoot_roll_rot_) * rd_.link_[Left_Foot].rotm;
-    lfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
+    lfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Left_Foot].xpos); // 지면에서 Ankle frame 위치
 
-    rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_.link_[Right_Foot].rotm;
+    rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * rd_cc_.link_[Right_Foot].rotm;
     // rfoot_float_current_.linear() = DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_) * DyrosMath::inverseIsometry3d(rfoot_pitch_rot_) * DyrosMath::inverseIsometry3d(rfoot_roll_rot_) * rd_.link_[Right_Foot].rotm;
-    rfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
+    rfoot_float_current_.translation() = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[Right_Foot].xpos); // 지면에서 Ankle frame
 
-    com_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos); // 지면에서 CoM 위치
-    com_float_current_dot = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].v);
+    com_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos); // 지면에서 CoM 위치
+    com_float_current_dot = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].v);
 
-    cp_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_.link_[COM_id].xpos + rd_.link_[COM_id].v / wn);
+    cp_float_current_ = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(pelv_yaw_rot_current_from_global_), rd_cc_.link_[COM_id].xpos + rd_cc_.link_[COM_id].v / wn);
 
     if (walking_tick == 0)
     {
@@ -1455,15 +1478,15 @@ void CustomController::getRobotState()
     // std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
     // std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
     // std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
-    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_.link_[Right_Foot].rotm));
+    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), phase_indicator_(0)*rd_cc_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_cc_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[Right_Foot].rotm));
     swing_state_firststance_frame_(3) = swing_quat.x();
     swing_state_firststance_frame_(4) = swing_quat.y();
     swing_state_firststance_frame_(5) = swing_quat.z();
     swing_state_firststance_frame_(6) = swing_quat.w();
 
-    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), rd_.link_[COM_id].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond com_quat(supportfoot_global_init_.linear().transpose() * rd_.link_[COM_id].rotm);
+    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_), rd_cc_.link_[COM_id].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond com_quat(supportfoot_global_init_.linear().transpose() * rd_cc_.link_[COM_id].rotm);
     com_state_firststance_frame_(3) = com_quat.x();
     com_state_firststance_frame_(4) = com_quat.y();
     com_state_firststance_frame_(5) = com_quat.z();
