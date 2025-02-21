@@ -205,6 +205,7 @@ public:
 
 
 
+
     // Policy input
     Eigen::VectorXd target_com_state_stance_frame_;
     Eigen::VectorXd target_swing_state_stance_frame_;
@@ -215,36 +216,20 @@ public:
     Eigen::MatrixXd foot_step_support_frame_offset_;
 
     Eigen::Isometry3d pelv_support_start_;
-    Eigen::Isometry3d pelv_support_init_;
-    Eigen::Vector2d del_zmp;
-    Eigen::Vector2d cp_desired_;
-    Eigen::Vector2d cp_measured_;
-    Eigen::Vector2d cp_measured_LPF;
-    Eigen::Vector2d cp_measured_thread_;
-    Eigen::Vector2d cp_measured_mpc_;
-    Eigen::Vector3d cp_float_current_;
+    // Eigen::Isometry3d pelv_support_init_;
+    Eigen::Isometry3d pelv_support_init_yaw_;
 
     Eigen::Vector3d com_desired_;
     Eigen::Vector3d com_desired_dot_;
 
-    Eigen::Vector3d com_support_init_;
-    Eigen::Vector3d com_support_init_dot_;
-    Eigen::Vector3d com_float_init_;
-    Eigen::Vector3d com_float_init_dot_;
-    Eigen::Vector3d com_float_current_;
-    Eigen::Vector3d com_float_current_dot_;
+    Eigen::Vector3d com_support_init_yaw_;
+    Eigen::Vector3d com_support_init_dot_yaw_;
+
     Eigen::Vector3d com_support_current_;
     Eigen::Vector3d com_support_current_dot_;
     Eigen::Vector3d com_support_current_dot_prev_;
-    Eigen::Vector3d com_support_current_LPF;
-    Eigen::Vector3d com_float_current_LPF;
-    Eigen::Vector3d com_support_current_prev;
-    Eigen::Vector3d com_support_cp_;
-
-    Eigen::Vector3d com_float_current_dot;
-    Eigen::Vector3d com_float_current_dot_prev;
-    Eigen::Vector3d com_float_current_dot_LPF;
-    Eigen::Vector3d com_support_current_dot_LPF;
+    Eigen::Vector3d com_global_current_;
+    Eigen::Vector3d com_global_current_dot_;
 
     Eigen::Vector3d pelv_rpy_current_;
     Eigen::Vector3d rfoot_rpy_current_;
@@ -257,12 +242,10 @@ public:
     Eigen::Isometry3d rfoot_yaw_rot_;
     Eigen::Isometry3d lfoot_yaw_rot_;
 
-    Eigen::Isometry3d pelv_float_current_;
-    Eigen::Isometry3d lfoot_float_current_;
-    Eigen::Isometry3d rfoot_float_current_;
-    Eigen::Isometry3d pelv_float_init_;
-    Eigen::Isometry3d lfoot_float_init_;
-    Eigen::Isometry3d rfoot_float_init_;
+    Eigen::Isometry3d pelv_global_current_;
+    Eigen::Isometry3d lfoot_global_current_;
+    Eigen::Isometry3d rfoot_global_current_;
+    Eigen::Isometry3d pelv_global_init_;
     Eigen::Isometry3d lfoot_global_init_;
     Eigen::Isometry3d rfoot_global_init_;
 
@@ -291,21 +274,26 @@ public:
     Eigen::Isometry3d rfoot_trajectory_float_slow_;
 
     Eigen::Vector3d pelv_support_euler_init_;
+    Eigen::Vector3d pelv_support_euler_init_yaw_;
     Eigen::Vector3d lfoot_support_euler_init_;
+    Eigen::Vector3d lfoot_support_euler_init_yaw_;
     Eigen::Vector3d rfoot_support_euler_init_;
+    Eigen::Vector3d rfoot_support_euler_init_yaw_;
     double wn = sqrt(GRAVITY / com_height_);
 
     double walking_end_flag = 0;
     
-    Eigen::Isometry3d swingfoot_float_current_; 
-    Eigen::Isometry3d supportfoot_float_current_; 
+    Eigen::Isometry3d swingfoot_global_current_; 
+    Eigen::Isometry3d supportfoot_global_current_; // Only yaw is considered
 
     Eigen::Isometry3d pelv_support_current_;
     Eigen::Isometry3d lfoot_support_current_;
     Eigen::Isometry3d rfoot_support_current_;
 
     Eigen::Isometry3d lfoot_support_init_;
+    Eigen::Isometry3d lfoot_support_init_yaw_;
     Eigen::Isometry3d rfoot_support_init_;
+    Eigen::Isometry3d rfoot_support_init_yaw_;
     
     Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
 
@@ -365,9 +353,10 @@ public:
     bool is_preview_ctrl_init = true;
 
     // Logging
-    Eigen::Isometry3d supportfoot_global_init_;
-    Eigen::VectorXd swing_state_firststance_frame_;
-    Eigen::VectorXd com_state_firststance_frame_;
+    Eigen::Isometry3d supportfoot_global_init_; // Used just to compute init_yaw_
+    Eigen::Isometry3d supportfoot_global_init_yaw_;
+    Eigen::VectorXd swing_state_stance_frame_;
+    Eigen::VectorXd com_state_stance_frame_;
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.1;
@@ -410,7 +399,6 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
-
 
 private:
     Eigen::VectorQd ControlVal_;

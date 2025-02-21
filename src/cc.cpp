@@ -404,8 +404,8 @@ void CustomController::initVariable()
     initBias();
     base_lin_vel.setZero();
     base_ang_vel.setZero();
-    swing_state_firststance_frame_.setZero(13);
-    com_state_firststance_frame_.setZero(13);
+    swing_state_stance_frame_.setZero(13);
+    com_state_stance_frame_.setZero(13);
     q_leg_desired_ = q_init_.segment(0, num_actuator_action);
 
     string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
@@ -1027,8 +1027,8 @@ void CustomController::computeSlow()
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
                     writeFile << target_swing_state_stance_frame_.transpose() << "\t";
                     writeFile << target_com_state_stance_frame_.transpose() << "\t";
-                    writeFile << swing_state_firststance_frame_.transpose() << "\t";
-                    writeFile << com_state_firststance_frame_.transpose() << "\t";
+                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << com_state_stance_frame_.transpose() << "\t";
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
