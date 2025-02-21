@@ -355,8 +355,8 @@ public:
     // Logging
     Eigen::Isometry3d supportfoot_global_init_; // Used just to compute init_yaw_
     Eigen::Isometry3d supportfoot_global_init_yaw_;
-    Eigen::VectorXd swing_state_firststance_frame_;
-    Eigen::VectorXd com_state_firststance_frame_;
+    Eigen::VectorXd swing_state_stance_frame_;
+    Eigen::VectorXd com_state_stance_frame_;
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.1;

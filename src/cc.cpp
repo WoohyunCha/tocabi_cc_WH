@@ -404,8 +404,8 @@ void CustomController::initVariable()
     initBias();
     base_lin_vel.setZero();
     base_ang_vel.setZero();
-    swing_state_firststance_frame_.setZero(13);
-    com_state_firststance_frame_.setZero(13);
+    swing_state_stance_frame_.setZero(13);
+    com_state_stance_frame_.setZero(13);
     q_leg_desired_ = q_init_.segment(0, num_actuator_action);
 
     string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
@@ -1027,8 +1027,8 @@ void CustomController::computeSlow()
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
                     writeFile << target_swing_state_stance_frame_.transpose() << "\t";
                     writeFile << target_com_state_stance_frame_.transpose() << "\t";
-                    writeFile << swing_state_firststance_frame_.transpose() << "\t";
-                    writeFile << com_state_firststance_frame_.transpose() << "\t";
+                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << com_state_stance_frame_.transpose() << "\t";
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
@@ -1390,19 +1390,19 @@ void CustomController::getRobotState()
     // std::cout << "support foot global pos : " << supportfoot_global_init_.translation().transpose() << std::endl;
     // std::cout << "Left foot global pos : " << rd_.link_[Left_Foot].xpos.transpose() << std::endl;
     // std::cout << "Right foot global pos : " << rd_.link_[Right_Foot].xpos.transpose() << std::endl;
-    swing_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_yaw_), phase_indicator_(0)*rd_cc_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_cc_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_init_yaw_.linear().transpose() * rd_cc_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_init_yaw_.linear().transpose() * rd_cc_.link_[Right_Foot].rotm));
-    swing_state_firststance_frame_(3) = swing_quat.x();
-    swing_state_firststance_frame_(4) = swing_quat.y();
-    swing_state_firststance_frame_(5) = swing_quat.z();
-    swing_state_firststance_frame_(6) = swing_quat.w();
+    swing_state_stance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), phase_indicator_(0)*rd_cc_.link_[Left_Foot].xpos + (1-phase_indicator_(0))*rd_cc_.link_[Right_Foot].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond swing_quat(phase_indicator_(0)*(supportfoot_global_current_.linear().transpose() * rd_cc_.link_[Left_Foot].rotm) + (1-phase_indicator_(0))*(supportfoot_global_current_.linear().transpose() * rd_cc_.link_[Right_Foot].rotm));
+    swing_state_stance_frame_(3) = swing_quat.x();
+    swing_state_stance_frame_(4) = swing_quat.y();
+    swing_state_stance_frame_(5) = swing_quat.z();
+    swing_state_stance_frame_(6) = swing_quat.w();
 
-    com_state_firststance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_init_yaw_), rd_cc_.link_[COM_id].xpos); // Compute swing foot state from init support foot
-    Eigen::Quaterniond com_quat(supportfoot_global_init_yaw_.linear().transpose() * rd_cc_.link_[COM_id].rotm);
-    com_state_firststance_frame_(3) = com_quat.x();
-    com_state_firststance_frame_(4) = com_quat.y();
-    com_state_firststance_frame_(5) = com_quat.z();
-    com_state_firststance_frame_(6) = com_quat.w();
+    com_state_stance_frame_.segment(0,3) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), rd_cc_.link_[COM_id].xpos); // Compute swing foot state from init support foot
+    Eigen::Quaterniond com_quat(supportfoot_global_current_.linear().transpose() * rd_cc_.link_[COM_id].rotm);
+    com_state_stance_frame_(3) = com_quat.x();
+    com_state_stance_frame_(4) = com_quat.y();
+    com_state_stance_frame_(5) = com_quat.z();
+    com_state_stance_frame_(6) = com_quat.w();
 
     x_preview_(0) = com_support_current_(0);
     y_preview_(0) = com_support_current_(1);
@@ -1412,7 +1412,6 @@ void CustomController::getRobotState()
 
     x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
     y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
-
 }
 
 void CustomController::calculateFootStepTotal()
