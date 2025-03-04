@@ -592,6 +592,19 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
     // data_idx++;
+
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // data_idx++;
+
+
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+    // data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
     // data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
@@ -819,6 +832,7 @@ void CustomController::loadEncoderNetwork()
     {
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
+    base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
 
     std::ifstream file[6];
     file[0].open(base_path + "encoder/conv1_weight.txt", std::ios::in);
@@ -2124,9 +2138,10 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick);
 
-    target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.1, 0.),
+    target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
     DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
     DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+    std::cout << target_com_state_float_frame_.translation().transpose() << std::endl;
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
