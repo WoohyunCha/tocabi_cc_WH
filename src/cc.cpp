@@ -1566,18 +1566,18 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
     //TODO CoM Yaw implement
     if (current_step_number == 0)
     {
-        v0_x_dsp1 = swingfoot_support_init_(0)/2;
+        v0_x_dsp1 = com_support_init_yaw_(0);
         vT_x_dsp1 = 0.0;
-        v0_y_dsp1 = swingfoot_support_init_(1)/2;
+        v0_y_dsp1 = com_support_init_yaw_(1);
         vT_y_dsp1 = 0.0;
-        v0_yaw_dsp1 = swingfoot_support_init_(5)/2;
-        vT_yaw_dsp1 = swingfoot_support_init_(5)/2;
+        v0_yaw_dsp1 =  pelv_support_euler_init_(2);
+        vT_yaw_dsp1 = pelv_support_euler_init_(2);
 
         v0_x_ssp = 0.0;
         vT_x_ssp = 0.0;
         v0_y_ssp = 0.0;
         vT_y_ssp = 0.0;
-        v0_yaw_ssp = swingfoot_support_init_(5)/2;
+        v0_yaw_ssp =  pelv_support_euler_init_(2);
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2;
 
         v0_x_dsp2 = 0.0;
