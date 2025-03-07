@@ -1411,6 +1411,8 @@ void CustomController::getRobotState()
     com_state_stance_frame_(5) = com_quat.z();
     com_state_stance_frame_(6) = com_quat.w();
 
+
+    // // Comment out for ideal preview reference generation!
     // x_preview_(0) = com_support_current_(0);
     // y_preview_(0) = com_support_current_(1);
     
