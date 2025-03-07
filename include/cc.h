@@ -192,6 +192,8 @@ public:
     Eigen::Vector3d step_yaw_;
     Eigen::Vector3d t_dsp_;
     Eigen::Vector3d t_ssp_;
+    Eigen::Vector3d t_dsp_seconds;
+    Eigen::Vector3d t_ssp_seconds;
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
     int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
