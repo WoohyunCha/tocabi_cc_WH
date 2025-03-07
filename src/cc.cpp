@@ -1043,6 +1043,10 @@ void CustomController::computeSlow()
                     writeFile << target_com_state_stance_frame_.transpose() << "\t";
                     writeFile << swing_state_stance_frame_.transpose() << "\t";
                     writeFile << com_state_stance_frame_.transpose() << "\t";
+                    writeFile << q_leg_desired_.transpose() << "\t";
+                    writeFile << ref_zmp_(walking_tick,0) << "\t";
+                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
+                    
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
@@ -1336,14 +1340,14 @@ void CustomController::updateFootstepCommand(){
 
         phase_indicator_(2) = 1-phase_indicator_(1);
 
-        step_length_x_(0) = phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
-        step_length_y_(0) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_length_y_ + (1-phase_indicator_(2)) * Rcommand_step_length_y_);
-        step_yaw_(0) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
-        t_dsp_(0) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
-        t_dsp_seconds(0) = (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
-        t_ssp_(0) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
-        t_ssp_seconds(0) = (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
-        foot_height_(0) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
+        step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
+        step_length_y_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_length_y_ + (1-phase_indicator_(0)) * Rcommand_step_length_y_);
+        step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
+        t_dsp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_);
+        t_dsp_seconds(0) = (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_);
+        t_ssp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_) * hz_);
+        t_ssp_seconds(0) = (phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_);
+        foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
 
         for (int i = 0; i < number_of_foot_step; i++){
             t_dsp_(i) = std::floor(t_dsp_(i));
@@ -1429,16 +1433,14 @@ void CustomController::getRobotState()
     com_state_stance_frame_(5) = com_quat.z();
     com_state_stance_frame_(6) = com_quat.w();
 
-    x_preview_(0) = com_support_current_(0);
-    y_preview_(0) = com_support_current_(1);
+    // x_preview_(0) = com_support_current_(0);
+    // y_preview_(0) = com_support_current_(1);
     
-    x_preview_(1) = com_support_current_dot_(0);
-    y_preview_(1) = com_support_current_dot_(1);
+    // x_preview_(1) = com_support_current_dot_(0);
+    // y_preview_(1) = com_support_current_dot_(1);
 
-    x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
-    y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
-
-    std::cout << swing_state_stance_frame_.segment(0,3) << std::endl;
+    // x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
+    // y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
 }
 
 void CustomController::calculateFootStepTotal()
@@ -1476,24 +1478,10 @@ void CustomController::calculateFootStepTotal()
 
 void CustomController::addZmpOffset()
 {
-    double lfoot_zmp_offset_, rfoot_zmp_offset_;
 
-    lfoot_zmp_offset_ = -zmp_offset; // simul 1.1 s
-    rfoot_zmp_offset_ =  zmp_offset;
 
     foot_step_support_frame_offset_ = foot_step_support_frame_;
 
-    for (int i = 0; i < number_of_foot_step; i++)
-    {
-        if (foot_step_(i, 6) == 0) // left support foot 
-        {
-            foot_step_support_frame_offset_(i, 1) += lfoot_zmp_offset_;
-        }
-        else // right support foot
-        {
-            foot_step_support_frame_offset_(i, 1) += rfoot_zmp_offset_;
-        }
-    }
 }
 
 
@@ -1586,18 +1574,18 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
     //TODO CoM Yaw implement
     if (current_step_number == 0)
     {
-        v0_x_dsp1 = swingfoot_support_init_(0);
+        v0_x_dsp1 = swingfoot_support_init_(0)/2;
         vT_x_dsp1 = 0.0;
-        v0_y_dsp1 = swingfoot_support_init_(1);
+        v0_y_dsp1 = swingfoot_support_init_(1)/2;
         vT_y_dsp1 = 0.0;
-        v0_yaw_dsp1 = swingfoot_support_init_(5);
-        vT_yaw_dsp1 = swingfoot_support_init_(5);
+        v0_yaw_dsp1 = swingfoot_support_init_(5)/2;
+        vT_yaw_dsp1 = swingfoot_support_init_(5)/2;
 
         v0_x_ssp = 0.0;
         vT_x_ssp = 0.0;
         v0_y_ssp = 0.0;
         vT_y_ssp = 0.0;
-        v0_yaw_ssp = swingfoot_support_init_(5);
+        v0_yaw_ssp = swingfoot_support_init_(5)/2;
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2;
 
         v0_x_dsp2 = 0.0;
@@ -2154,7 +2142,6 @@ void CustomController::getTargetState(){
     target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
     DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
     DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
-    std::cout << target_com_state_float_frame_.translation().transpose() << std::endl;
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);

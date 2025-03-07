@@ -196,7 +196,7 @@ public:
     Eigen::Vector3d t_ssp_seconds;
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
-    int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
+    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
     const double com_height_ = 0.68;
 
     double t_last_;

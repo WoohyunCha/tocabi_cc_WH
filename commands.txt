@@ -1,13 +1,13 @@
-Lcommand_step_length_x_=.4
-Lcommand_step_length_y_=0.22
+Lcommand_step_length_x_=0.4
+Lcommand_step_length_y_=0.205
 Lcommand_step_yaw_=0.
-Lcommand_t_dsp_=.05
-Lcommand_t_ssp_=1.
-Lcommand_foot_height_=0.06
+Lcommand_t_dsp_=0.05
+Lcommand_t_ssp_=.5
+Lcommand_foot_height_=0.08
 
-Rcommand_step_length_x_=.4
-Rcommand_step_length_y_=0.22
+Rcommand_step_length_x_=0.4
+Rcommand_step_length_y_=0.205
 Rcommand_step_yaw_=0.
-Rcommand_t_dsp_=.05
-Rcommand_t_ssp_=1.
-Rcommand_foot_height_=0.06
+Rcommand_t_dsp_=0.05
+Rcommand_t_ssp_=.5
+Rcommand_foot_height_=0.08
