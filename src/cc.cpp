@@ -1295,6 +1295,8 @@ void CustomController::updateInitialState()
     rfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(rfoot_support_init_yaw_.linear());
     lfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(lfoot_support_init_yaw_.linear());
 
+
+
 }
 
 // PREVIEW
@@ -1433,6 +1435,7 @@ void CustomController::getRobotState()
     com_state_stance_frame_(5) = com_quat.z();
     com_state_stance_frame_(6) = com_quat.w();
 
+    // // Comment out for ideal preview reference!
     // x_preview_(0) = com_support_current_(0);
     // y_preview_(0) = com_support_current_(1);
     
@@ -1574,18 +1577,18 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
     //TODO CoM Yaw implement
     if (current_step_number == 0)
     {
-        v0_x_dsp1 = swingfoot_support_init_(0)/2;
+        v0_x_dsp1 = com_support_init_yaw_(0);
         vT_x_dsp1 = 0.0;
-        v0_y_dsp1 = swingfoot_support_init_(1)/2;
+        v0_y_dsp1 = com_support_init_yaw_(1);
         vT_y_dsp1 = 0.0;
-        v0_yaw_dsp1 = swingfoot_support_init_(5)/2;
-        vT_yaw_dsp1 = swingfoot_support_init_(5)/2;
+        v0_yaw_dsp1 =  pelv_support_euler_init_(2);
+        vT_yaw_dsp1 = pelv_support_euler_init_(2);
 
         v0_x_ssp = 0.0;
         vT_x_ssp = 0.0;
         v0_y_ssp = 0.0;
         vT_y_ssp = 0.0;
-        v0_yaw_ssp = swingfoot_support_init_(5)/2;
+        v0_yaw_ssp =  pelv_support_euler_init_(2);
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2;
 
         v0_x_dsp2 = 0.0;
@@ -1934,8 +1937,8 @@ void CustomController::previewcontroller(double dt, int NL, int tick,
     Eigen::VectorXd px, py;
     px.setZero(1); px = C * x_k;
     py.setZero(1); py = C * y_k;
-    EX_preview_ = (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
-    EY_preview_ = (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
+    EX_preview_ += (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
+    EY_preview_ += (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
     double sum_Gd_px_ref = 0, sum_Gd_py_ref = 0;
     for (int i = 0; i < NL; i++)
     {

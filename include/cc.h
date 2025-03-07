@@ -299,11 +299,6 @@ public:
     
     Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
 
-    Eigen::Vector6d supportfoot_support_init_offset_;
-    Eigen::Vector6d supportfoot_float_init_;
-    Eigen::Vector6d supportfoot_support_init_;
-    Eigen::Vector6d swingfoot_float_init_;
-    Eigen::Vector6d swingfoot_support_init_;
     
     Eigen::MatrixXd ref_zmp_;
     Eigen::MatrixXd ref_zmp_container;
