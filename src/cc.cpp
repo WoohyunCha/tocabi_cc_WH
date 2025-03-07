@@ -1411,14 +1411,14 @@ void CustomController::getRobotState()
     com_state_stance_frame_(5) = com_quat.z();
     com_state_stance_frame_(6) = com_quat.w();
 
-    x_preview_(0) = com_support_current_(0);
-    y_preview_(0) = com_support_current_(1);
+    // x_preview_(0) = com_support_current_(0);
+    // y_preview_(0) = com_support_current_(1);
     
-    x_preview_(1) = com_support_current_dot_(0);
-    y_preview_(1) = com_support_current_dot_(1);
+    // x_preview_(1) = com_support_current_dot_(0);
+    // y_preview_(1) = com_support_current_dot_(1);
 
-    x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
-    y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
+    // x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
+    // y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
 }
 
 void CustomController::calculateFootStepTotal()
@@ -1566,18 +1566,18 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
     //TODO CoM Yaw implement
     if (current_step_number == 0)
     {
-        v0_x_dsp1 = swingfoot_support_init_(0);
+        v0_x_dsp1 = swingfoot_support_init_(0)/2;
         vT_x_dsp1 = 0.0;
-        v0_y_dsp1 = swingfoot_support_init_(1);
+        v0_y_dsp1 = swingfoot_support_init_(1)/2;
         vT_y_dsp1 = 0.0;
-        v0_yaw_dsp1 = swingfoot_support_init_(5);
-        vT_yaw_dsp1 = swingfoot_support_init_(5);
+        v0_yaw_dsp1 = swingfoot_support_init_(5)/2;
+        vT_yaw_dsp1 = swingfoot_support_init_(5)/2;
 
         v0_x_ssp = 0.0;
         vT_x_ssp = 0.0;
         v0_y_ssp = 0.0;
         vT_y_ssp = 0.0;
-        v0_yaw_ssp = swingfoot_support_init_(5);
+        v0_yaw_ssp = swingfoot_support_init_(5)/2;
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2;
 
         v0_x_dsp2 = 0.0;
