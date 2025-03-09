@@ -592,13 +592,37 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(2);
     data_idx++;
-
-    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
     // data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(5);
     data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(6);
     data_idx++;
+
+    state_cur_(data_idx) = target_com_state_stance_frame_(0);
+    data_idx++;
+    state_cur_(data_idx) = target_com_state_stance_frame_(1);
+    data_idx++;
+    state_cur_(data_idx) = target_com_state_stance_frame_(2);
+    data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(4);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+    // data_idx++;
+
+    // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
+    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // data_idx++;
 
 
     // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
