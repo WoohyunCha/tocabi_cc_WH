@@ -592,13 +592,37 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(2);
     data_idx++;
-
-    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
     // data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(5);
     data_idx++;
     state_cur_(data_idx) = target_swing_state_stance_frame_(6);
     data_idx++;
+
+    state_cur_(data_idx) = target_com_state_stance_frame_(0);
+    data_idx++;
+    state_cur_(data_idx) = target_com_state_stance_frame_(1);
+    data_idx++;
+    state_cur_(data_idx) = target_com_state_stance_frame_(2);
+    data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(4);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+    // data_idx++;
+
+    // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
+    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // data_idx++;
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // data_idx++;
 
 
     // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
@@ -1313,11 +1337,11 @@ void CustomController::updateFootstepCommand(){
         step_yaw_ << 0., 0., 0.;
         // foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
         foot_height_ << 0.08, 0.08, 0.08;
-        // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
-        t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_, 0.1, 0.1;
+        t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
+        // t_dsp_ << 0.1, 0.1, 0.1;
         t_dsp_seconds = t_dsp_;
-        // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
-        t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_, 1., 1.;
+        t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
+        // t_ssp_ << 1., 1., 1.;
         t_ssp_seconds = t_ssp_;
         t_dsp_ *= hz_;
         t_ssp_ *= hz_;
@@ -2095,8 +2119,8 @@ void CustomController::computeIkControl(const Eigen::Isometry3d &float_trunk_tra
     q_des(5) = atan2(L_r(1), L_r(2));                                                                                  // Ankle roll
     q_des(11) = atan2(R_r(1), R_r(2));
 
-    L_alpha = asin(L_upper / L_C * sin(M_PI - q_des(3)));
-    R_alpha = asin(L_upper / R_C * sin(M_PI - q_des(9)));
+    L_alpha = asin(DyrosMath::minmax_cut(L_upper / L_C * sin(M_PI - q_des(3)), -0.99, 0.99) );
+    R_alpha = asin(DyrosMath::minmax_cut(L_upper / R_C * sin(M_PI - q_des(9)), -0.99, 0.99));
     
     q_des(4) = -atan2(L_r(0), sqrt(pow(L_r(1), 2) + pow(L_r(2), 2))) - L_alpha;
     q_des(10) = -atan2(R_r(0), sqrt(pow(R_r(1), 2) + pow(R_r(2), 2))) - R_alpha;
