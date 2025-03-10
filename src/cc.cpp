@@ -505,227 +505,444 @@ void CustomController::processNoise()
     time_pre_ = time_cur_;
 }
 
+
 void CustomController::processObservation() // [linvel, angvel, proj_grav, commands, dof_pos, dof_vel, actions]
+
 {
+
+
 
     int data_idx = 0;
 
+
+
     Eigen::Quaterniond q;
+
     q.x() = rd_cc_.q_virtual_(3);
+
     q.y() = rd_cc_.q_virtual_(4);
+
     q.z() = rd_cc_.q_virtual_(5);
+
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
+
+
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
+
     base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
+
     // std::cout <<"global : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
+
     // base_ang_vel = q.conjugate()*base_ang_vel;
+
     // std::cout << "local : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
 
+
+
  
+
     // for (int i=0; i<6; i++)
+
     // {
+
     //     state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
+
     //     data_idx++;
+
     // }
 
-    for (int i = 0; i < 3; i++){
-        state_cur_(data_idx) = base_lin_vel(i);
-        data_idx++;
-    }
+
 
     for (int i = 0; i < 3; i++){
-        state_cur_(data_idx) = base_ang_vel(i);
+
+        state_cur_(data_idx) = base_lin_vel(i);
+
         data_idx++;
+
     }
+
+
+
+    for (int i = 0; i < 3; i++){
+
+        state_cur_(data_idx) = base_ang_vel(i);
+
+        data_idx++;
+
+    }
+
+
+
 
 
     Vector3_t grav, projected_grav, forward_vec;
+
     grav << 0, 0, -1.;
+
     forward_vec << 1., 0, 0;
+
     projected_grav = q.conjugate()*grav;
 
+
+
     // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+
     // data_idx++;
+
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+
     // data_idx++;
+
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+
     // data_idx++;
+
     state_cur_(data_idx) = q.x();
+
     data_idx++;
+
     state_cur_(data_idx) = q.y();
+
     data_idx++;
+
     state_cur_(data_idx) = q.z();
+
     data_idx++;
+
     state_cur_(data_idx) = q.w();
+
     data_idx++;
 
+
+
     for (int i = 0; i < num_actuator_action; i++)
+
     {
+
         state_cur_(data_idx) = q_noise_(i) - q_init_(i);
+
         data_idx++;
+
     }
 
+
+
     for (int i = 0; i < num_actuator_action; i++)
+
     {
+
         if (is_on_robot_)
+
         {
+
             state_cur_(data_idx) = q_vel_noise_(i);
+
         }
+
         else
+
         {
+
             state_cur_(data_idx) = q_vel_noise_(i); //rd_cc_.q_dot_virtual_(i+6);
+
         }
+
         data_idx++;
+
     }
+
+
 
     for (int i = 0; i < num_actuator_action; i++)
+
     {
+
         state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
+
         data_idx++;
+
     }
 
-    state_cur_(data_idx) = target_swing_state_stance_frame_(0);
-    data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(1);
-    data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(2);
-    data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-    // data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-    data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+
+
+    state_cur_(data_idx) = swing_state_stance_frame_(0);
+
     data_idx++;
 
-    state_cur_(data_idx) = target_com_state_stance_frame_(0);
+    state_cur_(data_idx) = swing_state_stance_frame_(1);
+
     data_idx++;
-    state_cur_(data_idx) = target_com_state_stance_frame_(1);
+
+    state_cur_(data_idx) = swing_state_stance_frame_(2);
+
     data_idx++;
-    state_cur_(data_idx) = target_com_state_stance_frame_(2);
+
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
+
+    // data_idx++;
+
+    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
+
+    // data_idx++;
+
+    state_cur_(data_idx) = swing_state_stance_frame_(5);
+
     data_idx++;
+
+    state_cur_(data_idx) = swing_state_stance_frame_(6);
+
+    data_idx++;
+
+
+
+    state_cur_(data_idx) = com_state_stance_frame_(0);
+
+    data_idx++;
+
+    state_cur_(data_idx) = com_state_stance_frame_(1);
+
+    data_idx++;
+
+    state_cur_(data_idx) = com_state_stance_frame_(2);
+
+    data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(4);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+
     // data_idx++;
+
+
 
     // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
+
     // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+
     // data_idx++;
+
+
+
 
 
     // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(7);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(8);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(9);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_swing_state_stance_frame_(12);
+
     // data_idx++;
+
+
+
 
 
     // state_cur_(data_idx) = target_com_state_stance_frame_(0);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(1);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(7);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(8);
+
     // data_idx++;
+
     // state_cur_(data_idx) = target_com_state_stance_frame_(12);
+
     // data_idx++;
+
+
+
+
 
 
 
     // std::cout << "Swing and Com state" << std::endl;
+
     // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
+
     // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
+
     // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
+
     state_cur_(data_idx) = walking_tick;
+
     data_idx++;
+
+
 
     state_cur_(data_idx) = step_length_x_(0);
+
     data_idx++;
+
     state_cur_(data_idx) = step_length_y_(0);
+
     data_idx++;
+
     state_cur_(data_idx) = step_yaw_(0);
+
     data_idx++;
+
     state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_dsp_ + (1-phase_indicator_(0))*Rcommand_t_dsp_;
+
     data_idx++;
+
     state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_ssp_ + (1-phase_indicator_(0))*Rcommand_t_ssp_;
+
     data_idx++;
+
     state_cur_(data_idx) = foot_height_(0);
+
     data_idx++;
+
+
 
     for (int i = 0; i <num_actuator_action; i++) 
+
     {
+
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
+
         data_idx++;
+
     }
+
     state_buffer_.block(0, 0, num_cur_state*(num_state_skip*num_state_hist-1),1) = state_buffer_.block(num_cur_state, 0, num_cur_state*(num_state_skip*num_state_hist-1),1);
+
     state_history_.block(0, 0, num_cur_state, history_skip_*history_len_-1) = state_history_.block(0, 1, num_cur_state,history_skip_*history_len_-1);
 
+
+
     MatrixXd tmp = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
+
     for (int i = 0; i < num_cur_state; i++){
+
         tmp(i) = DyrosMath::minmax_cut(tmp(i), -10., 10.);
+
     }
+
     state_buffer_.block(num_cur_state*(num_state_skip*num_state_hist-1), 0, num_cur_state,1) = tmp;
+
     state_history_.block(0,history_skip_*history_len_-1, num_cur_state, 1) = tmp;
 
+
+
     if (!encoder_initialized){
+
         for (int i = 0; i < history_skip_*history_len_; i++) 
+
             state_history_.block(0,i, num_cur_state, 1) = tmp;
+
         
+
         encoder_initialized = true;
+
     }
+
+
 
     // // Internal State First
+
     // for (int i = 0; i < num_state_hist; i++)
+
     // {
+
     //     state_.block(num_cur_internal_state*i, 0, num_cur_internal_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_internal_state, 1);
+
     // }
+
     // // Action History Second
+
     // for (int i = 0; i < num_state_hist-1; i++)
+
     // {
+
     //     state_.block(num_state_hist*num_cur_internal_state + num_action*i, 0, num_action, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)) + num_cur_internal_state, 0, num_action, 1);
+
     // }
+
     for (int i = 0; i < num_state_hist; i++){
+
         state_.block(num_cur_state*i, 0, num_cur_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_state, 1);
+
     }
+
     if (use_encoder_){
+
         for (int i = 0; i < history_len_; i++){
+
             encoder_input_.block(0, i, num_cur_state, 1) = state_history_.block(0, history_skip_*(i+1)-1, num_cur_state, 1);
+
        }
+
     }
-
-
-
 }
+
+
+
 
 // RELU
 // void CustomController::feedforwardPolicy()
@@ -965,162 +1182,341 @@ void CustomController::loadEncoderNetwork()
     }
 }
 
+
+
 void CustomController::computeSlow()
+
 {
+
     copyRobotData(rd_);
+
     if (rd_cc_.tc_.mode == 7)
+
     {
+
         if (rd_cc_.tc_init)
+
         {
+
             //Initialize settings for Task Control! 
+
             start_time_ = rd_cc_.control_time_us_;
+
             q_noise_pre_ = q_noise_ = q_init_ = rd_cc_.q_virtual_.segment(6,MODEL_DOF);
-            q_leg_desired_ = rd_.q_.segment(0,12);
+
+            q_leg_desired_ = rd_cc_.q_.segment(0,12);
+
             time_cur_ = start_time_ / 1e6;
+
             time_pre_ = time_cur_ - 0.005;
+
             // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
+
             time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_-0.1))*1e6;
 
+
+
             rd_.tc_init = false;
+
             std::cout<<"cc mode 7"<<std::endl;
+
             torque_init_ = rd_cc_.torque_desired;
+
             target_com_state_stance_frame_.setZero(13);
+
             target_swing_state_stance_frame_.setZero(13);
 
+
+
             processNoise();
+
             // Woohyun
+
             processBias();
+
             processObservation();
+
             for (int i = 0; i < num_state_skip*num_state_hist; i++) 
+
             {
+
                 state_buffer_.block(num_cur_state*i, 0, num_cur_state, 1) = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
+
                 // state_buffer_.block(num_cur_state*i, 0, num_cur_state, 1).setZero();
+
             }
+
         }
 
+
+
         processNoise();
+
         // Woohyun
+
         processBias();
 
+
+
         // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
+
         // With encoder, 
+
         if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_ - 4/10000.0) // 125 is the control frequency
+
         {
+
             // auto start_time = std::chrono::high_resolution_clock::now();
 
+
+
             // Call the functions you want to measure
+
             updateFootstepCommand();
+
             getRobotState();
+
             walkingStateMachine();
+
             getComTrajectory(); 
+
             getFootTrajectory();
+
+
 
             getTargetState();
 
+
+
             processObservation();
+
             feedforwardPolicy();
+
+
 
             updateNextStepTime();
 
+
+
             // End time measurement
+
             // auto end_time = std::chrono::high_resolution_clock::now();
 
+
+
             // // Calculate the duration in microseconds
+
             // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
 
+
+
             // // Output the time taken
+
             // std::cout << "processObservation and feedforwardPolicy took " << duration << " us" << std::endl;
 
+
+
             
+
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
+
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
+
             std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            if (value_ < 80.0)
+
+            if (value_ < 0.0)
+
             {
+
                 if (stop_by_value_thres_ == false)
+
                 {
 
+
+
                     stop_by_value_thres_ = true;
+
                     stop_start_time_ = rd_cc_.control_time_us_;
+
                     q_stop_ = q_noise_;
+
                     std::cout << "Stop by Value Function : " << walking_tick << ", Value : " << value_ << std::endl;
+
                 }
+
             }
 
+
+
             if (is_write_file_)
+
             {
+
                     writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+
                     // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
+
+
                     // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+
                     // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+
                     writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+
                     writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
 
+
+
                     writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+
                     writeFile << q_noise_.transpose() << "\t";
+
                     writeFile << q_dot_lpf_.transpose() << "\t";
+
                     writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+
                     writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+
                     writeFile << heading << "\t";
 
+
+
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+
                     writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+
                     writeFile << target_com_state_stance_frame_.transpose() << "\t";
+
                     writeFile << swing_state_stance_frame_.transpose() << "\t";
+
                     writeFile << com_state_stance_frame_.transpose() << "\t";
+
+                    writeFile << q_leg_desired_.transpose() << "\t";
+
+                    writeFile << ref_zmp_(walking_tick,0) << "\t";
+
+                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
+
+                    
+
                     // else writeFile << hidden_layer2_.transpose() << "\t";
+
                     writeFile << std::endl;
+
+
 
                     time_write_pre_ = rd_cc_.control_time_us_;
 
 
+
+                    // Data for actuator net training
+
+                    if (actuator_net_log){
+
+                        actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
+
+                        actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
+
+                        actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
+
+                        actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
+
+                        actuator_data_file << std::endl;
+
+                    }
+
+
+
             }
+
             
+
             time_inference_pre_ = rd_cc_.control_time_us_;
+
         }
+
+
+
+
 
 
 
         for (int i = 0; i < num_actuator_action; i++)
+
         {
+
             // WH
+
             torque_rl_(i) = DyrosMath::minmax_cut(rl_action_(i), -1., 1.) *torque_bound_(i) ;
+
             // torque_rl_(i) = DyrosMath::minmax_cut(torque_rl_(i)  + 
+
             // DyrosMath::minmax_cut(kp_(i,i) * (q_leg_desired_(i) - q_noise_(i)) - kv_(i,i)*q_vel_noise_(i),-torque_bound_(i), torque_bound_(i) ),
+
             // -torque_bound_(i), torque_bound_(i));
+
         }
+
         for (int i = num_actuator_action; i < MODEL_DOF; i++)
+
         {
+
             torque_rl_(i) = kp_(i,i) * (q_init_(i) - q_noise_(i)) - kv_(i,i)*q_vel_noise_(i);
+
         }
+
         
+
         if (rd_cc_.control_time_us_ < start_time_ + 0.1e6)
+
         {
+
+
 
             for (int i = 0; i <MODEL_DOF; i++)
+
             {
+
                 torque_spline_(i) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 0.1e6, torque_init_(i), torque_rl_(i), 0.0, 0.0);
+
             }
+
             rd_.torque_desired = torque_spline_;    
+
         }
+
         else
+
         {
+
              rd_.torque_desired = torque_rl_;
+
             
+
         }
+
+
 
         if (stop_by_value_thres_)
+
         {
+
             rd_.torque_desired = kp_ * (q_stop_ - q_noise_) - kv_*q_vel_noise_;
+
         }
+
         
+
         
+
         
+
+
 
     }
-}
 
+}
 void CustomController::computeFast()
 {
     // if (tc.mode == 10)
@@ -1314,75 +1710,137 @@ void CustomController::updateInitialState()
 }
 
 // PREVIEW
-// PREVIEW
 void CustomController::updateFootstepCommand(){
+
     if (walking_tick == 0){
+
         phase_indicator_ << first_stance_foot_, 1-first_stance_foot_, first_stance_foot_;
+
         // step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,  phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,  phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
+
         step_length_x_ << 0. ,0., 0.;
+
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_ + (1-phase_indicator_(1))*Rcommand_step_length_y_), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
+
         step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205+ (1-phase_indicator_(1))*0.205), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
+
         // step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
+
         step_yaw_ << 0., 0., 0.;
+
         // foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+
         foot_height_ << 0.08, 0.08, 0.08;
-        // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
+
         t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_, 0.1, 0.1;
+
+        // t_dsp_ << 0.1, 0.1, 0.1;
+
         t_dsp_seconds = t_dsp_;
-        // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
+
         t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_, 1., 1.;
+
+        // t_ssp_ << 1., 1., 1.;
+
         t_ssp_seconds = t_ssp_;
+
         t_dsp_ *= hz_;
+
         t_ssp_ *= hz_;
+
         for (int i = 0; i < number_of_foot_step; i++){
+
             t_dsp_(i) = std::floor(t_dsp_(i));
+
             t_ssp_(i) = std::floor(t_ssp_(i));
+
             t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
+
         }
+
         calculateFootStepTotal();
+
         getRobotState();
+
         updateInitialState();
+
         getZmpTrajectory();
+
         resetPreviewState();
+
     }
 
+
+
     else if (walking_tick > t_total_(0)){
+
         // step_length_x_.segment(0,2) = step_length_x_.segment(1,2);
+
         // step_length_y_.segment(0,2) = step_length_y_.segment(1,2);
+
         // step_yaw_.segment(0,2) = step_yaw_.segment(1,2);
+
         // foot_height_.segment(0,2) = foot_height_.segment(1,2);
+
         // t_dsp_.segment(0,2) = t_dsp_.segment(1,2);
+
         // t_ssp_.segment(0,2) = t_ssp_.segment(1,2);
+
         phase_indicator_.segment(0,2) = phase_indicator_.segment(1,2);
+
+
 
         phase_indicator_(2) = 1-phase_indicator_(1);
 
+
+
         step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
+
         step_length_y_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_length_y_ + (1-phase_indicator_(0)) * Rcommand_step_length_y_);
+
         step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
+
         t_dsp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_);
+
         t_dsp_seconds(0) = (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_);
+
         t_ssp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_) * hz_);
+
         t_ssp_seconds(0) = (phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_);
+
         foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
 
+
+
         for (int i = 0; i < number_of_foot_step; i++){
+
             t_dsp_(i) = std::floor(t_dsp_(i));
+
             t_ssp_(i) = std::floor(t_ssp_(i));
+
             t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
+
         }
 
+
+
         walking_tick = 0;
+
         calculateFootStepTotal();
+
         getRobotState();
+
         updateInitialState();
+
         getZmpTrajectory();
+
         resetPreviewState();
+
     }
 
+
+
 }
-
-
 void CustomController::getRobotState()
 {
 
@@ -2108,8 +2566,10 @@ void CustomController::computeIkControl(const Eigen::Isometry3d &float_trunk_tra
     q_des(5) = atan2(L_r(1), L_r(2));                                                                                  // Ankle roll
     q_des(11) = atan2(R_r(1), R_r(2));
 
-    L_alpha = asin(L_upper / L_C * sin(M_PI - q_des(3)));
-    R_alpha = asin(L_upper / R_C * sin(M_PI - q_des(9)));
+
+    L_alpha = asin(DyrosMath::minmax_cut(L_upper / L_C * sin(M_PI - q_des(3)), -0.99, 0.99) );
+
+    R_alpha = asin(DyrosMath::minmax_cut(L_upper / R_C * sin(M_PI - q_des(9)), -0.99, 0.99));
     
     q_des(4) = -atan2(L_r(0), sqrt(pow(L_r(1), 2) + pow(L_r(2), 2))) - L_alpha;
     q_des(10) = -atan2(R_r(0), sqrt(pow(R_r(1), 2) + pow(R_r(2), 2))) - R_alpha;
