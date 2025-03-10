@@ -42,8 +42,8 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 73;
-    static const int num_cur_internal_state = 73;
+    static const int num_cur_state = 65;
+    static const int num_cur_internal_state = 65;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -197,6 +197,7 @@ public:
     Eigen::Vector3d t_total_;
     int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
     const double com_height_ = 0.68;
+    int current_step_num = 0;
 
     double t_last_;
     double t_start_;
