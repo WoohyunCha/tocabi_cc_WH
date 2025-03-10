@@ -507,440 +507,226 @@ void CustomController::processNoise()
 
 
 void CustomController::processObservation() // [linvel, angvel, proj_grav, commands, dof_pos, dof_vel, actions]
-
 {
-
-
 
     int data_idx = 0;
 
-
-
     Eigen::Quaterniond q;
-
     q.x() = rd_cc_.q_virtual_(3);
-
     q.y() = rd_cc_.q_virtual_(4);
-
     q.z() = rd_cc_.q_virtual_(5);
-
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
-
-
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
-
     base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
-
     // std::cout <<"global : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
-
     // base_ang_vel = q.conjugate()*base_ang_vel;
-
     // std::cout << "local : " << base_ang_vel(0) << ", " << base_ang_vel(1) << ", " << base_ang_vel(2) << std::endl;
 
-
-
  
-
     // for (int i=0; i<6; i++)
-
     // {
-
     //     state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
-
     //     data_idx++;
-
     // }
 
-
-
     for (int i = 0; i < 3; i++){
-
         state_cur_(data_idx) = base_lin_vel(i);
-
         data_idx++;
-
     }
-
-
 
     for (int i = 0; i < 3; i++){
-
         state_cur_(data_idx) = base_ang_vel(i);
-
         data_idx++;
-
     }
-
-
-
 
 
     Vector3_t grav, projected_grav, forward_vec;
-
     grav << 0, 0, -1.;
-
     forward_vec << 1., 0, 0;
-
     projected_grav = q.conjugate()*grav;
 
-
-
     // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
-
     // data_idx++;
-
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
-
     // data_idx++;
-
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
-
     // data_idx++;
-
     state_cur_(data_idx) = q.x();
-
     data_idx++;
-
     state_cur_(data_idx) = q.y();
-
     data_idx++;
-
     state_cur_(data_idx) = q.z();
-
     data_idx++;
-
     state_cur_(data_idx) = q.w();
-
     data_idx++;
 
-
-
     for (int i = 0; i < num_actuator_action; i++)
-
     {
-
         state_cur_(data_idx) = q_noise_(i) - q_init_(i);
-
         data_idx++;
-
     }
 
-
-
     for (int i = 0; i < num_actuator_action; i++)
-
     {
-
         if (is_on_robot_)
-
         {
-
             state_cur_(data_idx) = q_vel_noise_(i);
-
         }
-
         else
-
         {
-
             state_cur_(data_idx) = q_vel_noise_(i); //rd_cc_.q_dot_virtual_(i+6);
-
         }
-
         data_idx++;
-
     }
-
-
 
     for (int i = 0; i < num_actuator_action; i++)
-
     {
-
         state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
-
         data_idx++;
-
     }
 
-
-
-    // state_cur_(data_idx) = swing_state_stance_frame_(0);
-
-    // data_idx++;
-
-    // state_cur_(data_idx) = swing_state_stance_frame_(1);
-
-    // data_idx++;
-
-    // state_cur_(data_idx) = swing_state_stance_frame_(2);
-
-    // data_idx++;
-
+    state_cur_(data_idx) = swing_state_stance_frame_(0);
+    data_idx++;
+    state_cur_(data_idx) = swing_state_stance_frame_(1);
+    data_idx++;
+    state_cur_(data_idx) = swing_state_stance_frame_(2);
+    data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-
     // data_idx++;
+    state_cur_(data_idx) = swing_state_stance_frame_(5);
+    data_idx++;
+    state_cur_(data_idx) = swing_state_stance_frame_(6);
+    data_idx++;
 
-    // state_cur_(data_idx) = swing_state_stance_frame_(5);
-
-    // data_idx++;
-
-    // state_cur_(data_idx) = swing_state_stance_frame_(6);
-
-    // data_idx++;
-
-
-
-    // state_cur_(data_idx) = com_state_stance_frame_(0);
-
-    // data_idx++;
-
-    // state_cur_(data_idx) = com_state_stance_frame_(1);
-
-    // data_idx++;
-
-    // state_cur_(data_idx) = com_state_stance_frame_(2);
-
-    // data_idx++;
-
+    state_cur_(data_idx) = com_state_stance_frame_(0);
+    data_idx++;
+    state_cur_(data_idx) = com_state_stance_frame_(1);
+    data_idx++;
+    state_cur_(data_idx) = com_state_stance_frame_(2);
+    data_idx++;
     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(4);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(5);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(6);
-
     // data_idx++;
-
-
 
     // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
-
     // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
-
     // data_idx++;
-
-
-
 
 
     // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(7);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(8);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(9);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_swing_state_stance_frame_(12);
-
     // data_idx++;
-
-
-
 
 
     // state_cur_(data_idx) = target_com_state_stance_frame_(0);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(1);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(5);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(6);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(7);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(8);
-
     // data_idx++;
-
     // state_cur_(data_idx) = target_com_state_stance_frame_(12);
-
     // data_idx++;
-
-
-
-
 
 
 
     // std::cout << "Swing and Com state" << std::endl;
-
     // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
-
     // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
-
     // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
-
     state_cur_(data_idx) = walking_tick;
-
     data_idx++;
-
-
 
     state_cur_(data_idx) = step_length_x_(0);
-
     data_idx++;
-
     state_cur_(data_idx) = step_length_y_(0);
-
     data_idx++;
-
     state_cur_(data_idx) = step_yaw_(0);
-
     data_idx++;
-
     state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_dsp_ + (1-phase_indicator_(0))*Rcommand_t_dsp_;
-
     data_idx++;
-
     state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_ssp_ + (1-phase_indicator_(0))*Rcommand_t_ssp_;
-
     data_idx++;
-
     state_cur_(data_idx) = foot_height_(0);
-
     data_idx++;
-
-
 
     for (int i = 0; i <num_actuator_action; i++) 
-
     {
-
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
-
         data_idx++;
-
     }
-
     state_buffer_.block(0, 0, num_cur_state*(num_state_skip*num_state_hist-1),1) = state_buffer_.block(num_cur_state, 0, num_cur_state*(num_state_skip*num_state_hist-1),1);
-
     state_history_.block(0, 0, num_cur_state, history_skip_*history_len_-1) = state_history_.block(0, 1, num_cur_state,history_skip_*history_len_-1);
 
-
-
     MatrixXd tmp = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
-
     for (int i = 0; i < num_cur_state; i++){
-
         tmp(i) = DyrosMath::minmax_cut(tmp(i), -10., 10.);
-
     }
-
     state_buffer_.block(num_cur_state*(num_state_skip*num_state_hist-1), 0, num_cur_state,1) = tmp;
-
     state_history_.block(0,history_skip_*history_len_-1, num_cur_state, 1) = tmp;
 
-
-
     if (!encoder_initialized){
-
         for (int i = 0; i < history_skip_*history_len_; i++) 
-
             state_history_.block(0,i, num_cur_state, 1) = tmp;
-
         
-
         encoder_initialized = true;
-
     }
-
-
 
     // // Internal State First
-
     // for (int i = 0; i < num_state_hist; i++)
-
     // {
-
     //     state_.block(num_cur_internal_state*i, 0, num_cur_internal_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_internal_state, 1);
-
     // }
-
     // // Action History Second
-
     // for (int i = 0; i < num_state_hist-1; i++)
-
     // {
-
     //     state_.block(num_state_hist*num_cur_internal_state + num_action*i, 0, num_action, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)) + num_cur_internal_state, 0, num_action, 1);
-
     // }
-
     for (int i = 0; i < num_state_hist; i++){
-
         state_.block(num_cur_state*i, 0, num_cur_state, 1) = state_buffer_.block(num_cur_state*(num_state_skip*(i+1)-1), 0, num_cur_state, 1);
-
     }
-
     if (use_encoder_){
-
         for (int i = 0; i < history_len_; i++){
-
             encoder_input_.block(0, i, num_cur_state, 1) = state_history_.block(0, history_skip_*(i+1)-1, num_cur_state, 1);
-
        }
-
     }
-}
 
+
+
+}
 
 
 
