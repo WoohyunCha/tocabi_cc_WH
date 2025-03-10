@@ -1035,7 +1035,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
             std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            if (value_ < 0.0)
+            if (value_ < 0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -1369,7 +1369,7 @@ void CustomController::updateFootstepCommand(){
         phase_indicator_(2) = 1-phase_indicator_(1);
 
         step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
-        step_length_y_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_length_y_ + (1-phase_indicator_(0)) * Rcommand_step_length_y_);
+        step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_length_y_ + (1-phase_indicator_(0)) * Rcommand_step_length_y_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205+ (1-phase_indicator_(1))*0.205), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
         step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
         t_dsp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_);
         t_dsp_seconds(0) = (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_);
