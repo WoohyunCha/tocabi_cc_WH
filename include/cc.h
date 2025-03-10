@@ -5,7 +5,6 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-#include <tocabi_msgs/RLCommand.h>
 
 class CustomController
 {

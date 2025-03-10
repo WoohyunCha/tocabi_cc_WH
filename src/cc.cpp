@@ -586,26 +586,26 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    state_cur_(data_idx) = swing_state_stance_frame_(0);
     data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+    state_cur_(data_idx) = swing_state_stance_frame_(1);
     data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+    state_cur_(data_idx) = swing_state_stance_frame_(2);
     data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
     // data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
     // data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    state_cur_(data_idx) = swing_state_stance_frame_(5);
     data_idx++;
-    state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    state_cur_(data_idx) = swing_state_stance_frame_(6);
     data_idx++;
 
-    state_cur_(data_idx) = target_com_state_stance_frame_(0);
+    state_cur_(data_idx) = com_state_stance_frame_(0);
     data_idx++;
-    state_cur_(data_idx) = target_com_state_stance_frame_(1);
+    state_cur_(data_idx) = com_state_stance_frame_(1);
     data_idx++;
-    state_cur_(data_idx) = target_com_state_stance_frame_(2);
+    state_cur_(data_idx) = com_state_stance_frame_(2);
     data_idx++;
     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
     // data_idx++;
@@ -1035,7 +1035,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
             std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            if (value_ < 60.0)
+            if (value_ < 0.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
