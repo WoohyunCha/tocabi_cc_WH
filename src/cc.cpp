@@ -407,6 +407,7 @@ void CustomController::initVariable()
     swing_state_stance_frame_.setZero(13);
     com_state_stance_frame_.setZero(13);
     q_leg_desired_ = q_init_.segment(0, num_actuator_action);
+    com_support_current_dot_prev_.setZero(3);
 
     string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
 
@@ -587,28 +588,30 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    state_cur_(data_idx) = swing_state_stance_frame_(0);
-    data_idx++;
-    state_cur_(data_idx) = swing_state_stance_frame_(1);
-    data_idx++;
-    state_cur_(data_idx) = swing_state_stance_frame_(2);
-    data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
+    // state_cur_(data_idx) = swing_state_stance_frame_(0);
     // data_idx++;
+    // state_cur_(data_idx) = swing_state_stance_frame_(1);
+    // data_idx++;
+    // state_cur_(data_idx) = swing_state_stance_frame_(2);
+    // data_idx++;
+    // // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
+    // // data_idx++;
+    // // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
+    // // data_idx++;
+    // state_cur_(data_idx) = swing_state_stance_frame_(5);
+   // data_idx++;
     // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
     // data_idx++;
-    state_cur_(data_idx) = swing_state_stance_frame_(5);
-    data_idx++;
-    state_cur_(data_idx) = swing_state_stance_frame_(6);
-    data_idx++;
+    // state_cur_(data_idx) = swing_state_stance_frame_(6);
+    // data_idx++;
 
-    state_cur_(data_idx) = com_state_stance_frame_(0);
-    data_idx++;
-    state_cur_(data_idx) = com_state_stance_frame_(1);
-    data_idx++;
-    state_cur_(data_idx) = com_state_stance_frame_(2);
-    data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+    // state_cur_(data_idx) = com_state_stance_frame_(0);
+    // data_idx++;
+    // state_cur_(data_idx) = com_state_stance_frame_(1);
+    // data_idx++;
+    // state_cur_(data_idx) = com_state_stance_frame_(2);
+    // data_idx++;
+     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
     // data_idx++;
     // state_cur_(data_idx) = target_com_state_stance_frame_(4);
     // data_idx++;
@@ -676,9 +679,9 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = step_yaw_(0);
     data_idx++;
-    state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_dsp_ + (1-phase_indicator_(0))*Rcommand_t_dsp_;
+    state_cur_(data_idx) = t_dsp_seconds(0);
     data_idx++;
-    state_cur_(data_idx) = phase_indicator_(0)*Lcommand_t_ssp_ + (1-phase_indicator_(0))*Rcommand_t_ssp_;
+    state_cur_(data_idx) = t_ssp_seconds(0);
     data_idx++;
     state_cur_(data_idx) = foot_height_(0);
     data_idx++;
@@ -1498,9 +1501,9 @@ void CustomController::updateFootstepCommand(){
 
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
 
-        step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), 
-        (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205+ (1-phase_indicator_(1))*0.205), 
-        (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
+        step_length_y_ << (2*phase_indicator_(0)-1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), 
+        (2*phase_indicator_(1)-1) * 0.205, 
+        (2*phase_indicator_(2)-1) * 0.205;
         
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Lcommand_step_length_y_),
         //  (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Lcommand_step_length_y_),
@@ -1568,41 +1571,49 @@ void CustomController::updateFootstepCommand(){
 
     else if (walking_tick > t_total_(0)){
 
-        step_length_x_.segment(0,2) = step_length_x_.segment(1,2);
 
-        step_length_y_.segment(0,2) = step_length_y_.segment(1,2);
-
-        step_yaw_.segment(0,2) = step_yaw_.segment(1,2);
-
-        foot_height_.segment(0,2) = foot_height_.segment(1,2);
-
-        t_dsp_.segment(0,2) = t_dsp_.segment(1,2);
-
-        t_ssp_.segment(0,2) = t_ssp_.segment(1,2);
 
         phase_indicator_.segment(0,2) = phase_indicator_.segment(1,2);
-
-
 
         phase_indicator_(2) = 1-phase_indicator_(1);
 
 
 
-        step_length_x_(2) = phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
+        step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
 
-        step_length_y_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
 
-        step_yaw_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
 
-        t_dsp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
+        step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
 
-        t_dsp_seconds(2) = (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
+        (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205),
 
-        t_ssp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
+        (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
 
-        t_ssp_seconds(2) = (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
 
-        foot_height_(2) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
+
+        step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
+
+
+
+        t_dsp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_);
+
+
+
+        t_dsp_seconds(0) = (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_);
+
+
+
+        t_ssp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_) * hz_);
+
+
+
+        t_ssp_seconds(0) = (phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_);
+
+
+
+        foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
+
+
 
 
 
@@ -1847,14 +1858,14 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
         vT_x_dsp1 = 0.0;
         v0_y_dsp1 = com_support_init_yaw_(1);
         vT_y_dsp1 = 0.0;
-        v0_yaw_dsp1 =  pelv_support_euler_init_(2);
-        vT_yaw_dsp1 = pelv_support_euler_init_(2);
+        v0_yaw_dsp1 =  pelv_support_euler_init_yaw_(2);
+        vT_yaw_dsp1 = pelv_support_euler_init_yaw_(2);
 
         v0_x_ssp = 0.0;
         vT_x_ssp = 0.0;
         v0_y_ssp = 0.0;
         vT_y_ssp = 0.0;
-        v0_yaw_ssp =  pelv_support_euler_init_(2);
+        v0_yaw_ssp =  pelv_support_euler_init_yaw_(2);
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2.0;
 
         v0_x_dsp2 = 0.0;
@@ -1923,7 +1934,7 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
             temp_px(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, 0.0, t_dsp1_, v0_x_dsp1, vT_x_dsp1, 0.0, 0.0), min(v0_x_dsp1, vT_x_dsp1), max(v0_x_dsp1, vT_x_dsp1));
             temp_py(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, 0.0, t_dsp1_, v0_y_dsp1, vT_y_dsp1, 0.0, 0.0), min(v0_y_dsp1, vT_y_dsp1), max(v0_y_dsp1, vT_y_dsp1));
             temp_yaw(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, 0.0, t_dsp1_, v0_yaw_dsp1, vT_yaw_dsp1, 0.0, 0.0), min(v0_yaw_dsp1, vT_yaw_dsp1), max(v0_yaw_dsp1, vT_yaw_dsp1));
-            temp_yawvel(i) = DyrosMath::minmax_cut(DyrosMath::cubicDot(i, 0.0, t_dsp1_, v0_yaw_dsp1, vT_yaw_dsp1, 0., 0.), min(v0_yaw_dsp1, vT_yaw_dsp1), max(v0_yaw_dsp1, vT_yaw_dsp1));
+            temp_yawvel(i) = DyrosMath::cubicDot(i, 0.0, t_dsp1_, v0_yaw_dsp1, vT_yaw_dsp1, 0., 0.);
         }
         else if (i >= t_dsp1_ && i < t_dsp1_ + t_ssp)
         {
@@ -1934,7 +1945,7 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
             temp_px(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_, t_dsp1_ + t_ssp, v0_x_ssp, vT_x_ssp, 0.0, 0.0), min(v0_x_ssp, vT_x_ssp), max(v0_x_ssp, vT_x_ssp));
             temp_py(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_, t_dsp1_ + t_ssp, v0_y_ssp, vT_y_ssp, 0.0, 0.0), min(v0_y_ssp, vT_y_ssp), max(v0_y_ssp, vT_y_ssp));
             temp_yaw(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_, t_dsp1_ + t_ssp, v0_yaw_ssp, vT_yaw_ssp, 0.0, 0.0), min(v0_yaw_ssp, vT_yaw_ssp), max(v0_yaw_ssp, vT_yaw_ssp));
-            temp_yawvel(i) = DyrosMath::minmax_cut(DyrosMath::cubicDot(i, t_dsp1_, t_dsp1_+t_ssp, v0_yaw_ssp, vT_yaw_ssp, 0., 0.), min(v0_yaw_ssp, vT_yaw_ssp), max(v0_yaw_ssp, vT_yaw_ssp));
+            temp_yawvel(i) = DyrosMath::cubicDot(i, t_dsp1_, t_dsp1_+t_ssp, v0_yaw_ssp, vT_yaw_ssp, 0., 0.);
         }
         else
         {
@@ -1945,7 +1956,7 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
             temp_px(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_x_dsp2, vT_x_dsp2, 0.0, 0.0), min(v0_x_dsp2, vT_x_dsp2), max(v0_x_dsp2, vT_x_dsp2));
             temp_py(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_y_dsp2, vT_y_dsp2, 0.0, 0.0), min(v0_y_dsp2, vT_y_dsp2), max(v0_y_dsp2, vT_y_dsp2));
             temp_yaw(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_yaw_dsp2, vT_yaw_dsp2, 0.0, 0.0), min(v0_yaw_dsp2, vT_yaw_dsp2), max(v0_yaw_dsp2, vT_yaw_dsp2));
-            temp_yawvel(i) = DyrosMath::minmax_cut(DyrosMath::cubicDot(i, t_dsp1_ + t_ssp, t_total, v0_yaw_dsp2, vT_yaw_dsp2, 0., 0.), min(v0_yaw_dsp2, vT_yaw_dsp2), max(v0_yaw_dsp2, vT_yaw_dsp2));
+            temp_yawvel(i) = DyrosMath::cubicDot(i, t_dsp1_ + t_ssp, t_total, v0_yaw_dsp2, vT_yaw_dsp2, 0., 0.);
         }
     }
 
