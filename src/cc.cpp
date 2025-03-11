@@ -976,7 +976,6 @@ void CustomController::computeSlow()
 {
 
     copyRobotData(rd_);
-
     if (rd_cc_.tc_.mode == 7)
 
     {
@@ -999,7 +998,7 @@ void CustomController::computeSlow()
 
             // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
 
-            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_-0.1))*1e6;
+            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_-0.05))*1e6;
 
 
 
@@ -1045,16 +1044,15 @@ void CustomController::computeSlow()
 
 
 
-        // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
+        // processObservation and feedforwardPolicy mean time: 1000 us, max 3000 us
 
         // With encoder, 
 
-        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_ - 4/10000.0) // 125 is the control frequency
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_) // 125 is the control frequency
 
         {
 
             // auto start_time = std::chrono::high_resolution_clock::now();
-
 
 
             // Call the functions you want to measure
@@ -1079,15 +1077,13 @@ void CustomController::computeSlow()
 
             feedforwardPolicy();
 
-
-
             updateNextStepTime();
 
 
 
-            // End time measurement
-
+            // // // End time measurement
             // auto end_time = std::chrono::high_resolution_clock::now();
+
 
 
 
@@ -1105,9 +1101,9 @@ void CustomController::computeSlow()
 
             
 
-            // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
+            // // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
 
-            action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
+            // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
             // std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
             // std::cout << "walking time : " << walking_tick / hz_ <<  ", step y : " << step_length_y_.transpose() << std::endl;
@@ -1481,165 +1477,6 @@ void CustomController::updateInitialState()
 }
 
 
-// // Delayed commands
-// void CustomController::updateFootstepCommand(){
-
-//     if (walking_tick == 0){
-
-//         phase_indicator_ << first_stance_foot_, 1-first_stance_foot_, first_stance_foot_;
-
-//         // step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,
-//         // phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,
-//         // phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_ ;
-
-//         // step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,  0., 0.;
-
-//         step_length_x_ << 0. ,0., 0.;
-
-//         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), 
-//         // (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205), 
-//         // (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
-
-//         step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), 
-//         (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205+ (1-phase_indicator_(1))*0.205), 
-//         (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
-        
-//         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
-//         //  (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Rcommand_step_length_y_),
-//         //   (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
-
-//         // step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_), 0., 0.;
-
-//         // step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_),
-//         // (2*phase_indicator_(1) - 1) * ( phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_),
-//         // (2*phase_indicator_(2) - 1) * ( phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
-
-//         step_yaw_ << 0., 0., 0.;
-
-//         // foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
-
-//         foot_height_ << 0.08, 0.08, 0.08;
-
-//         // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_, 0.1, 0.1;
-
-//         // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,
-//         // phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,
-//         // phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
-
-//         t_dsp_ << 0.1, 0.1, 0.1;
-
-//         t_dsp_seconds = t_dsp_;
-
-//         // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_, 1., 1.;
-
-//         // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,
-//         // phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,
-//         // phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
-
-//         t_ssp_ << 1., 1., 1.;
-
-//         t_ssp_seconds = t_ssp_;
-
-//         t_dsp_ *= hz_;
-
-//         t_ssp_ *= hz_;
-
-//         for (int i = 0; i < number_of_foot_step; i++){
-
-//             t_dsp_(i) = std::floor(t_dsp_(i));
-
-//             t_ssp_(i) = std::floor(t_ssp_(i));
-
-//             t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
-
-//         }
-
-//         calculateFootStepTotal();
-
-//         getRobotState();
-
-//         updateInitialState();
-
-//         getZmpTrajectory();
-
-//         resetPreviewState();
-
-//     }
-
-
-
-//     else if (walking_tick > t_total_(0)){
-
-//         step_length_x_.segment(0,2) = step_length_x_.segment(1,2);
-
-//         step_length_y_.segment(0,2) = step_length_y_.segment(1,2);
-
-//         step_yaw_.segment(0,2) = step_yaw_.segment(1,2);
-
-//         foot_height_.segment(0,2) = foot_height_.segment(1,2);
-
-//         t_dsp_.segment(0,2) = t_dsp_.segment(1,2);
-
-//         t_ssp_.segment(0,2) = t_ssp_.segment(1,2);
-
-//         t_dsp_seconds.segment(0,2) = t_dsp_seconds.segment(1,2);
-
-//         t_ssp_seconds.segment(0,2) = t_ssp_seconds.segment(1,2);
-
-//         phase_indicator_.segment(0,2) = phase_indicator_.segment(1,2);
-
-
-
-//         phase_indicator_(2) = 1-phase_indicator_(1);
-
-
-
-//         step_length_x_(2) = phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_;
-
-//         step_length_y_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
-
-//         step_yaw_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
-
-//         t_dsp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
-
-//         t_dsp_seconds(2) = (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
-
-//         t_ssp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
-
-//         t_ssp_seconds(2) = (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
-
-//         foot_height_(2) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
-
-
-
-//         for (int i = 0; i < number_of_foot_step; i++){
-
-//             t_dsp_(i) = std::floor(t_dsp_(i));
-
-//             t_ssp_(i) = std::floor(t_ssp_(i));
-
-//             t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
-
-//         }
-
-
-
-//         walking_tick = 0;
-
-//         calculateFootStepTotal();
-
-//         getRobotState();
-
-//         updateInitialState();
-
-//         getZmpTrajectory();
-
-//         resetPreviewState();
-
-//     }
-// }
-
-
 // Fixed last commands
 void CustomController::updateFootstepCommand(){
 
@@ -1659,7 +1496,7 @@ void CustomController::updateFootstepCommand(){
         // (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205), 
         // (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
 
-        step_length_y_ << (2*phase_indicator_(0)-1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), 
+        step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
         (2*phase_indicator_(1)-1) * 0.205, 
         (2*phase_indicator_(2)-1) * 0.205;
         
@@ -1735,8 +1572,8 @@ void CustomController::updateFootstepCommand(){
         step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
 
         step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
-        (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205),
-        (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
+        (2*phase_indicator_(1)-1) * 0.205,
+        (2*phase_indicator_(2)-1) * 0.205;
 
         step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
 
@@ -1750,7 +1587,7 @@ void CustomController::updateFootstepCommand(){
 
         foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
 
-
+        
 
         for (int i = 0; i < number_of_foot_step; i++){
 
