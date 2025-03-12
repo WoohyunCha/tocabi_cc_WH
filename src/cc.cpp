@@ -731,18 +731,18 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
 
 
-// RELU
+// // RELU
 // void CustomController::feedforwardPolicy()
 // {
 //     hidden_layer1_ = policy_net_w0_ * state_ + policy_net_b0_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden1; i++) 
 //     {
 //         if (hidden_layer1_(i) < 0)
 //             hidden_layer1_(i) = 0.0;
 //     }
 
 //     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden2; i++) 
 //     {
 //         if (hidden_layer2_(i) < 0)
 //             hidden_layer2_(i) = 0.0;
@@ -751,14 +751,14 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 //     rl_action_ = action_net_w_ * hidden_layer2_ + action_net_b_;
 
 //     value_hidden_layer1_ = value_net_w0_ * state_ + value_net_b0_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden1; i++) 
 //     {
 //         if (value_hidden_layer1_(i) < 0)
 //             value_hidden_layer1_(i) = 0.0;
 //     }
 
 //     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden2; i++) 
 //     {
 //         if (value_hidden_layer2_(i) < 0)
 //             value_hidden_layer2_(i) = 0.0;
@@ -1103,10 +1103,10 @@ void CustomController::computeSlow()
 
             // // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
 
-            // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
+            // // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
-            // std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
-            // std::cout << "walking time : " << walking_tick / hz_ <<  ", step y : " << step_length_y_.transpose() << std::endl;
+            // // std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
+            // // std::cout << "walking time : " << walking_tick / hz_ <<  ", step y : " << step_length_y_.transpose() << std::endl;
 
             if (value_ < 0.0)
 
