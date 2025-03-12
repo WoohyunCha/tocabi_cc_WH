@@ -998,7 +998,7 @@ void CustomController::computeSlow()
 
             // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
 
-            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_-0.05))*1e6;
+            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_))*1e6;
 
 
 
