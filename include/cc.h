@@ -290,9 +290,7 @@ public:
     Eigen::Isometry3d lfoot_support_current_;
     Eigen::Isometry3d rfoot_support_current_;
 
-    Eigen::Isometry3d lfoot_support_init_;
     Eigen::Isometry3d lfoot_support_init_yaw_;
-    Eigen::Isometry3d rfoot_support_init_;
     Eigen::Isometry3d rfoot_support_init_yaw_;
     
     Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
@@ -353,18 +351,18 @@ public:
     Eigen::VectorXd com_state_stance_frame_;
 
     // USER COMMAND
-    double Lcommand_step_length_x_ = 0.1;
-    double Lcommand_step_length_y_ = 0.22;
+    double Lcommand_step_length_x_ = 0.;
+    double Lcommand_step_length_y_ = 0.205;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = 0.8;
+    double Lcommand_t_ssp_ = 1.;
     double Lcommand_foot_height_ = 0.08;
 
-    double Rcommand_step_length_x_ = 0.1;
-    double Rcommand_step_length_y_ = 0.22;
+    double Rcommand_step_length_x_ = 0.;
+    double Rcommand_step_length_y_ = 0.205;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = 0.8;
+    double Rcommand_t_ssp_ = 1.;
     double Rcommand_foot_height_ = 0.08;
 
     // PREVIEW CONTROL

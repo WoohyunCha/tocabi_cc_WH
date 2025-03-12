@@ -1001,7 +1001,7 @@ void CustomController::computeSlow()
 
             // time_inference_pre_ = rd_cc_.control_time_us_ - (1/249.9)*1e6;
 
-            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_-0.1))*1e6;
+            time_inference_pre_ = rd_cc_.control_time_us_ - (1/(hz_))*1e6;
 
 
 
@@ -1051,7 +1051,7 @@ void CustomController::computeSlow()
 
         // With encoder, 
 
-        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_ - 4/10000.0) // 125 is the control frequency
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_) // 125 is the control frequency
 
         {
 
@@ -1501,8 +1501,11 @@ void CustomController::updateFootstepCommand(){
 
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205), (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
 
-        step_length_y_ << (2*phase_indicator_(0)-1) * ( phase_indicator_(0)*0.205 + (1-phase_indicator_(0))*0.205), 
+
+        step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
+
         (2*phase_indicator_(1)-1) * 0.205, 
+
         (2*phase_indicator_(2)-1) * 0.205;
         
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Lcommand_step_length_y_),
@@ -1585,9 +1588,9 @@ void CustomController::updateFootstepCommand(){
 
         step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
 
-        (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205),
+        (2*phase_indicator_(1)-1) * 0.205,
 
-        (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
+        (2*phase_indicator_(2)-1) * 0.205;
 
 
 
@@ -1756,11 +1759,86 @@ void CustomController::calculateFootStepTotal()
 
 }
 
+
 void CustomController::addZmpOffset()
+
+
+
 {
 
 
+
+    double lfoot_zmp_offset_, rfoot_zmp_offset_;
+
+
+
+
+
+
+
+    lfoot_zmp_offset_ = -zmp_offset; // simul 1.1 s
+
+
+
+    rfoot_zmp_offset_ =  zmp_offset;
+
+
+
+
+
+
+
     foot_step_support_frame_offset_ = foot_step_support_frame_;
+
+
+
+
+
+
+
+    for (int i = 0; i < number_of_foot_step; i++)
+
+
+
+    {
+
+
+
+        if (foot_step_(i, 6) == 0) // left support foot 
+
+
+
+        {
+
+
+
+            foot_step_support_frame_offset_(i, 1) += lfoot_zmp_offset_;
+
+
+
+        }
+
+
+
+        else // right support foot
+
+
+
+        {
+
+
+
+            foot_step_support_frame_offset_(i, 1) += rfoot_zmp_offset_;
+
+
+
+        }
+
+
+
+    }
+
+
 
 }
 
