@@ -2,11 +2,11 @@
 
 'L_HipRoll_Joint': 0.0,
 
-'L_HipPitch_Joint': -0.52,
+'L_HipPitch_Joint': -0.46,
 
-'L_Knee_Joint': 1.05,
+'L_Knee_Joint': 1.04,
 
-'L_AnklePitch_Joint': -0.53,
+'L_AnklePitch_Joint': -0.58,
 
 'L_AnkleRoll_Joint': 0.0,
 
@@ -16,11 +16,11 @@
 
 'R_HipRoll_Joint': 0.0,
 
-'R_HipPitch_Joint': -0.52,
+'R_HipPitch_Joint': -0.46,
 
-'R_Knee_Joint': 1.05,
+'R_Knee_Joint': 1.04,
 
-'R_AnklePitch_Joint': -0.53,
+'R_AnklePitch_Joint': -0.58,
 
 'R_AnkleRoll_Joint': 0.0,
 

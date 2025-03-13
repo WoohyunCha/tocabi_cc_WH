@@ -1147,25 +1147,27 @@ void CustomController::computeSlow()
 
 
 
-                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+                    writeFile << rd_cc_.LF_FT.transpose() << "\t";
 
-                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+                    writeFile << rd_cc_.RF_FT.transpose() << "\t";
 
-                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
 
-                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
 
 
 
                     writeFile << rd_cc_.torque_desired.transpose()  << "\t";
 
-                    writeFile << q_noise_.transpose() << "\t";
+                    writeFile << q_noise_.segment(0,12).transpose() << "\t";
 
-                    writeFile << q_dot_lpf_.transpose() << "\t";
+                    writeFile << q_dot_lpf_.segment(0,12).transpose() << "\t";
 
-                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+                    // writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
 
-                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t";
+
+                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
 
                     writeFile << heading << "\t";
 
@@ -1173,19 +1175,19 @@ void CustomController::computeSlow()
 
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
 
-                    writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << target_swing_state_stance_frame_.segment(0, 3).transpose() << "\t";
 
-                    writeFile << target_com_state_stance_frame_.transpose() << "\t";
+                    writeFile << target_com_state_stance_frame_.segment(0, 3).transpose() << "\t";
 
-                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << swing_state_stance_frame_.segment(0, 3).transpose() << "\t";
 
-                    writeFile << com_state_stance_frame_.transpose() << "\t";
+                    writeFile << com_state_stance_frame_.segment(0, 3).transpose() << "\t";
 
-                    writeFile << q_leg_desired_.transpose() << "\t";
+                    // writeFile << q_leg_desired_.transpose() << "\t";
 
-                    writeFile << ref_zmp_(walking_tick,0) << "\t";
+                    // writeFile << ref_zmp_(walking_tick,0) << "\t";
 
-                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
+                    // writeFile << ref_zmp_(walking_tick, 1) << "\t";
 
                     
 
