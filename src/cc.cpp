@@ -584,6 +584,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     for (int i = 0; i < num_actuator_action; i++)
     {
+        // state_cur_(data_idx) = q_leg_desired_(i);
         state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
         data_idx++;
     }
@@ -1700,14 +1701,18 @@ void CustomController::getRobotState()
     com_state_stance_frame_(6) = com_quat.w();
 
     // Comment out for ideal preview reference!
-    x_preview_(0) = com_support_current_(0);
-    y_preview_(0) = com_support_current_(1);
+    if (!ideal_preview){
+        x_preview_(0) = com_support_current_(0);
+        y_preview_(0) = com_support_current_(1);
+        
+        x_preview_(1) = com_support_current_dot_(0);
+        y_preview_(1) = com_support_current_dot_(1);
     
-    x_preview_(1) = com_support_current_dot_(0);
-    y_preview_(1) = com_support_current_dot_(1);
+        x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
+        y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
 
-    x_preview_(2) = (com_support_current_dot_(0) - com_support_current_dot_prev_(0)) * hz_;
-    y_preview_(2) = (com_support_current_dot_(1) - com_support_current_dot_prev_(1)) * hz_;
+        windupPreview();
+    }
 }
 
 void CustomController::calculateFootStepTotal()
@@ -1991,8 +1996,7 @@ void CustomController::resetPreviewState(){
     y_preview_(1) = com_support_init_dot_yaw_(1);
     UX_preview_ = 0;
     UY_preview_ = 0;
-    EX_preview_ = 0; // windup
-    EY_preview_ = 0;
+    windupPreview();
 }
 
 void CustomController::getComTrajectory()
@@ -2234,8 +2238,8 @@ void CustomController::previewcontroller(double dt, int NL, int tick,
     Eigen::VectorXd px, py;
     px.setZero(1); px = C * x_k;
     py.setZero(1); py = C * y_k;
-    EX_preview_ = (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
-    EY_preview_ = (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
+    EX_preview_ -= (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
+    EY_preview_ -= (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
     double sum_Gd_px_ref = 0, sum_Gd_py_ref = 0;
     for (int i = 0; i < NL; i++)
     {
@@ -2255,6 +2259,11 @@ void CustomController::previewcontroller(double dt, int NL, int tick,
 
 }
 
+
+void CustomController::windupPreview(){
+    EX_preview_ = 0;
+    EY_preview_ = 0;
+}
 
 void CustomController::getFootTrajectory() 
 {

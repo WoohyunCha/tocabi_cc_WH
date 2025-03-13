@@ -365,6 +365,8 @@ public:
     double Rcommand_t_ssp_ = 1.;
     double Rcommand_foot_height_ = 0.08;
 
+    bool ideal_preview = false;
+
     // PREVIEW CONTROL
     void updateInitialState();
     void updateFootstepCommand();
@@ -375,6 +377,7 @@ public:
     void floatToSupportFootstep();
     void updateNextStepTime();
     void resetPreviewState();
+    void windupPreview();
     void computeIkControl(const Eigen::Isometry3d &float_trunk_transform, const Eigen::Isometry3d &float_lleg_transform, const Eigen::Isometry3d &float_rleg_transform, Eigen::Vector12d &q_des);
 
     void getZmpTrajectory();
