@@ -75,13 +75,6 @@ command_len = 3;
 end_index = start_index + command_len - 1;
 command_data = d1(:, start_index:end_index);
 
-start_index = end_index+1;
-latent_len = 512;
-end_index = start_index + latent_len - 1;
-latent_data = d1(:, start_index:end_index);
-
-writematrix(latent_data, 'latent3.csv');
-
 data_len = size(d1, 1); % number of rows in d1
 time = zeros(data_len);
 for i=2:size(d1,1)-1
