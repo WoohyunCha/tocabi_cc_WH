@@ -376,8 +376,8 @@ void CustomController::initVariable()
                     10, 10,
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
-    q_init_ << 0.0, 0.0, -0.28, 0.6, -0.32, 0.0,
-                0.0, 0.0, -0.28, 0.6, -0.32, 0.0,
+    q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
+                0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
                 0.0, 0.0, 0.0,
                 0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
                 0.0, 0.0,
@@ -584,8 +584,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     for (int i = 0; i < num_actuator_action; i++)
     {
-        // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
-        state_cur_(data_idx) = q_leg_desired_(i);
+        state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
+        // state_cur_(data_idx) = q_leg_desired_(i);
         data_idx++;
     }
 
@@ -1509,11 +1509,11 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,
+        // step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,
 
-        phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,
+        // phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,
 
-        phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_ ;
+        // phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_ ;
 
 
 
@@ -1521,7 +1521,7 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // step_length_x_ << 0. ,0., 0.;
+        step_length_x_ << 0. ,0., 0.;
 
 
 
@@ -1533,19 +1533,19 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
+        step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
 
-        // (2*phase_indicator_(1)-1) * 0.205, 
+        (2*phase_indicator_(1)-1) * 0.205, 
 
-        // (2*phase_indicator_(2)-1) * 0.205;
+        (2*phase_indicator_(2)-1) * 0.205;
 
         
 
-        step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
+        // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
 
-         (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Rcommand_step_length_y_),
+        //  (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Rcommand_step_length_y_),
 
-          (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
+        //   (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
 
 
 
@@ -1553,23 +1553,23 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_),
+        // step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_),
 
-        (2*phase_indicator_(1) - 1) * ( phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_),
+        // (2*phase_indicator_(1) - 1) * ( phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_),
 
-        (2*phase_indicator_(2) - 1) * ( phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
-
-
-
-        // step_yaw_ << 0., 0., 0.;
+        // (2*phase_indicator_(2) - 1) * ( phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
 
 
 
-        foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+        step_yaw_ << 0., 0., 0.;
 
 
 
-        // foot_height_ << 0.08, 0.08, 0.08;
+        // foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+
+
+
+        foot_height_ << 0.08, 0.08, 0.08;
 
 
 
@@ -1577,15 +1577,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,
+        // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,
 
-        phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,
+        // phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,
 
-        phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
+        // phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
 
 
 
-        // t_dsp_ << 0.1, 0.1, 0.1;
+        t_dsp_ << 0.1, 0.1, 0.1;
 
 
 
@@ -1597,15 +1597,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,
+        // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,
 
-        phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,
+        // phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,
 
-        phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
+        // phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
 
 
 
-        // t_ssp_ << 1., 1., 1.;
+        t_ssp_ << 1., 1., 1.;
 
 
 
