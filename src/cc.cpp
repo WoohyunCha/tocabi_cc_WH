@@ -1149,61 +1149,78 @@ void CustomController::computeSlow()
 
             {
 
-                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+                writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
 
-                    // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
-
-
-
-                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
-
-                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
-
-                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
-
-                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+                // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
 
+                for (int i = 0; i < 6; i++)
+                writeFile << rd_cc_.LF_FT(i) << "\t";
 
-                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+                for (int i = 0; i < 6; i++)
+                writeFile << rd_cc_.RF_FT(i) << "\t";
 
-                    writeFile << q_noise_.transpose() << "\t";
+                // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
 
-                    writeFile << q_dot_lpf_.transpose() << "\t";
-
-                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
-
-                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
-
-                    writeFile << heading << "\t";
+                // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
 
 
+                for (int i = 0; i < 33; i++)
+                writeFile << rd_cc_.torque_desired(i)  << "\t";
 
-                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                for (int i = 0; i < 33; i++)
+                writeFile << q_noise_(i) << "\t";
 
-                    writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+                for (int i = 0; i < 33; i++)
+                writeFile << q_dot_lpf_(i) << "\t";
 
-                    writeFile << target_com_state_stance_frame_.transpose() << "\t";
+                for (int i = 0; i < 3; i++)
+                writeFile << base_lin_vel(i) << "\t" ;
+                
 
-                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                for (int i = 0; i < 3; i++)
+                writeFile << base_ang_vel(i) << "\t" ;
+                
+                for (int i = 0; i < 33; i++)
+                writeFile << rd_cc_.q_dot_virtual_(6+i) << "\t";
 
-                    writeFile << com_state_stance_frame_.transpose() << "\t";
+                for (int i = 0; i < 40; i++)
+                writeFile << rd_cc_.q_virtual_(i) << "\t";
 
-                    writeFile << q_leg_desired_.transpose() << "\t";
-
-                    writeFile << ref_zmp_(walking_tick,0) << "\t";
-
-                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
-
-                    
-
-                    // else writeFile << hidden_layer2_.transpose() << "\t";
-
-                    writeFile << std::endl;
+                writeFile << heading << "\t";
 
 
 
-                    time_write_pre_ = rd_cc_.control_time_us_;
+                writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+
+                for (int i = 0; i < 13; i++)
+                writeFile << target_swing_state_stance_frame_(i) << "\t";
+
+                for (int i = 0; i < 13; i++)
+                writeFile << target_com_state_stance_frame_(i) << "\t";
+
+                for (int i = 0; i < 13; i++)
+                writeFile << swing_state_stance_frame_(i) << "\t";
+
+                for (int i = 0; i < 13; i++)
+                writeFile << com_state_stance_frame_(i) << "\t";
+
+                for (int i = 0; i < 12; i++)
+                writeFile << q_leg_desired_(i) << "\t";
+
+                writeFile << ref_zmp_(walking_tick,0) << "\t";
+
+                writeFile << ref_zmp_(walking_tick, 1) << "\t";
+
+                
+
+                // else writeFile << hidden_layer2_.transpose() << "\t";
+
+                writeFile << std::endl;
+
+
+
+                time_write_pre_ = rd_cc_.control_time_us_;
 
 
 
