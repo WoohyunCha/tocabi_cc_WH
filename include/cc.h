@@ -205,7 +205,7 @@ public:
     double t_double1_;
     double t_double2_;
     double zmp_offset = 0.;
-
+    const bool ideal_preview = false;   
 
 
 
@@ -233,6 +233,7 @@ public:
     Eigen::Vector3d com_support_current_dot_prev_;
     Eigen::Vector3d com_global_current_;
     Eigen::Vector3d com_global_current_dot_;
+    Eigen::Vector3d com_global_current_dot_prev_;
 
     Eigen::Vector3d pelv_rpy_current_;
     Eigen::Vector3d rfoot_rpy_current_;
@@ -391,6 +392,7 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
+    void windupPreview();
 
 private:
     Eigen::VectorQd ControlVal_;
