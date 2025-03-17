@@ -521,7 +521,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     Vector3_t base_lin_vel, base_ang_vel;
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
-    base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
+    // base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
+    base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
 
     // for (int i=0; i<6; i++)
     // {
@@ -563,7 +564,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .4, 0.0, 0.0);// .5;//target_vel_x_;
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .4, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
@@ -573,7 +575,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*wrap_to_pi(target_heading_ - heading), -1., 1.);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*wrap_to_pi(target_heading_ - heading), -.5, .5);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
@@ -1246,8 +1248,9 @@ void CustomController::copyRobotData(RobotData &rd_l)
 
 void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-    target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], -0.2, 0.5);
+    target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], 0.0, 0.5);
     target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
+    target_heading_ = DyrosMath::minmax_cut(joy->axes[3]*3.14, -3.14, 3.14);
 }
 
 double CustomController::wrap_to_pi(double angles){
@@ -1265,8 +1268,6 @@ double CustomController::wrap_to_pi(double angles){
 //     pre_target_vel_x_ = state_cur_(9);
 //     pre_target_vel_y_ = state_cur_(10);
 //     pre_target_vel_yaw_ = state_cur_(11);
-
-
 // }
 
 
