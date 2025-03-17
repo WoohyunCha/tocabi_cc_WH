@@ -584,8 +584,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     for (int i = 0; i < num_actuator_action; i++)
     {
-        state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
-        // state_cur_(data_idx) = q_leg_desired_(i);
+        // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
+        state_cur_(data_idx) = q_leg_desired_(i);
         data_idx++;
     }
 
@@ -1124,7 +1124,6 @@ void CustomController::computeSlow()
 
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
-            std::cout << "walking time : " << walking_tick / hz_ <<  ", Value : " << value_ << std::endl;
 
             if (value_ < 60.0)
 
@@ -1633,7 +1632,7 @@ void CustomController::updateFootstepCommand(){
 
 
 
-            t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
+            t_total_(i) = 2*t_dsp_(i) + t_ssp_(i);
 
 
 
@@ -1752,17 +1751,7 @@ void CustomController::updateFootstepCommand(){
         for (int i = 0; i < number_of_foot_step; i++){
 
 
-
-            t_dsp_(i) = std::floor(t_dsp_(i));
-
-
-
-            t_ssp_(i) = std::floor(t_ssp_(i));
-
-
-
-            t_total_(i) = std::floor(2*t_dsp_(i) + t_ssp_(i));
-
+            t_total_(i) = 2*t_dsp_(i) + t_ssp_(i);
 
 
         }
@@ -1869,15 +1858,17 @@ void CustomController::getRobotState()
     com_state_stance_frame_(5) = com_quat.z();
     com_state_stance_frame_(6) = com_quat.w();
 
-    // Comment out for ideal preview reference!
-    x_preview_(0) = com_support_current_(0);
-    y_preview_(0) = com_support_current_(1);
+    if (!ideal_preview){
+        x_preview_(0) = com_support_current_(0);
+        y_preview_(0) = com_support_current_(1);
+        
+        x_preview_(1) = com_support_current_dot_(0);
+        y_preview_(1) = com_support_current_dot_(1);
     
-    x_preview_(1) = com_support_current_dot_(0);
-    y_preview_(1) = com_support_current_dot_(1);
+        x_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(0) * hz_;
+        y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
+    }
 
-    x_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(0) * hz_;
-    y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
 }
 
 void CustomController::calculateFootStepTotal()
@@ -2107,6 +2098,13 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
         vT_y_dsp2 = (foot_step_support_frame_offset_(current_step_number - 0, 1)) / 2.0;
         v0_yaw_dsp2 = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2.0;
         vT_yaw_dsp2 = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2.0;
+
+
+        // std::cout << "v0 y dsp1 : " << v0_y_dsp1 << std::endl;
+        // std::cout << "vT y dsp1 : " << vT_y_dsp1 << std::endl;
+        // std::cout << "v0 y dsp2 : " << v0_y_dsp2 << std::endl;
+        // std::cout << "vT y dsp2 : " << vT_y_dsp2 << std::endl;
+
     }
     else if (current_step_number == 1)
     { 
@@ -2185,12 +2183,12 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
             // lin_interpol = (i - t_dsp1_ - t_ssp_) / t_dsp2_;
             // temp_px(i) = (1.0 - lin_interpol) * v0_x_dsp2 + lin_interpol * vT_x_dsp2;
             // temp_py(i) = (1.0 - lin_interpol) * v0_y_dsp2 + lin_interpol * vT_y_dsp2;
-
             temp_px(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_x_dsp2, vT_x_dsp2, 0.0, 0.0), min(v0_x_dsp2, vT_x_dsp2), max(v0_x_dsp2, vT_x_dsp2));
             temp_py(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_y_dsp2, vT_y_dsp2, 0.0, 0.0), min(v0_y_dsp2, vT_y_dsp2), max(v0_y_dsp2, vT_y_dsp2));
             temp_yaw(i) = DyrosMath::minmax_cut(DyrosMath::cubic(i, t_dsp1_ + t_ssp, t_total, v0_yaw_dsp2, vT_yaw_dsp2, 0.0, 0.0), min(v0_yaw_dsp2, vT_yaw_dsp2), max(v0_yaw_dsp2, vT_yaw_dsp2));
             temp_yawvel(i) = DyrosMath::cubicDot(i, t_dsp1_ + t_ssp, t_total, v0_yaw_dsp2, vT_yaw_dsp2, 0., 0.);
         }
+        // std::cout << current_step_number << " step's temp_py " << i << " : " << temp_py(i) << std::endl;
     }
 
 }
@@ -2203,8 +2201,7 @@ void CustomController::resetPreviewState(){
     y_preview_(1) = com_support_init_dot_yaw_(1);
     UX_preview_ = 0;
     UY_preview_ = 0;
-    EX_preview_ = 0; // windup
-    EY_preview_ = 0;
+    windupPreview();
 }
 
 void CustomController::getComTrajectory()
@@ -2238,6 +2235,8 @@ void CustomController::getComTrajectory()
     com_desired_dot_(0) = x_preview_(1);
     com_desired_dot_(1) = y_preview_(1);
     com_desired_dot_(2) = 0.;
+
+    if (!ideal_preview) windupPreview();
 
     
 }
@@ -2447,8 +2446,8 @@ void CustomController::previewcontroller(double dt, int NL, int tick,
     Eigen::VectorXd px, py;
     px.setZero(1); px = C * x_k;
     py.setZero(1); py = C * y_k;
-    EX_preview_ = (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
-    EY_preview_ = (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
+    EX_preview_ -= (px(0) - ref_zmp_(tick,0)) * Gi(0, 0);
+    EY_preview_ -= (py(0) - ref_zmp_(tick,1)) * Gi(0, 0);
     double sum_Gd_px_ref = 0, sum_Gd_py_ref = 0;
     for (int i = 0; i < NL; i++)
     {
@@ -2671,9 +2670,14 @@ void CustomController::getTargetState(){
 }
 
 
+void CustomController::windupPreview(){
+    EX_preview_ = 0.;
+    EY_preview_ = 0.;
+}
 
 void CustomController::updateNextStepTime()
 {       
+    std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
     walking_tick++;
 }
 
