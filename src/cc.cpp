@@ -1130,8 +1130,8 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
     if(joy->axes[7] == -1.0 && Lcommand_t_dsp_ < 0.2 && Lcommand_t_ssp_<1.2){ //long step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
-            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.008;
-            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.03;
+            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.01;
+            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.05;
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
@@ -1140,8 +1140,8 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
     }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.05 && Lcommand_t_ssp_> 0.5){//short step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
-            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.008;
-            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.03;
+            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.01;
+            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.05;
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
@@ -2191,7 +2191,7 @@ void CustomController::getZmpTrajectory()
 {
     unsigned int norm_size = 0;
 
-    norm_size = 4.0*hz_ ; // compute zmp over the three planned steps
+    norm_size = 6.0*hz_ ; // compute zmp over the three planned steps
     addZmpOffset(); 
 
     zmpGenerator(norm_size);
