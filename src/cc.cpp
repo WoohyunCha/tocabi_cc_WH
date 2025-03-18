@@ -1283,9 +1283,10 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
 
-            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.008;
 
-            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.03;
+            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.01;
+
+            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.05;
 
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
 
@@ -1303,9 +1304,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
 
-            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.008;
+            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.01;
 
-            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.03;
+            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.05;
 
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
 
@@ -1381,7 +1382,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         if(last_buttons_3[last_buttons_3.size()-2]==0){
 
-            joy_height= Lcommand_foot_height_+0.002;
+            joy_height= Lcommand_foot_height_+0.02;
 
             Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
 
@@ -1391,11 +1392,11 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 
 
-    }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.05){
+    }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.06){
 
         if(last_buttons_2[last_buttons_2.size()-2]==0){
 
-        joy_height= Lcommand_foot_height_-0.002;
+        joy_height= Lcommand_foot_height_-0.02;
 
         Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
 
@@ -2813,7 +2814,7 @@ void CustomController::getZmpTrajectory()
 {
     unsigned int norm_size = 0;
 
-    norm_size = 4.0*hz_ ; // compute zmp over the three planned steps
+    norm_size = 6.0*hz_ ; // compute zmp over the three planned steps
     addZmpOffset(); 
 
     zmpGenerator(norm_size);
