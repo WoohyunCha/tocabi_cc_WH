@@ -412,7 +412,6 @@ void CustomController::initVariable()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
 
-    loadCommand(cur_path + "commands.txt");
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -970,6 +969,508 @@ void CustomController::loadEncoderNetwork()
 
 
 
+void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+
+{   
+
+
+
+    last_buttons_0.push_back(joy->buttons[0]);
+
+    last_buttons_1.push_back(joy->buttons[1]);
+
+    last_buttons_2.push_back(joy->buttons[2]);
+
+    last_buttons_3.push_back(joy->buttons[3]);
+
+    last_buttons_7.push_back(joy->axes[7]);
+
+    // joy_length_previous_vec.push_back(joy_length);
+
+
+
+    if (last_buttons_0.size() > 10) {
+
+        last_buttons_0.erase(last_buttons_0.begin());
+
+    }
+
+    if (last_buttons_1.size() > 10) {
+
+        last_buttons_1.erase(last_buttons_1.begin()); 
+
+    }
+
+    if (last_buttons_2.size() > 10) {
+
+        last_buttons_2.erase(last_buttons_2.begin());
+
+    }
+
+    if (last_buttons_3.size() > 10) {
+
+        last_buttons_3.erase(last_buttons_3.begin()); 
+
+    }
+
+    if (last_buttons_7.size() > 10) {
+
+        last_buttons_7.erase(last_buttons_7.begin());
+
+    }
+
+    if(iter_x_l>1){
+
+        joy_length_previous = joy_length_command;
+
+        iter_x_l =0;
+
+    }
+
+    if(iter_x_r>1){
+
+        joy_length_previous = joy_length_command;
+
+        iter_x_r =0;
+
+    }
+
+    if(iter_end_x>3){
+
+        joy_length_previous = joy_length_command;
+
+        iter_end_x =0;
+
+    }
+
+
+
+
+
+
+
+    if(iter_y_l_ls>1){
+
+        joy_length_y_l_previous = joy_length_y_l_command;
+
+        iter_y_l_ls =0;
+
+    }
+
+    if(iter_y_l_rs>2){
+
+        joy_length_y_l_previous = joy_length_y_l_command;
+
+        iter_y_l_rs =0;
+
+    }
+
+    if(iter_end_y_l_ls>1){
+
+        joy_length_y_l_previous = joy_length_y_l_command;
+
+        iter_end_y_l_ls =0;
+
+    }
+
+    if(iter_end_y_l_rs>2){
+
+        joy_length_y_l_previous = joy_length_y_l_command;
+
+        iter_end_y_l_rs =0;
+
+    }
+
+
+
+
+
+
+
+    if(iter_y_r_ls>2){
+
+        joy_length_y_r_previous = joy_length_y_r_command;
+
+        iter_y_r_ls =0;
+
+    }
+
+    if(iter_y_r_rs>1){
+
+        joy_length_y_r_previous = joy_length_y_r_command;
+
+        iter_y_r_rs =0;
+
+    }
+
+    if(iter_end_y_r_ls>2){
+
+        joy_length_y_r_previous = joy_length_y_r_command;
+
+        iter_end_y_r_ls =0;
+
+    }
+
+    if(iter_end_y_r_rs>1){
+
+        joy_length_y_r_previous = joy_length_y_r_command;
+
+        iter_end_y_r_rs =0;
+
+    }
+
+
+
+
+
+    
+
+    if(fabs(joy->axes[0]) < 0.1 && fabs(joy->axes[1]) < 0.1){ 
+
+        
+
+        joy_length =0.0;
+
+        joy_length_y_r_temp =0.205;
+
+        joy_length_y_l_temp =0.205;
+
+        // if(joy_length = 0.0){
+
+        //     joy_length_previous =0.0;
+
+        // }
+
+        // Lcommand_step_length_x_ = joy_length_l;
+
+        Lcommand_step_length_x_ = 0.;
+
+        // std::cout<<joy_length_r<<std::endl;
+
+        // Lcommand_step_length_y_ = joy_length_y_l;
+
+        Lcommand_step_length_y_ = 0.205;
+
+        // Lcommand_step_yaw_ = joy_yaw_l;
+
+        // std::cout << "joy yaw l :" << joy_yaw_l << std::endl;
+
+        // Lcommand_step_yaw_ = 0.;
+
+       // Lcommand_t_dsp_ = 0.2;
+
+        // Lcommand_t_ssp_ = 1.0;
+
+        // Lcommand_foot_height_ = 0.1; 
+
+        // Rcommand_step_length_x_ = joy_length_r;
+
+        Rcommand_step_length_x_ = 0.;
+
+        // Rcommand_step_length_y_ = joy_length_y_r;
+
+        Rcommand_step_length_y_ = 0.205;
+
+        // Rcommand_step_yaw_ = joy_yaw_r;
+
+        // std::cout << "joy yaw r :" << joy_yaw_r << std::endl;
+
+        // Rcommand_step_yaw_ = 0.;
+
+        // Rcommand_t_dsp_ = 0.2;
+
+        // Rcommand_t_ssp_ = 1.0;
+
+        // Rcommand_foot_height_ = 0.1;
+
+
+
+    }else{
+
+
+
+        joy_x = joy->axes[1];
+
+        joy_y = joy->axes[0];
+
+        norm = sqrt(pow(joy_x,2) + pow(joy_y,2));
+
+
+
+        joy_x /=norm;
+
+        joy_y /=norm;
+
+
+
+        
+
+        if(joy_x > 0.0){
+
+            joy_length = joy_length_temp*joy_x;
+
+            // joy_length_l =joy_length_temp*joy_x;
+
+            // joy_length_r =joy_length_temp*joy_x;
+
+            // std::cout<<joy_length<<std::endl;
+
+            Lcommand_step_length_x_ = joy_length;
+
+            Rcommand_step_length_x_ = joy_length;
+
+        }else if(joy_x < 0.0){
+
+            joy_length = joy_length_temp*joy_x;
+
+            // joy_length_l =joy_length_temp*-joy_x;
+
+            // joy_length_r =joy_length_temp*-joy_x;
+
+                // std::cout<<joy_length<<std::endl;
+
+            Lcommand_step_length_x_ = joy_length;
+
+            Rcommand_step_length_x_ = joy_length;
+
+        }
+
+
+
+        if(joy_y > 0.0){
+
+
+
+            joy_length_y_l_temp = 0.205 + (joy_length_y_temp - 0.205)*joy_y; 
+
+            joy_length_y_r_temp =0.205;
+
+            Lcommand_step_length_y_= joy_length_y_l_temp;
+
+            Rcommand_step_length_y_= joy_length_y_r_temp;
+
+            // std::cout<<joy_length_y_r<<std::endl;
+
+            // std::cout<<joy_y<<std::endl;
+
+            // std::cout<<Lcommand_step_length_y_<<std::endl;
+
+        }else if(joy_y < 0.0){
+
+
+
+            joy_length_y_r_temp = 0.205 +  (joy_length_y_temp - 0.205)*-joy_y;
+
+            joy_length_y_l_temp = 0.205;
+
+            Lcommand_step_length_y_= joy_length_y_l_temp;             
+
+            Rcommand_step_length_y_= joy_length_y_r_temp;
+
+            // std::cout<<Rcommand_step_length_y_<<std::endl;
+
+        }
+
+    }
+
+    //  std::cout<<joy_length_y_r<<std::endl;
+
+    
+
+
+
+    if(joy->axes[7] == -1.0 && Lcommand_t_dsp_ < 0.2 && Lcommand_t_ssp_<1.2){ //long step
+
+        if(last_buttons_7[last_buttons_7.size()-2]==0.0){
+
+            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.008;
+
+            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.03;
+
+            Rcommand_t_dsp_ = Lcommand_t_dsp_;
+
+            Rcommand_t_ssp_ = Lcommand_t_ssp_;
+
+            ROS_INFO("%f",Lcommand_t_dsp_);
+
+            ROS_INFO("%f",Lcommand_t_ssp_);
+
+        }
+
+
+
+    }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.05 && Lcommand_t_ssp_> 0.5){//short step
+
+        if(last_buttons_7[last_buttons_7.size()-2]==0.0){
+
+            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.008;
+
+            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.03;
+
+            Rcommand_t_dsp_ = Lcommand_t_dsp_;
+
+            Rcommand_t_ssp_ = Lcommand_t_ssp_;
+
+            ROS_INFO("%f",Lcommand_t_dsp_);
+
+            ROS_INFO("%f",Lcommand_t_ssp_);
+
+            }
+
+    }else{
+
+        Lcommand_t_dsp_ = Lcommand_t_dsp_;
+
+        Lcommand_t_ssp_ = Lcommand_t_ssp_;
+
+
+
+        Rcommand_t_dsp_ = Lcommand_t_dsp_;
+
+        Rcommand_t_ssp_ = Lcommand_t_ssp_;
+
+    }
+
+    
+
+    if(joy->buttons[1] == 1 && joy_length_temp < 0.4 && joy_length_y_temp < 0.4){ 
+
+        if(last_buttons_1[last_buttons_1.size()-2]==0){
+
+
+
+            joy_length_temp+=0.06;//보폭
+
+            joy_length_y_temp +=0.04;
+
+            ROS_INFO("step_length_x_ : %f",joy_length_temp);
+
+            ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
+
+        }            
+
+    }
+
+    if(joy->buttons[0] == 1 &&  joy_length_temp > 0.1 && joy_length_y_temp > 0.25){ 
+
+        if(last_buttons_0[last_buttons_0.size()-2]==0){
+
+            // 0.06 0.12 0.18 0.24 0.30 0.36
+
+            // 0.25 0.29 0.33 0.37 0.41 0.45         
+
+
+
+            joy_length_temp-=0.06;//보폭
+
+            joy_length_y_temp-=0.04;//보폭
+
+            ROS_INFO("step_length_x_ : %f",joy_length_temp);
+
+            ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
+
+            
+
+        }            
+
+    }
+
+
+
+    if(joy->buttons[3]==1 && Lcommand_foot_height_<0.2){
+
+        if(last_buttons_3[last_buttons_3.size()-2]==0){
+
+            joy_height= Lcommand_foot_height_+0.002;
+
+            Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
+
+            ROS_INFO("%f",joy_height);
+
+        }
+
+
+
+    }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.05){
+
+        if(last_buttons_2[last_buttons_2.size()-2]==0){
+
+        joy_height= Lcommand_foot_height_-0.002;
+
+        Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
+
+        ROS_INFO("%f",joy_height);
+
+        }
+
+    }else{
+
+        Lcommand_foot_height_= joy_height;
+
+        Rcommand_foot_height_= joy_height;
+
+    }
+
+
+
+    if(joy->buttons[4] == 1){
+
+        joy_yaw_l_command =0.3;
+
+        joy_yaw_r_command =0.0;
+
+
+
+        Lcommand_step_yaw_ = joy_yaw_l_command;           
+
+        Rcommand_step_yaw_ = joy_yaw_r_command;
+
+    }
+
+    if(joy->buttons[5] == 1){
+
+        joy_yaw_l_command =0.0;
+
+        joy_yaw_r_command =0.3;
+
+
+
+        Lcommand_step_yaw_ = joy_yaw_l_command;           
+
+        Rcommand_step_yaw_ = joy_yaw_r_command;
+
+
+
+    }
+
+    if(joy->buttons[5] != 1 && joy->buttons[4] != 1){
+
+        joy_yaw_l_command =0.0;
+
+        joy_yaw_r_command =0.0;
+
+        
+
+        Lcommand_step_yaw_ = joy_yaw_l_command;           
+
+        Rcommand_step_yaw_ = joy_yaw_r_command;
+
+    }
+
+
+
+    
+
+    // target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], -0.2, 0.5);
+
+    // target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
+
+    // std::cout << "Rcommand_step_yaw_ :" << Rcommand_step_yaw_ << std::endl;
+
+}
+
+
+
 void CustomController::computeSlow()
 
 {
@@ -1333,11 +1834,6 @@ void CustomController::copyRobotData(RobotData &rd_l)
     std::memcpy(&rd_cc_, &rd_l, sizeof(RobotData));
 }
 
-void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
-{
-    target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], -0.2, 0.5);
-    target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
-}
 
 std::string CustomController::loadPathFromConfig(const std::string &config_file)
 {
@@ -1506,10 +2002,11 @@ void CustomController::updateInitialState()
 
 }
 
-
-// PREVIEW
-// PREVIEW
 void CustomController::updateFootstepCommand(){
+
+
+
+
 
 
 
@@ -1517,15 +2014,31 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         phase_indicator_ << first_stance_foot_, 1-first_stance_foot_, first_stance_foot_;
 
 
 
-        // step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,
 
-        // phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,
 
-        // phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_ ;
+
+
+        step_length_x_ << phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_,
+
+
+
+        phase_indicator_(1)*Lcommand_step_length_x_ + (1-phase_indicator_(1))*Rcommand_step_length_x_,
+
+
+
+        phase_indicator_(2)*Lcommand_step_length_x_ + (1-phase_indicator_(2))*Rcommand_step_length_x_ ;
+
+
+
+
 
 
 
@@ -1533,31 +2046,63 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        step_length_x_ << 0. ,0., 0.;
+
+
+
+
+        // step_length_x_ << 0. ,0., 0.;
+
+
+
+
 
 
 
         // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_), 
 
+
+
         // (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.205 + (1-phase_indicator_(1))*0.205), 
+
+
 
         // (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.205 + (1-phase_indicator_(2))*0.205);
 
 
 
-        step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
 
-        (2*phase_indicator_(1)-1) * 0.205, 
 
-        (2*phase_indicator_(2)-1) * 0.205;
+
+
+        // step_length_y_ << (2*phase_indicator_(0)-1) * 0.205, 
+
+
+
+        // (2*phase_indicator_(1)-1) * 0.205, 
+
+
+
+        // (2*phase_indicator_(2)-1) * 0.205;
+
+
 
         
 
-        // step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
 
-        //  (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Rcommand_step_length_y_),
 
-        //   (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
+        step_length_y_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
+
+
+
+         (2*phase_indicator_(1)-1) * (phase_indicator_(1)*Lcommand_step_length_y_+ (1-phase_indicator_(1))*Rcommand_step_length_y_),
+
+
+
+          (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
+
+
+
+
 
 
 
@@ -1565,23 +2110,47 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_),
-
-        // (2*phase_indicator_(1) - 1) * ( phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_),
-
-        // (2*phase_indicator_(2) - 1) * ( phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
 
 
 
-        step_yaw_ << 0., 0., 0.;
+
+        step_yaw_ << (2*phase_indicator_(0) - 1) * ( phase_indicator_(0)*Lcommand_step_yaw_ + (1-phase_indicator_(0))*Rcommand_step_yaw_),
 
 
 
-        // foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+        (2*phase_indicator_(1) - 1) * ( phase_indicator_(1)*Lcommand_step_yaw_ + (1-phase_indicator_(1))*Rcommand_step_yaw_),
 
 
 
-        foot_height_ << 0.08, 0.08, 0.08;
+        (2*phase_indicator_(2) - 1) * ( phase_indicator_(2)*Lcommand_step_yaw_ + (1-phase_indicator_(2))*Rcommand_step_yaw_);
+
+
+
+
+
+
+
+        // step_yaw_ << 0., 0., 0.;
+
+
+
+
+
+
+
+        foot_height_ << phase_indicator_(0)*Lcommand_foot_height_ + (1-phase_indicator_(0))*Rcommand_foot_height_,  phase_indicator_(1)*Lcommand_foot_height_ + (1-phase_indicator_(1))*Rcommand_foot_height_,  phase_indicator_(2)*Lcommand_foot_height_ + (1-phase_indicator_(2))*Rcommand_foot_height_;
+
+
+
+
+
+
+
+        // foot_height_ << 0.08, 0.08, 0.08;
+
+
+
+
 
 
 
@@ -1589,15 +2158,31 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,
-
-        // phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,
-
-        // phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
 
 
 
-        t_dsp_ << 0.1, 0.1, 0.1;
+
+        t_dsp_ << phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_,
+
+
+
+        phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_,
+
+
+
+        phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_;
+
+
+
+
+
+
+
+        // t_dsp_ << 0.1, 0.1, 0.1;
+
+
+
+
 
 
 
@@ -1605,19 +2190,39 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_, 1., 1.;
 
 
 
-        // t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,
-
-        // phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,
-
-        // phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
 
 
 
-        t_ssp_ << 1., 1., 1.;
+
+        t_ssp_ << phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_,
+
+
+
+        phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_,
+
+
+
+        phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_;
+
+
+
+
+
+
+
+        // t_ssp_ << 1., 1., 1.;
+
+
+
+
 
 
 
@@ -1625,7 +2230,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         t_dsp_ *= hz_;
+
+
+
+
 
 
 
@@ -1633,7 +2246,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         for (int i = 0; i < number_of_foot_step; i++){
+
+
+
+
 
 
 
@@ -1641,7 +2262,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
             t_ssp_(i) = std::floor(t_ssp_(i));
+
+
+
+
 
 
 
@@ -1649,7 +2278,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -1657,7 +2294,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         getRobotState();
+
+
+
+
 
 
 
@@ -1665,7 +2310,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         getZmpTrajectory();
+
+
+
+
 
 
 
@@ -1673,7 +2326,19 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -1685,75 +2350,165 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        step_length_x_.segment(0,2) = step_length_x_.segment(1,2);
 
-        step_length_y_.segment(0,2) = step_length_y_.segment(1,2);
 
-        step_yaw_.segment(0,2) = step_yaw_.segment(1,2);
 
-        t_dsp_.segment(0,2) = t_dsp_.segment(1,2);
 
-        t_ssp_.segment(0,2) = t_ssp_.segment(1,2);
+        // step_length_x_.segment(0,2) = step_length_x_.segment(1,2);
 
-        foot_height_.segment(0,2) = foot_height_.segment(1,2);
+
+
+        // step_length_y_.segment(0,2) = step_length_y_.segment(1,2);
+
+
+
+        // step_yaw_.segment(0,2) = step_yaw_.segment(1,2);
+
+
+
+        // t_dsp_.segment(0,2) = t_dsp_.segment(1,2);
+
+
+
+        // t_ssp_.segment(0,2) = t_ssp_.segment(1,2);
+
+
+
+        // foot_height_.segment(0,2) = foot_height_.segment(1,2);
+
+
+
+
 
 
 
         phase_indicator_.segment(0,2) = phase_indicator_.segment(1,2);
 
+
+
         phase_indicator_(2) = 1-phase_indicator_(1);
 
 
 
-        step_length_x_(2) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
-
-        // step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
 
 
 
-        step_length_y_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
 
-        // step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
-
-        // (2*phase_indicator_(1)-1) * 0.205,
-
-        // (2*phase_indicator_(2)-1) * 0.205;
+        // step_length_x_(2) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
 
 
 
-        step_yaw_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
-
-        // step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
+        step_length_x_(0) = phase_indicator_(0)*Lcommand_step_length_x_ + (1-phase_indicator_(0))*Rcommand_step_length_x_;
 
 
 
-        t_dsp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
-
-        // t_dsp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_);
 
 
-
-        t_dsp_seconds(2) = (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
-
-        // t_dsp_seconds(0) = (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_);
+        // step_length_y_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2)*Lcommand_step_length_y_ + (1-phase_indicator_(2))*Rcommand_step_length_y_);
 
 
 
-        t_ssp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
-
-        // t_ssp_(0) = std::floor((phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_) * hz_);
+        step_length_y_ << (2*phase_indicator_(0)-1) * (phase_indicator_(0)*Lcommand_step_length_y_ + (1-phase_indicator_(0))*Rcommand_step_length_y_),
 
 
 
-        t_ssp_seconds(2) = (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
-
-        // t_ssp_seconds(0) = (phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_);
+        (2*phase_indicator_(1)-1) * 0.205,
 
 
 
-        foot_height_(2) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
+        (2*phase_indicator_(2)-1) * 0.205;
 
-        // foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
+
+
+
+
+
+
+        // step_yaw_(2) = (2*phase_indicator_(2)-1) * (phase_indicator_(2) * Lcommand_step_yaw_ + (1-phase_indicator_(2)) * Rcommand_step_yaw_);
+
+
+
+        step_yaw_(0) = (2*phase_indicator_(0)-1) * (phase_indicator_(0) * Lcommand_step_yaw_ + (1-phase_indicator_(0)) * Rcommand_step_yaw_);
+
+
+
+
+
+
+
+        // t_dsp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
+
+
+
+        t_dsp_ << std::floor((phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_) * hz_),
+
+        std::floor((phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_) * hz_),
+
+        std::floor((phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_) * hz_);
+
+
+
+
+
+
+
+        // t_dsp_seconds(2) = (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
+
+
+
+        t_dsp_seconds << (phase_indicator_(0) * Lcommand_t_dsp_+(1-phase_indicator_(0)) * Rcommand_t_dsp_),
+
+        (phase_indicator_(1) * Lcommand_t_dsp_+(1-phase_indicator_(1)) * Rcommand_t_dsp_),
+
+        (phase_indicator_(2) * Lcommand_t_dsp_+(1-phase_indicator_(2)) * Rcommand_t_dsp_);
+
+
+
+
+
+
+
+        // t_ssp_(2) = std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
+
+
+
+        t_ssp_ << std::floor((phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_) * hz_),
+
+        std::floor((phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_) * hz_),
+
+        std::floor((phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_) * hz_);
+
+
+
+
+
+
+
+        // t_ssp_seconds(2) = (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
+
+
+
+        t_ssp_seconds << (phase_indicator_(0) * Lcommand_t_ssp_+(1-phase_indicator_(0)) * Rcommand_t_ssp_),
+
+        (phase_indicator_(1) * Lcommand_t_ssp_+(1-phase_indicator_(1)) * Rcommand_t_ssp_),
+
+        (phase_indicator_(2) * Lcommand_t_ssp_+(1-phase_indicator_(2)) * Rcommand_t_ssp_);
+
+
+
+
+
+
+
+        // foot_height_(2) = phase_indicator_(2) * Lcommand_foot_height_ + (1-phase_indicator_(2)) * Rcommand_foot_height_;
+
+
+
+        foot_height_(0) = phase_indicator_(0) * Lcommand_foot_height_ + (1-phase_indicator_(0)) * Rcommand_foot_height_;
+
+
+
+
 
 
 
@@ -1761,13 +2516,29 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         for (int i = 0; i < number_of_foot_step; i++){
+
+
+
 
 
             t_total_(i) = 2*t_dsp_(i) + t_ssp_(i);
 
 
+
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -1779,7 +2550,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         calculateFootStepTotal();
+
+
+
+
 
 
 
@@ -1787,7 +2566,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         updateInitialState();
+
+
+
+
 
 
 
@@ -1795,11 +2582,37 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
         resetPreviewState();
 
 
 
+
+
+
+
     }
+
+
+
+    // std::cout << "L command step length x : " << Lcommand_step_length_x_ << std::endl;
+
+    // std::cout << "R command step length x : " << Rcommand_step_length_x_ << std::endl;
+
+    // std::cout << "L command step length y : " << Lcommand_step_length_y_ << std::endl;
+
+    // std::cout << "R command step length y : " << Rcommand_step_length_y_ << std::endl;
+
+    // std::cout << "L command step yaw : " << Lcommand_step_yaw_ << std::endl;
+
+    // std::cout << "R command step yaw : " << Rcommand_step_yaw_ << std::endl;
+
+    // std::cout << "Phase indicator : " << (phase_indicator_(0) ? "RIGHT SUPPORT":"LEFT SUPPORT") << std::endl;
+
+
 
 }
 
@@ -1884,118 +2697,112 @@ void CustomController::getRobotState()
 
 }
 
+
 void CustomController::calculateFootStepTotal()
+
 {
 
+
+
     foot_step_.resize(number_of_foot_step, 7);
+
     foot_step_.setZero();
+
     foot_step_support_frame_.resize(number_of_foot_step, 7);
+
     foot_step_support_frame_.setZero();
+
     
+
     // foot_step_ is foothold command in that step's stance foot
+
     // foot_step_support_frame_ is foothold command in the first stance foot frame
+
     foot_step_(0,0) = step_length_x_(0);
+
     foot_step_(0,1) = step_length_y_(0);
+
     foot_step_(0,5) = step_yaw_(0);
+
     foot_step_(0,6) = 1-phase_indicator_(0);
+
     foot_step_support_frame_(0, 0) = step_length_x_(0);
+
     foot_step_support_frame_(0, 1) = step_length_y_(0);
+
     foot_step_support_frame_(0, 5) = step_yaw_(0);
+
     foot_step_support_frame_(0, 6) = 1-phase_indicator_(0);
 
+
+
     for (int i = 1; i < number_of_foot_step; i++){
+
         foot_step_(i,0) = step_length_x_(i);
+
         foot_step_(i,1) = step_length_y_(i);
+
         foot_step_(i,5) = step_yaw_(i);
+
+        foot_step_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
+
+        foot_step_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
+
         foot_step_(i,6) = 1-phase_indicator_(i);
+
         
+
         foot_step_support_frame_(i, 0) = foot_step_support_frame_(i-1, 0) + cos(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) - sin(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
+
         foot_step_support_frame_(i, 1) = foot_step_support_frame_(i-1, 1) + sin(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) + cos(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
+
         foot_step_support_frame_(i, 5) = foot_step_support_frame_(i-1, 5) + step_yaw_(i);
+
+        foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
+
+        foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+
         foot_step_support_frame_(i, 6) = 1-phase_indicator_(i);
 
     }
 
+
+
+
+
+    // ZMP OFFSET
+
+    for (int i = 0; i < number_of_foot_step; i++){
+
+        foot_step_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
+
+        foot_step_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
+
+
+
+        foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
+
+        foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+
+    }
+
+
+
+
+
 }
 
 
+
+
+
 void CustomController::addZmpOffset()
-
-
 
 {
 
 
 
-    double lfoot_zmp_offset_, rfoot_zmp_offset_;
-
-
-
-
-
-
-
-    lfoot_zmp_offset_ = -zmp_offset; // simul 1.1 s
-
-
-
-    rfoot_zmp_offset_ =  zmp_offset;
-
-
-
-
-
-
-
     foot_step_support_frame_offset_ = foot_step_support_frame_;
-
-
-
-
-
-
-
-    for (int i = 0; i < number_of_foot_step; i++)
-
-
-
-    {
-
-
-
-        if (foot_step_(i, 6) == 0) // left support foot 
-
-
-
-        {
-
-
-
-            foot_step_support_frame_offset_(i, 1) += lfoot_zmp_offset_;
-
-
-
-        }
-
-
-
-        else // right support foot
-
-
-
-        {
-
-
-
-            foot_step_support_frame_offset_(i, 1) += rfoot_zmp_offset_;
-
-
-
-        }
-
-
-
-    }
 
 
 
@@ -2690,7 +3497,6 @@ void CustomController::windupPreview(){
 
 void CustomController::updateNextStepTime()
 {       
-    std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
     walking_tick++;
 }
 
