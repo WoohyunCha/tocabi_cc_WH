@@ -367,6 +367,85 @@ public:
 
     bool ideal_preview = false;
 
+
+    int iter_x_l=0;
+    int iter_x_r=0;
+    int iter_y_l_ls =0;
+    int iter_y_l_rs =0;
+    int iter_y_r_ls =0;
+    int iter_y_r_rs =0;
+    int iter_y_r =0;
+    int iter_yaw_l_ls=0;
+    int iter_yaw_l_rs=0;
+    int iter_yaw_r_ls=0;
+    int iter_yaw_r_rs=0;
+    int iter_end_x=0;
+    int iter_end_y_l_ls =0;
+    int iter_end_y_l_rs =0;
+    int iter_end_y_r_ls =0;
+    int iter_end_y_r_rs =0;
+    int iter_end_y_r =0;
+    int iter_end_yaw_l=0;
+    int iter_end_yaw_r=0;
+    double joy_x;
+    double joy_y;
+    double joy_height = 0.08;
+    double joy_length =0.0;
+    double joy_length_y =0.205;
+    double joy_length_temp =0.30;
+    double joy_length_y_temp =0.40;
+    double joy_length_command =0.;
+    double joy_length_y_r_command =0.;
+    double joy_length_y_l_command =0.;
+    double joy_length_previous=0.0;
+    double joy_length_r =0.;
+    double joy_length_l =0.;
+    double joy_length_y_l =0.205;
+    double joy_length_y_r =0.205;
+    double joy_length_y_r_temp =0.205;
+    double joy_length_y_l_temp =0.205;
+    double joy_length_y_l_previous =0.205;
+    double joy_length_y_r_previous =0.205;
+    double joy_yaw_r =0.;
+    double joy_yaw_l =0.;
+    double joy_yaw_l_previous =0.;
+    double joy_yaw_r_previous =0.;
+    double joy_yaw_r_command =0.;
+    double joy_yaw_l_command =0.;
+    double swing_previous_l =0.;
+    double swing_previous_r =0.;
+    double joy_temp;
+    
+    
+    double joy_left_foot_pos;
+    double joy_right_foot_pos;
+    double joy_walking_tick;
+    double previous_l =0.;
+    double previous_r =0.;
+    double current_l =0.;
+    double current_r =0.;
+    double previous_lswing =0.;
+    double previous_rswing =0.;
+    double current_lswing =0.;
+    double current_rswing =0.;
+
+
+    std::vector<int> last_buttons_0;
+    std::vector<int> last_buttons_1;
+    std::vector<int> last_buttons_2;
+    std::vector<int> last_buttons_3;
+    std::vector<double> joy_walking_tick_temp;
+    std::vector<double> joy_length_previous_vec= std::vector<double>(10,0.0);;
+    std::vector<double> swing_previous_r_vec;
+    std::vector<double> swing_previous_l_vec;
+    std::vector<double> joy_yaw_l_previous_vec = std::vector<double>(10,0.0);
+    std::vector<double> joy_yaw_r_previous_vec= std::vector<double>(10,0.0);
+    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.205);;
+    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.205);
+    std::vector<double> last_buttons_7;
+
+    double norm;
+
     // PREVIEW CONTROL
     void updateInitialState();
     void updateFootstepCommand();
@@ -394,7 +473,6 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
-
 
 private:
     Eigen::VectorQd ControlVal_;
