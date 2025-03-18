@@ -366,6 +366,7 @@ public:
     double Rcommand_t_ssp_ = 1.;
     double Rcommand_foot_height_ = 0.08;
 
+    bool ideal_preview = false;
 
 
     int iter_x_l=0;
