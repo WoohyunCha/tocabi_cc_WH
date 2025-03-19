@@ -352,14 +352,14 @@ public:
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.;
-    double Lcommand_step_length_y_ = 0.205;
+    double Lcommand_step_length_y_ = 0.22;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
     double Lcommand_t_ssp_ = 1.;
     double Lcommand_foot_height_ = 0.08;
 
     double Rcommand_step_length_x_ = 0.;
-    double Rcommand_step_length_y_ = 0.205;
+    double Rcommand_step_length_y_ = 0.22;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
     double Rcommand_t_ssp_ = 1.;
@@ -391,7 +391,7 @@ public:
     double joy_y;
     double joy_height = 0.08;
     double joy_length =0.0;
-    double joy_length_y =0.205;
+    double joy_length_y =0.22;
     double joy_length_temp =0.30;
     double joy_length_y_temp =0.40;
     double joy_length_command =0.;
@@ -400,12 +400,12 @@ public:
     double joy_length_previous=0.0;
     double joy_length_r =0.;
     double joy_length_l =0.;
-    double joy_length_y_l =0.205;
-    double joy_length_y_r =0.205;
-    double joy_length_y_r_temp =0.205;
-    double joy_length_y_l_temp =0.205;
-    double joy_length_y_l_previous =0.205;
-    double joy_length_y_r_previous =0.205;
+    double joy_length_y_l =0.22;
+    double joy_length_y_r =0.22;
+    double joy_length_y_r_temp =0.22;
+    double joy_length_y_l_temp =0.22;
+    double joy_length_y_l_previous =0.22;
+    double joy_length_y_r_previous =0.22;
     double joy_yaw_r =0.;
     double joy_yaw_l =0.;
     double joy_yaw_l_previous =0.;
@@ -440,8 +440,8 @@ public:
     std::vector<double> swing_previous_l_vec;
     std::vector<double> joy_yaw_l_previous_vec = std::vector<double>(10,0.0);
     std::vector<double> joy_yaw_r_previous_vec= std::vector<double>(10,0.0);
-    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.205);;
-    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.205);
+    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.22);;
+    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.22);
     std::vector<double> last_buttons_7;
 
     double norm;
