@@ -2699,92 +2699,40 @@ void CustomController::getRobotState()
 }
 
 
-void CustomController::calculateFootStepTotal()
 
+void CustomController::calculateFootStepTotal()
 {
 
-
-
     foot_step_.resize(number_of_foot_step, 7);
-
     foot_step_.setZero();
-
     foot_step_support_frame_.resize(number_of_foot_step, 7);
-
     foot_step_support_frame_.setZero();
-
     
-
     // foot_step_ is foothold command in that step's stance foot
-
     // foot_step_support_frame_ is foothold command in the first stance foot frame
-
     foot_step_(0,0) = step_length_x_(0);
-
     foot_step_(0,1) = step_length_y_(0);
-
     foot_step_(0,5) = step_yaw_(0);
-
     foot_step_(0,6) = 1-phase_indicator_(0);
-
     foot_step_support_frame_(0, 0) = step_length_x_(0);
-
     foot_step_support_frame_(0, 1) = step_length_y_(0);
-
     foot_step_support_frame_(0, 5) = step_yaw_(0);
-
     foot_step_support_frame_(0, 6) = 1-phase_indicator_(0);
 
-
-
     for (int i = 1; i < number_of_foot_step; i++){
-
         foot_step_(i,0) = step_length_x_(i);
-
         foot_step_(i,1) = step_length_y_(i);
-
         foot_step_(i,5) = step_yaw_(i);
-
         foot_step_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
-
         foot_step_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
-
         foot_step_(i,6) = 1-phase_indicator_(i);
-
         
-
         foot_step_support_frame_(i, 0) = foot_step_support_frame_(i-1, 0) + cos(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) - sin(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
-
         foot_step_support_frame_(i, 1) = foot_step_support_frame_(i-1, 1) + sin(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) + cos(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
-
         foot_step_support_frame_(i, 5) = foot_step_support_frame_(i-1, 5) + step_yaw_(i);
-
         foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
-
         foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
-
         foot_step_support_frame_(i, 6) = 1-phase_indicator_(i);
-
-    }
-
-
-
-
-
-    // ZMP OFFSET
-
-    for (int i = 0; i < number_of_foot_step; i++){
-
-        foot_step_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
-
-        foot_step_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
-
-
-
-        foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
-
-        foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
-
     }
 
 
@@ -2794,19 +2742,15 @@ void CustomController::calculateFootStepTotal()
 }
 
 
-
-
-
 void CustomController::addZmpOffset()
-
 {
 
-
-
     foot_step_support_frame_offset_ = foot_step_support_frame_;
-
-
-
+    // ZMP OFFSET
+    for (int i = 0; i < number_of_foot_step; i++){
+        foot_step_support_frame_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+    }
 }
 
 
