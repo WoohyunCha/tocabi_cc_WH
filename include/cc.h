@@ -204,7 +204,7 @@ public:
     double t_temp_;  
     double t_double1_;
     double t_double2_;
-    double zmp_offset = 0.;
+    double zmp_offset = 0.02;
     const bool ideal_preview = false;   
 
 
@@ -389,21 +389,21 @@ public:
     double joy_y;
     double joy_height = 0.08;
     double joy_length =0.0;
-    double joy_length_y =0.205;
-    double joy_length_temp =0.30;
-    double joy_length_y_temp =0.40;
+    double joy_length_y =0.22;
+    double joy_length_temp =0.20;
+    double joy_length_y_temp =0.35;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
     double joy_length_y_l_command =0.;
     double joy_length_previous=0.0;
     double joy_length_r =0.;
     double joy_length_l =0.;
-    double joy_length_y_l =0.205;
-    double joy_length_y_r =0.205;
-    double joy_length_y_r_temp =0.205;
-    double joy_length_y_l_temp =0.205;
-    double joy_length_y_l_previous =0.205;
-    double joy_length_y_r_previous =0.205;
+    double joy_length_y_l =0.22;
+    double joy_length_y_r =0.22;
+    double joy_length_y_r_temp =0.22;
+    double joy_length_y_l_temp =0.22;
+    double joy_length_y_l_previous =0.22;
+    double joy_length_y_r_previous =0.22;
     double joy_yaw_r =0.;
     double joy_yaw_l =0.;
     double joy_yaw_l_previous =0.;

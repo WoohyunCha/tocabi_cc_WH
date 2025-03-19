@@ -1131,9 +1131,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         joy_length =0.0;
 
-        joy_length_y_r_temp =0.21;
+        joy_length_y_r_temp =0.22;
 
-        joy_length_y_l_temp =0.21;
+        joy_length_y_l_temp =0.22;
 
         // if(joy_length = 0.0){
 
@@ -1149,7 +1149,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         // Lcommand_step_length_y_ = joy_length_y_l;
 
-        Lcommand_step_length_y_ = 0.21;
+        Lcommand_step_length_y_ = 0.22;
 
         // Lcommand_step_yaw_ = joy_yaw_l;
 
@@ -1169,7 +1169,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
         // Rcommand_step_length_y_ = joy_length_y_r;
 
-        Rcommand_step_length_y_ = 0.21;
+        Rcommand_step_length_y_ = 0.22;
 
         // Rcommand_step_yaw_ = joy_yaw_r;
 
@@ -1241,9 +1241,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 
 
-            joy_length_y_l_temp = 0.21 + (joy_length_y_temp - 0.21)*joy_y; 
+            joy_length_y_l_temp = 0.22 + (joy_length_y_temp - 0.22)*joy_y; 
 
-            joy_length_y_r_temp =0.21;
+            joy_length_y_r_temp =0.22;
 
             Lcommand_step_length_y_= joy_length_y_l_temp;
 
@@ -1259,9 +1259,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 
 
-            joy_length_y_r_temp = 0.21 +  (joy_length_y_temp - 0.21)*-joy_y;
+            joy_length_y_r_temp = 0.22 +  (joy_length_y_temp - 0.22)*-joy_y;
 
-            joy_length_y_l_temp = 0.21;
+            joy_length_y_l_temp = 0.22;
 
             Lcommand_step_length_y_= joy_length_y_l_temp;             
 
@@ -2063,11 +2063,11 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.21 + (1-phase_indicator_(1))*0.21), 
+        // (2*phase_indicator_(1)-1) * (phase_indicator_(1)*0.22 + (1-phase_indicator_(1))*0.22), 
 
 
 
-        // (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.21 + (1-phase_indicator_(2))*0.21);
+        // (2*phase_indicator_(2)-1) * (phase_indicator_(2)*0.22 + (1-phase_indicator_(2))*0.22);
 
 
 
@@ -2075,15 +2075,15 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        // step_length_y_ << (2*phase_indicator_(0)-1) * 0.21, 
+        // step_length_y_ << (2*phase_indicator_(0)-1) * 0.22, 
 
 
 
-        // (2*phase_indicator_(1)-1) * 0.21, 
+        // (2*phase_indicator_(1)-1) * 0.22, 
 
 
 
-        // (2*phase_indicator_(2)-1) * 0.21;
+        // (2*phase_indicator_(2)-1) * 0.22;
 
 
 
@@ -2413,11 +2413,11 @@ void CustomController::updateFootstepCommand(){
 
 
 
-        (2*phase_indicator_(1)-1) * 0.21,
+        (2*phase_indicator_(1)-1) * 0.22,
 
 
 
-        (2*phase_indicator_(2)-1) * 0.21;
+        (2*phase_indicator_(2)-1) * 0.22;
 
 
 
