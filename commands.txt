@@ -1,13 +1,13 @@
 Lcommand_step_length_x_=0.3
 Lcommand_step_length_y_=0.205
 Lcommand_step_yaw_=0.
-Lcommand_t_dsp_=0.05
-Lcommand_t_ssp_=.6
+Lcommand_t_dsp_=0.1
+Lcommand_t_ssp_=.8
 Lcommand_foot_height_=0.12
 
 Rcommand_step_length_x_=0.3
 Rcommand_step_length_y_=0.205
 Rcommand_step_yaw_=0.
-Rcommand_t_dsp_=0.05
-Rcommand_t_ssp_=.6
+Rcommand_t_dsp_=0.1
+Rcommand_t_ssp_=.8
 Rcommand_foot_height_=0.12

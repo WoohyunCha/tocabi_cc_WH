@@ -203,7 +203,7 @@ public:
     double t_temp_;  
     double t_double1_;
     double t_double2_;
-    double zmp_offset = 0.;
+    double zmp_offset = 0.02;
 
 
 
