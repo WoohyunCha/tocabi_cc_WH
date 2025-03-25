@@ -128,11 +128,10 @@ public:
                                        : num_state;
     std::ofstream writeFile;
     std::ofstream actuator_data_file;
-    bool actuator_net_log = false;
 
     float phase_ = 0.0;
 
-    bool is_on_robot_ = true;
+    bool is_on_robot_ = false;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
@@ -184,7 +183,7 @@ public:
 
     // BIPED WALKING PARAMETER
     void walkingParameterSetting();
-    const int number_of_foot_step = 3;
+    const int number_of_foot_step = 2;
     Eigen::Vector3d phase_indicator_;
     Eigen::Vector3d step_length_x_;
     Eigen::Vector3d step_length_y_;
@@ -195,9 +194,8 @@ public:
     Eigen::Vector3d t_ssp_seconds;
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
-    int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
+    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
     const double com_height_ = 0.68;
-    int current_step_num = 0;
 
     double t_last_;
     double t_start_;
@@ -205,7 +203,6 @@ public:
     double t_double1_;
     double t_double2_;
     double zmp_offset = 0.02;
-    const bool ideal_preview = false;   
 
 
 
@@ -215,6 +212,7 @@ public:
 
 
     Eigen::MatrixXd foot_step_;
+    Eigen::MatrixXd foot_step_offset_;
     Eigen::MatrixXd foot_step_support_frame_;
     Eigen::MatrixXd foot_step_support_frame_offset_;
 
@@ -295,6 +293,7 @@ public:
     Eigen::Isometry3d rfoot_support_init_yaw_;
     
     Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
+
     
     Eigen::MatrixXd ref_zmp_;
     Eigen::MatrixXd ref_zmp_container;
@@ -353,18 +352,21 @@ public:
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.;
-    double Lcommand_step_length_y_ = 0.205;
+    double Lcommand_step_length_y_ = 0.22;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = 1.;
-    double Lcommand_foot_height_ = 0.08;
+    double Lcommand_t_ssp_ = .8;
+    double Lcommand_foot_height_ = 0.12;
 
     double Rcommand_step_length_x_ = 0.;
-    double Rcommand_step_length_y_ = 0.205;
+    double Rcommand_step_length_y_ = 0.22;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = 1.;
-    double Rcommand_foot_height_ = 0.08;
+    double Rcommand_t_ssp_ = .8;
+    double Rcommand_foot_height_ = 0.12;
+
+    bool ideal_preview = false;
+
 
     int iter_x_l=0;
     int iter_x_r=0;
@@ -387,10 +389,10 @@ public:
     int iter_end_yaw_r=0;
     double joy_x;
     double joy_y;
-    double joy_height = 0.08;
+    double joy_height = 0.12;
     double joy_length =0.0;
     double joy_length_y =0.22;
-    double joy_length_temp =0.20;
+    double joy_length_temp =0.2;
     double joy_length_y_temp =0.35;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
@@ -438,8 +440,8 @@ public:
     std::vector<double> swing_previous_l_vec;
     std::vector<double> joy_yaw_l_previous_vec = std::vector<double>(10,0.0);
     std::vector<double> joy_yaw_r_previous_vec= std::vector<double>(10,0.0);
-    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.205);;
-    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.205);
+    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.22);;
+    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.22);
     std::vector<double> last_buttons_7;
 
     double norm;
@@ -454,6 +456,7 @@ public:
     void floatToSupportFootstep();
     void updateNextStepTime();
     void resetPreviewState();
+    void windupPreview();
     void computeIkControl(const Eigen::Isometry3d &float_trunk_transform, const Eigen::Isometry3d &float_lleg_transform, const Eigen::Isometry3d &float_rleg_transform, Eigen::Vector12d &q_des);
 
     void getZmpTrajectory();
@@ -470,7 +473,6 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
-    void windupPreview();
 
 private:
     Eigen::VectorQd ControlVal_;
