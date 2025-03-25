@@ -184,7 +184,7 @@ public:
 
     // BIPED WALKING PARAMETER
     void walkingParameterSetting();
-    const int number_of_foot_step = 3;
+    const int number_of_foot_step = 2;
     Eigen::Vector3d phase_indicator_;
     Eigen::Vector3d step_length_x_;
     Eigen::Vector3d step_length_y_;
@@ -195,7 +195,7 @@ public:
     Eigen::Vector3d t_ssp_seconds;
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
-    int first_stance_foot_ = 0; // 1 means right foot stance, 0 means left foot stance
+    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
     const double com_height_ = 0.68;
 
     double t_last_;
@@ -213,6 +213,7 @@ public:
 
 
     Eigen::MatrixXd foot_step_;
+    Eigen::MatrixXd foot_step_offset_;
     Eigen::MatrixXd foot_step_support_frame_;
     Eigen::MatrixXd foot_step_support_frame_offset_;
 
@@ -355,15 +356,15 @@ public:
     double Lcommand_step_length_y_ = 0.22;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = 1.;
-    double Lcommand_foot_height_ = 0.08;
+    double Lcommand_t_ssp_ = .8;
+    double Lcommand_foot_height_ = 0.12;
 
     double Rcommand_step_length_x_ = 0.;
     double Rcommand_step_length_y_ = 0.22;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = 1.;
-    double Rcommand_foot_height_ = 0.08;
+    double Rcommand_t_ssp_ = .8;
+    double Rcommand_foot_height_ = 0.12;
 
     bool ideal_preview = false;
 
@@ -389,11 +390,11 @@ public:
     int iter_end_yaw_r=0;
     double joy_x;
     double joy_y;
-    double joy_height = 0.08;
+    double joy_height = 0.12;
     double joy_length =0.0;
     double joy_length_y =0.22;
-    double joy_length_temp =0.30;
-    double joy_length_y_temp =0.40;
+    double joy_length_temp =0.2;
+    double joy_length_y_temp =0.35;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
     double joy_length_y_l_command =0.;
