@@ -376,12 +376,27 @@ void CustomController::initVariable()
                     10, 10,
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
-    q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-                0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-                0.0, 0.0, 0.0,
-                0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
-                0.0, 0.0,
-                -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+    if (com_height_ == 0.68){
+        q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
+                    0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
+                    0.0, 0.0,
+                    -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+    }
+    else if (com_height_ == 0.728){
+        q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
+                    0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
+                    0.0, 0.0, 0.0,
+                    0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
+                    0.0, 0.0,
+                    -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+
+    }
+    else {
+        std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        exit(0);
+    }
 
     kp_.setZero();
     kv_.setZero();
@@ -1129,20 +1144,20 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     //  std::cout<<joy_length_y_r<<std::endl;
     
 
-    if(joy->axes[7] == -1.0 && Lcommand_t_dsp_ < 0.2 && Lcommand_t_ssp_<1.2){ //long step
+    if(joy->axes[7] == -1.0 && Lcommand_t_dsp_ < 0.2 && Lcommand_t_ssp_<1.0){ //long step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
-            Lcommand_t_dsp_ = Lcommand_t_dsp_+0.01;
-            Lcommand_t_ssp_ = Lcommand_t_ssp_+0.05;
+            Lcommand_t_dsp_ = DyrosMath::minmax_cut(Lcommand_t_dsp_+0.01, 0.02, 0.2);
+            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_+0.05, 0.5, 1.0);
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
             ROS_INFO("%f",Lcommand_t_ssp_);
         }
 
-    }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.05 && Lcommand_t_ssp_> 0.5){//short step
+    }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.02 && Lcommand_t_ssp_> 0.5){//short step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
-            Lcommand_t_dsp_ = Lcommand_t_dsp_-0.01;
-            Lcommand_t_ssp_ = Lcommand_t_ssp_-0.05;
+            Lcommand_t_dsp_ = DyrosMath::minmax_cut(Lcommand_t_dsp_-0.01, 0.02, 0.2);
+            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_-0.05, 0.5, 1.0);
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
@@ -1156,11 +1171,14 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         Rcommand_t_ssp_ = Lcommand_t_ssp_;
     }
     
-    if(joy->buttons[1] == 1 && joy_length_temp < 0.45 && joy_length_y_temp < 0.5){ 
+    if(joy->buttons[1] == 1 && joy_length_temp < 0.5 && joy_length_y_temp < 0.5){ 
         if(last_buttons_1[last_buttons_1.size()-2]==0){
 
             joy_length_temp+=0.06;//보폭
             joy_length_y_temp +=0.04;
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
+
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
         }            
@@ -1172,6 +1190,8 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
             joy_length_temp-=0.06;//보폭
             joy_length_y_temp-=0.04;//보폭
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
             
@@ -1180,14 +1200,14 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
     if(joy->buttons[3]==1 && Lcommand_foot_height_<0.2){
         if(last_buttons_3[last_buttons_3.size()-2]==0){
-            joy_height= Lcommand_foot_height_+0.002;
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_+0.02, 0.05, 0.2);
             Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
             ROS_INFO("%f",joy_height);
         }
 
     }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.05){
         if(last_buttons_2[last_buttons_2.size()-2]==0){
-        joy_height= Lcommand_foot_height_-0.002;
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_-0.02, 0.05, 0.2);
         Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
         ROS_INFO("%f",joy_height);
         }
@@ -1224,6 +1244,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     // target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
     // std::cout << "Rcommand_step_yaw_ :" << Rcommand_step_yaw_ << std::endl;
 }
+
 
 void CustomController::computeSlow()
 
@@ -2315,7 +2336,6 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
     Q_bar(0, 0) = Qe(0, 0);
 
     Eigen::Matrix4d K; K.setZero();
-
     if (com_height_ == 0.7){
         K(0, 0) = 68.7921510770868;
         K(0, 1) = 2331.78394937073;
@@ -2335,6 +2355,24 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
         K(3, 3) = 0.115349533788953;
     }
 
+    else if (com_height_ == 0.728){
+        K(0, 0) = 70.0813009391222;
+        K(0, 1) = 2420.65372019101;
+        K(0, 2) = 669.387885399937;
+        K(0, 3) = 2.72127899669319;
+        K(1, 0) = 2420.65372019101;
+        K(1, 1) = 85969.0761591658;
+        K(1, 2) = 23782.1340369413;
+        K(1, 3) = 99.0855302680049;
+        K(2, 0) = 669.387885399937;
+        K(2, 1) = 23782.1340369413;
+        K(2, 2) = 6579.12894080612;
+        K(2, 3) = 27.4486400273521;
+        K(3, 0) = 2.72127899669319;
+        K(3, 1) = 99.0855302680049;
+        K(3, 2) = 27.4486400273521;
+        K(3, 3) = 0.125016968799296;
+    }
 
     // // 0.65m
     else if (com_height_ == 0.65){
@@ -2403,6 +2441,15 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
         Gx(0, 0) = 38686.4538399671;
         Gx(0, 1) = 10800.0433241572;
         Gx(0, 2) = 128.255400226113;
+    }
+
+    // 0.728m
+    else if (com_height_ == 0.728){
+        Gi(0, 0) = 556.382091536873; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+        //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+        Gx(0, 0) = 38991.9807941560;
+        Gx(0, 1) = 11086.4028841705;
+        Gx(0, 2) = 130.234568101964;
     }
 
     // 0.65m
@@ -2665,9 +2712,21 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick+1);
 
-    target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
-    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+    if (com_height_ == 0.68){
+        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+
+    }
+    else if (com_height_ == 0.728){
+        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.04, 0.04), 
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+    }
+    else{
+        std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+        exit(0);
+    }
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
