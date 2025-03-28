@@ -686,7 +686,12 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
     // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
     // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
-    state_cur_(data_idx) = walking_tick;
+    // state_cur_(data_idx) = walking_tick;
+    // data_idx++;
+
+    state_cur_(data_idx) = cos(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
+    data_idx++;
+    state_cur_(data_idx) = sin(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
     data_idx++;
 
     state_cur_(data_idx) = step_length_x_(0);
@@ -1115,7 +1120,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             Lcommand_step_length_x_ = joy_length;
             Rcommand_step_length_x_ = joy_length;
         }else if(joy_x < 0.0){
-            joy_length = joy_length_temp*joy_x;
+            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.3, 0.0);
             // joy_length_l =joy_length_temp*-joy_x;
             // joy_length_r =joy_length_temp*-joy_x;
                 // std::cout<<joy_length<<std::endl;
