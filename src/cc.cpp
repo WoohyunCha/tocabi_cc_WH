@@ -372,13 +372,50 @@ void CustomController::initVariable()
                     10, 10,
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
-    q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-                0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-                0.0, 0.0, 0.0,
-                0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
-                0.0, 0.0,
-                -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
 
+    if (com_height_ == 0.68){
+
+        q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
+
+                    0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
+
+                    0.0, 0.0, 0.0,
+
+                    0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
+
+                    0.0, 0.0,
+
+                    -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+
+    }
+
+    else if (com_height_ == 0.728){
+
+        q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
+
+                    0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
+
+                    0.0, 0.0, 0.0,
+
+                    0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
+
+                    0.0, 0.0,
+
+                    -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+
+
+
+    }
+
+    else {
+
+        std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+
+        exit(0);
+
+    }
+                
+                
     kp_.setZero();
     kv_.setZero();
     kp_.diagonal() <<   2000.0, 5000.0, 4000.0, 3700.0, 3200.0, 3200.0,
@@ -667,7 +704,19 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
     // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
     // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
-    state_cur_(data_idx) = walking_tick;
+
+    // state_cur_(data_idx) = walking_tick;
+
+    // data_idx++;
+
+
+
+    state_cur_(data_idx) = cos(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
+
+    data_idx++;
+
+    state_cur_(data_idx) = sin(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
+
     data_idx++;
 
     state_cur_(data_idx) = step_length_x_(0);
@@ -1096,7 +1145,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             Lcommand_step_length_x_ = joy_length;
             Rcommand_step_length_x_ = joy_length;
         }else if(joy_x < 0.0){
-            joy_length = joy_length_temp*joy_x;
+            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.3, 0.0);
             // joy_length_l =joy_length_temp*-joy_x;
             // joy_length_r =joy_length_temp*-joy_x;
                 // std::cout<<joy_length<<std::endl;
@@ -2334,6 +2383,42 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
     }
 
 
+
+    else if (com_height_ == 0.728){
+
+        K(0, 0) = 70.0813009391222;
+
+        K(0, 1) = 2420.65372019101;
+
+        K(0, 2) = 669.387885399937;
+
+        K(0, 3) = 2.72127899669319;
+
+        K(1, 0) = 2420.65372019101;
+
+        K(1, 1) = 85969.0761591658;
+
+        K(1, 2) = 23782.1340369413;
+
+        K(1, 3) = 99.0855302680049;
+
+        K(2, 0) = 669.387885399937;
+
+        K(2, 1) = 23782.1340369413;
+
+        K(2, 2) = 6579.12894080612;
+
+        K(2, 3) = 27.4486400273521;
+
+        K(3, 0) = 2.72127899669319;
+
+        K(3, 1) = 99.0855302680049;
+
+        K(3, 2) = 27.4486400273521;
+
+        K(3, 3) = 0.125016968799296;
+
+    }
     // // 0.65m
     else if (com_height_ == 0.65){
         K(0, 0) = 66.4281134896190;
@@ -2403,6 +2488,21 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
         Gx(0, 2) = 128.255400226113;
     }
 
+
+    // 0.728m
+
+    else if (com_height_ == 0.728){
+
+        Gi(0, 0) = 556.382091536873; //Temp_mat_inv * B_bar_tran * K * I_bar ;
+
+        //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
+
+        Gx(0, 0) = 38991.9807941560;
+
+        Gx(0, 1) = 11086.4028841705;
+
+        Gx(0, 2) = 130.234568101964;
+    }
     // 0.65m
     else if (com_height_ == 0.65){
         Gi(0, 0) = 573.462734668883; //Temp_mat_inv * B_bar_tran * K * I_bar ;
@@ -2663,9 +2763,36 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick+1);
 
-    target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
-    DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+
+    if (com_height_ == 0.68){
+
+        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
+
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
+
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+
+
+
+    }
+
+    else if (com_height_ == 0.728){
+
+        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
+
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.04, 0.04), 
+
+        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+
+    }
+
+    else{
+
+        std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+
+        exit(0);
+
+    }
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
     Eigen::Vector4d swingq = target_swing_state_stance_frame_.segment(3,4);
