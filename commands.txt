@@ -1,13 +1,6 @@
-Lcommand_step_length_x_=0.3
-Lcommand_step_length_y_=0.21
-Lcommand_step_yaw_=0.
-Lcommand_t_dsp_=0.1
-Lcommand_t_ssp_=.8
-Lcommand_foot_height_=0.12
-
-Rcommand_step_length_x_=0.3
-Rcommand_step_length_y_=0.21
-Rcommand_step_yaw_=0.
-Rcommand_t_dsp_=0.1
-Rcommand_t_ssp_=.8
-Rcommand_foot_height_=0.12
+step_length_x_planned 0.45 0.2 0.3 0.25 0.25 0.3 -0.3 0.4 0.01 0.4 0.4 0.4
+step_length_y_planned 0.4 0.45 0.45 0.45 0.4 0.21 0.21 0.24 0.49 0.3 0.3 0.21
+step_yaw_planned 0.087 0.696 0.174 0.261 0.696 0.0 0.696 0.0 0.696 0.0 0.174 0.0
+t_dsp_planned 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1
+t_ssp_planned 0.7 0.7 0.7 0.7 0.7 0.7 0.7 0.7 0.7 0.7 0.7 0.7
+foot_height_planned 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1

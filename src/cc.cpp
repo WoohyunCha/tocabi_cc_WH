@@ -16,9 +16,11 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
         else
         {
             writeFile.open("/home/cha/catkin_ws/src/tocabi_cc/result/data.csv", std::ofstream::out);
+            evalFile.open("/home/cha/catkin_ws/src/tocabi_cc/result/eval_data.csv", std::ofstream::out);
             actuator_data_file.open("/home/cha/catkin_ws/src/tocabi_cc/result/actuator_data.csv", std::ofstream::app);
         }
         writeFile << std::fixed << std::setprecision(8);
+        evalFile << std::fixed << std::setprecision(8);
         actuator_data_file << std::fixed << std::setprecision(8);
         if (actuator_net_log) actuator_data_file << "START OF EPISODE\n";  // Mark the end of the data stream
     }
@@ -431,7 +433,16 @@ void CustomController::initVariable()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
 
-    // loadCommand(cur_path + "commands.txt");
+
+    if (eval_mode){
+        step_length_x_planned.setZero(planned_step_number);
+        step_length_y_planned.setZero(planned_step_number);
+        step_yaw_planned.setZero(planned_step_number);
+        t_dsp_planned.setZero(planned_step_number);
+        t_ssp_planned.setZero(planned_step_number);
+        foot_height_planned.setZero(planned_step_number);
+        loadCommand(cur_path + "commands.txt");
+    }
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -604,90 +615,36 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    // state_cur_(data_idx) = swing_state_stance_frame_(0);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(1);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(2);
-    // data_idx++;
-    // // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
-    // // data_idx++;
-    // // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-    // // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(5);
-   // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(6);
-    // data_idx++;
-
     // state_cur_(data_idx) = com_state_stance_frame_(0);
     // data_idx++;
     // state_cur_(data_idx) = com_state_stance_frame_(1);
     // data_idx++;
     // state_cur_(data_idx) = com_state_stance_frame_(2);
     // data_idx++;
-     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+    // state_cur_(data_idx) = com_state_stance_frame_(3);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(4);
+    // state_cur_(data_idx) = com_state_stance_frame_(4);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+    // state_cur_(data_idx) = com_state_stance_frame_(5);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+    // state_cur_(data_idx) = com_state_stance_frame_(6);
     // data_idx++;
-
-    // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
-    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // state_cur_(data_idx) = swing_state_stance_frame_(0);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // state_cur_(data_idx) = swing_state_stance_frame_(1);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // state_cur_(data_idx) = swing_state_stance_frame_(2);
     // data_idx++;
-
-
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    // state_cur_(data_idx) = swing_state_stance_frame_(3);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+    // state_cur_(data_idx) = swing_state_stance_frame_(4);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+    // state_cur_(data_idx) = swing_state_stance_frame_(5);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(7);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(8);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(9);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(12);
+    // state_cur_(data_idx) = swing_state_stance_frame_(6);
     // data_idx++;
 
 
-    // state_cur_(data_idx) = target_com_state_stance_frame_(0);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(1);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(7);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(8);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(12);
-    // data_idx++;
-
-
-
-    // std::cout << "Swing and Com state" << std::endl;
-    // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
-    // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
-    // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
-    // state_cur_(data_idx) = walking_tick;
-    // data_idx++;
 
     state_cur_(data_idx) = cos(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
     data_idx++;
@@ -712,6 +669,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
         data_idx++;
     }
+
     state_buffer_.block(0, 0, num_cur_state*(num_state_skip*num_state_hist-1),1) = state_buffer_.block(num_cur_state, 0, num_cur_state*(num_state_skip*num_state_hist-1),1);
     state_history_.block(0, 0, num_cur_state, history_skip_*history_len_-1) = state_history_.block(0, 1, num_cur_state,history_skip_*history_len_-1);
 
@@ -1625,89 +1583,51 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
     throw std::runtime_error("weights_path not found in configuration file.");
 }
 
-std::string CustomController::loadCommand(const std::string &command_file)
-{
-    std::ifstream file(command_file);
-    if (!file.is_open())
+void CustomController::loadCommand(const std::string &command_file)
     {
-        throw std::runtime_error("Cannot open command file: " + command_file);
-    }
-
-    std::string line, key, value;
-    while (std::getline(file, line))
-    {
-        // Skip empty lines (optional)
-        if (line.empty()) 
-            continue;
-
-        std::istringstream line_stream(line);
-        if (std::getline(line_stream, key, '=') && std::getline(line_stream, value))
+        std::ifstream file(command_file);
+        if (!file)
         {
-            // Convert 'value' string to double
-            double numericVal = std::stod(value);
-
-            // Now compare strings in if-else statements
-            if (key == "Lcommand_step_length_x_") {
-                Lcommand_step_length_x_ = numericVal;
-            } 
-            else if (key == "Lcommand_step_length_y_") {
-                Lcommand_step_length_y_ = numericVal;
-            } 
-            else if (key == "Lcommand_step_yaw_") {
-                Lcommand_step_yaw_ = numericVal;
-            } 
-            else if (key == "Lcommand_t_dsp_") {
-                Lcommand_t_dsp_ = numericVal;
-            }
-            else if (key == "Lcommand_t_ssp_") {
-                Lcommand_t_ssp_ = numericVal;
-            } 
-            else if (key == "Lcommand_foot_height_") {
-                Lcommand_foot_height_ = numericVal;
-            }
-            else if (key == "Rcommand_step_length_x_") {
-                Rcommand_step_length_x_ = numericVal;
-            }
-            else if (key == "Rcommand_step_length_y_") {
-                Rcommand_step_length_y_ = numericVal;
-            } 
-            else if (key == "Rcommand_step_yaw_") {
-                Rcommand_step_yaw_ = numericVal;
-            } 
-            else if (key == "Rcommand_t_dsp_") {
-                Rcommand_t_dsp_ = numericVal;
-            } 
-            else if (key == "Rcommand_t_ssp_") {
-                Rcommand_t_ssp_ = numericVal;
-            }
-            else if (key == "Rcommand_foot_height_") {
-                Rcommand_foot_height_ = numericVal;
-            }
-            else if (key == "weights_path") {
-                // If you have some string variable to store
-                // a path, you'd do something like:
-                // weights_path_ = value;
-            }
-            else
-            {
-                // Unrecognized key; you can ignore or warn, etc.
-                std::cerr << "Warning: unknown key '" << key << "' in " 
-                          << command_file << std::endl;
-            }
+        throw std::runtime_error("Cannot open command file: " + command_file);
         }
-    }
+
+        std::string line;
+        while (std::getline(file, line))
+        {
+        if (line.empty())
+        continue;
+
+        std::istringstream iss(line);
+        std::string key;
+        iss >> key;
+
+        Vector12d vec;
+        for (int i = 0; i < 12; i++)
+        {
+        if(!(iss >> vec(i)))
+        {
+        throw std::runtime_error("Error parsing 12 values for key: " + key);
+        }
+        }
+
+        if (key == "step_length_x_planned")
+        step_length_x_planned = vec;
+        else if (key == "step_length_y_planned")
+        step_length_y_planned = vec;
+        else if (key == "step_yaw_planned")
+        step_yaw_planned = vec;
+        else if (key == "t_dsp_planned")
+        t_dsp_planned = vec;
+        else if (key == "t_ssp_planned")
+        t_ssp_planned = vec;
+        else if (key == "foot_height_planned")
+        foot_height_planned = vec;
+        else
+        std::cerr << "Warning: Unknown key '" << key << "' in file " << command_file << std::endl;
+        }
 
     file.close();
-
-    // If you specifically require "weights_path" but haven't read it,
-    // you could throw here. Otherwise, remove this exception or change its logic.
-    // throw std::runtime_error("weights_path not found in configuration file.");
-    
-    // Return something if your function demands a std::string; 
-    // else you can make it void.
-    return {}; 
-}
-
+    }
 
 void CustomController::updateInitialState()
 {
@@ -1792,6 +1712,24 @@ void CustomController::updateFootstepCommand(){
             
         }
 
+        if (eval_mode){
+            for (int step = 0; step < number_of_foot_step; step++){
+
+                if (step == 0) phase_indicator_(step) = first_stance_foot_;
+                else phase_indicator_(step) = 1-phase_indicator_(step-1);
+
+                step_length_x_(step) = step_length_x_planned(step);
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_planned(step);
+                step_yaw_(step) = (2*phase_indicator_(step) - 1) * step_yaw_planned(step);
+                foot_height_(step) = foot_height_planned(step);
+                t_dsp_(step) = std::floor(t_dsp_planned(step) * hz_);
+                t_dsp_seconds(step) = t_dsp_planned(step);
+                t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
+                t_ssp_seconds(step) = t_ssp_planned(step);
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+            }
+        }
+
 
 
         calculateFootStepTotal();
@@ -1827,6 +1765,27 @@ void CustomController::updateFootstepCommand(){
         std::cout << "Foot Position error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
         std::cout << ">> X error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << " [m]" << std::endl;
         std::cout << ">> Y error : " << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
+        Eigen::Quaterniond q1(swing_state_stance_frame_(6), swing_state_stance_frame_(3), swing_state_stance_frame_(4), swing_state_stance_frame_(5));
+        double swing_yaw = std::atan2(2.0 * (q1.w() * q1.z() + q1.x() * q1.y()),
+                             1.0 - 2.0 * (q1.y() * q1.y() + q1.z() * q1.z()));
+        std::cout << "Foot Yaw error : " << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
+        
+
+        x_error = (step_length_x_(0) - swing_state_stance_frame_(0)) ;
+        y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
+        yaw_error = (DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0))) ;
+
+
+        if (eval_mode){
+            if (current_step_number < planned_step_number){
+                evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+                evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << "\t";
+                evalFile << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+                evalFile << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
+                evalFile << std::endl;
+
+            }
+        }
 
         step_length_x_.segment(0,number_of_foot_step-1) = step_length_x_.segment(1,number_of_foot_step-1);
 
@@ -1849,9 +1808,9 @@ void CustomController::updateFootstepCommand(){
         phase_indicator_(number_of_foot_step-1) = 1-phase_indicator_(number_of_foot_step-2);
 
         int step = number_of_foot_step-1;
-        step_length_x_(step) = phase_indicator_(step)*Lcommand_step_length_x_ + (1-phase_indicator_(step))*Rcommand_step_length_x_;
-        step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*Lcommand_step_length_y_ + (1-phase_indicator_(step))*Rcommand_step_length_y_);
-        step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*Lcommand_step_yaw_ + (1-phase_indicator_(step))*Rcommand_step_yaw_);
+        step_length_x_(step) = phase_indicator_(step)*(Lcommand_step_length_x_) + (1-phase_indicator_(step))*(Rcommand_step_length_x_);
+        step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*(Lcommand_step_length_y_) + (1-phase_indicator_(step))*(Rcommand_step_length_y_));
+        step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*(Lcommand_step_yaw_) + (1-phase_indicator_(step))*(Rcommand_step_yaw_));
         foot_height_(step) = phase_indicator_(step)*Lcommand_foot_height_ + (1-phase_indicator_(step))*Rcommand_foot_height_;
         t_dsp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_) * hz_);
         t_dsp_seconds(step) = phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_;
@@ -1861,8 +1820,39 @@ void CustomController::updateFootstepCommand(){
 
 
         walking_tick = 0;
+        current_step_number++;
 
+        if (eval_mode){
+            if (step + current_step_number < planned_step_number){
+                step_length_x_(step) = step_length_x_planned(step + current_step_number);
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_planned(step + current_step_number);
+                step_yaw_(step) = (2*phase_indicator_(step) - 1) * (step_yaw_planned(step + current_step_number) );
+                foot_height_(step) = foot_height_planned(step + current_step_number);
+                t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
+                t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
+                t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
+                t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
+            }
+            else{
+                step_length_x_(step) = 0.;
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+                step_yaw_(step) = 0.;
+                foot_height_(step) = 0.1;
+                t_dsp_(step) = std::floor(0.1* hz_);
+                t_dsp_seconds(step) = 0.1;
+                t_ssp_(step) = std::floor(0.7 * hz_);
+                t_ssp_seconds(step) =0.7;
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
+            }
+
+            // step_length_x_(0) += x_error;
+            // step_length_y_(0) += y_error;
+            // step_yaw_(0) += yaw_error;
+
+        }
 
         calculateFootStepTotal();
 
