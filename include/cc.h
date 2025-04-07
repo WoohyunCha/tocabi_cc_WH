@@ -18,7 +18,6 @@ public:
     const double pd_hz_ = 2000;
     double del_t = 1 / hz_;
 
-
     void computeSlow();
     void computeFast();
     void computePlanner();
@@ -127,7 +126,7 @@ public:
                                        ? num_state + encoder_dim_
                                        : num_state;
     std::ofstream writeFile;
-    std::ofstream actuator_data_file;
+    std::ofstream evalFile;
 
     float phase_ = 0.0;
 
@@ -178,7 +177,7 @@ public:
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
-    std::string loadCommand(const std::string &command_file);
+    void loadCommand(const std::string &command_file);
 
 
     // BIPED WALKING PARAMETER
@@ -367,6 +366,18 @@ public:
 
     bool ideal_preview = false;
 
+    bool eval_mode = true; // Genearate a fixed set of commands. For comparison between methods.
+    int current_step_number = 0;
+    int planned_step_number = 12;
+    Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
+    Eigen::VectorXd foothold_y_planned;
+    Eigen::VectorXd foothold_yaw_planned;
+    Eigen::VectorXd t_dsp_planned;
+    Eigen::VectorXd t_ssp_planned;
+    Eigen::VectorXd foot_height_planned;
+    Eigen::Vector3d lfoot_global_state; // These are (X,Y,yaw) info in global frame coordinates. Used for generating next foothold commands when stepping stone coordinates are given in global frame coordinates.
+    Eigen::Vector3d rfoot_global_state;
+
 
     int iter_x_l=0;
     int iter_x_r=0;
@@ -443,6 +454,10 @@ public:
     std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.22);;
     std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.22);
     std::vector<double> last_buttons_7;
+
+    double x_error = 0;
+    double y_error = 0;
+    double yaw_error = 0;
 
     double norm;
 
