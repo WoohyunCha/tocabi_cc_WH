@@ -42,7 +42,7 @@ public:
     static const int num_action = 12;
     static const int num_actuator_action = 12;
     static const int num_cur_state = 66;
-    static const int num_cur_internal_state = 66;
+    static const int num_cur_internal_state = 80;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -371,12 +371,14 @@ public:
     bool eval_mode = true; // Genearate a fixed set of commands. For comparison between methods.
     int current_step_number = 0;
     int planned_step_number = 12;
-    Eigen::VectorXd step_length_x_planned;
-    Eigen::VectorXd step_length_y_planned;
-    Eigen::VectorXd step_yaw_planned;
+    Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
+    Eigen::VectorXd foothold_y_planned;
+    Eigen::VectorXd foothold_yaw_planned;
     Eigen::VectorXd t_dsp_planned;
     Eigen::VectorXd t_ssp_planned;
     Eigen::VectorXd foot_height_planned;
+    Eigen::Vector3d lfoot_global_state; // These are (X,Y,yaw) info in global frame coordinates. Used for generating next foothold commands when stepping stone coordinates are given in global frame coordinates.
+    Eigen::Vector3d rfoot_global_state;
 
 
     int iter_x_l=0;

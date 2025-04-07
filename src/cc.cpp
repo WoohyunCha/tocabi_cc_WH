@@ -435,12 +435,16 @@ void CustomController::initVariable()
 
 
     if (eval_mode){
-        step_length_x_planned.setZero(planned_step_number);
-        step_length_y_planned.setZero(planned_step_number);
-        step_yaw_planned.setZero(planned_step_number);
+        foothold_x_planned.setZero(planned_step_number);
+        foothold_y_planned.setZero(planned_step_number);
+        foothold_yaw_planned.setZero(planned_step_number);
         t_dsp_planned.setZero(planned_step_number);
         t_ssp_planned.setZero(planned_step_number);
         foot_height_planned.setZero(planned_step_number);
+        lfoot_global_state.setZero(3);
+        rfoot_global_state.setZero(3);
+        lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
+        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
         loadCommand(cur_path + "commands.txt");
     }
 }
@@ -1360,7 +1364,7 @@ void CustomController::computeSlow()
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
 
-            if (value_ < 0.0)
+            if (value_ < -100.0)
 
             {
 
@@ -1610,12 +1614,12 @@ void CustomController::loadCommand(const std::string &command_file)
         }
         }
 
-        if (key == "step_length_x_planned")
-        step_length_x_planned = vec;
-        else if (key == "step_length_y_planned")
-        step_length_y_planned = vec;
-        else if (key == "step_yaw_planned")
-        step_yaw_planned = vec;
+        if (key == "foothold_x_planned")
+        foothold_x_planned = vec;
+        else if (key == "foothold_y_planned")
+        foothold_y_planned = vec;
+        else if (key == "foothold_yaw_planned")
+        foothold_yaw_planned = vec;
         else if (key == "t_dsp_planned")
         t_dsp_planned = vec;
         else if (key == "t_ssp_planned")
@@ -1682,7 +1686,6 @@ void CustomController::updateInitialState()
     rfoot_support_init_yaw_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_global_init_);
     rfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(rfoot_support_init_yaw_.linear());
     lfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(lfoot_support_init_yaw_.linear());
-
 }
 
 
@@ -1694,6 +1697,12 @@ void CustomController::updateFootstepCommand(){
 
     if (walking_tick == 0){
 
+        // Compute Global Foot States, estimatesy
+
+        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
+        rfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm)(2);
+        lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
+        lfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm)(2);
 
         for (int step = 0; step < number_of_foot_step; step++){
             if (step == 0) phase_indicator_(step) = first_stance_foot_;
@@ -1713,20 +1722,36 @@ void CustomController::updateFootstepCommand(){
         }
 
         if (eval_mode){
+
+
             for (int step = 0; step < number_of_foot_step; step++){
 
                 if (step == 0) phase_indicator_(step) = first_stance_foot_;
                 else phase_indicator_(step) = 1-phase_indicator_(step-1);
 
-                step_length_x_(step) = step_length_x_planned(step);
-                step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_planned(step);
-                step_yaw_(step) = (2*phase_indicator_(step) - 1) * step_yaw_planned(step);
                 foot_height_(step) = foot_height_planned(step);
                 t_dsp_(step) = std::floor(t_dsp_planned(step) * hz_);
                 t_dsp_seconds(step) = t_dsp_planned(step);
                 t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
                 t_ssp_seconds(step) = t_ssp_planned(step);
                 t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+            }
+
+            Eigen::Vector3d &stance = (first_stance_foot_) ? rfoot_global_state : lfoot_global_state;
+            Eigen::Vector3d &swing = (first_stance_foot_) ? lfoot_global_state : rfoot_global_state;
+            double x_len = foothold_x_planned(0) - stance(0);
+            double y_len = foothold_y_planned(0) - stance(1);
+            step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+            step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+            step_yaw_(0) = foothold_yaw_planned(0) - stance(2);
+
+            for (int step = 1; step < number_of_foot_step; step++){
+                x_len = foothold_x_planned(step) - foothold_x_planned(step-1);
+                y_len = foothold_y_planned(step) - foothold_y_planned(step-1);
+                step_length_x_(step) = cos(-foothold_yaw_planned(step-1))*x_len - sin(-foothold_yaw_planned(step-1))*y_len;
+                step_length_y_(step) = sin(-foothold_yaw_planned(step-1))*x_len + cos(-foothold_yaw_planned(step-1))*y_len;
+                step_yaw_(step) = foothold_yaw_planned(step) - foothold_yaw_planned(step-1);
+
             }
         }
 
@@ -1773,7 +1798,7 @@ void CustomController::updateFootstepCommand(){
 
         x_error = (step_length_x_(0) - swing_state_stance_frame_(0)) ;
         y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
-        yaw_error = (DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0))) ;
+        yaw_error = (DyrosMath::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
 
 
         if (eval_mode){
@@ -1823,19 +1848,46 @@ void CustomController::updateFootstepCommand(){
         current_step_number++;
 
         if (eval_mode){
-            if (step + current_step_number < planned_step_number){
-                step_length_x_(step) = step_length_x_planned(step + current_step_number);
-                step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_planned(step + current_step_number);
-                step_yaw_(step) = (2*phase_indicator_(step) - 1) * (step_yaw_planned(step + current_step_number) );
-                foot_height_(step) = foot_height_planned(step + current_step_number);
-                t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
-                t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
-                t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
-                t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
-                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+            if (current_step_number < planned_step_number){
 
+                Eigen::Vector3d &stance = (phase_indicator_(0)) ? rfoot_global_state : lfoot_global_state;
+                Eigen::Vector3d &swing = (phase_indicator_(0)) ? lfoot_global_state : rfoot_global_state;
+                double x_len = foothold_x_planned(current_step_number) - stance(0);
+                double y_len = foothold_y_planned(current_step_number) - stance(1);
+                
+                step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+                step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+                step_yaw_(0) = foothold_yaw_planned(current_step_number) - stance(2);
+                for (int step = 1; step < number_of_foot_step; step++){
+                    if (step + current_step_number < planned_step_number){
+                        x_len = foothold_x_planned(step + current_step_number) - foothold_x_planned(step + current_step_number-1);
+                        y_len = foothold_y_planned(step + current_step_number) - foothold_y_planned(step + current_step_number-1);
+                        step_length_x_(step) = cos(-foothold_yaw_planned(step + current_step_number-1))*x_len - sin(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+                        step_length_y_(step) = sin(-foothold_yaw_planned(step + current_step_number-1))*x_len + cos(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+                        step_yaw_(step) = foothold_yaw_planned(step + current_step_number) - foothold_yaw_planned(step + current_step_number-1);
+    
+                        foot_height_(step) = foot_height_planned(step + current_step_number);
+                        t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
+                        t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
+                        t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
+                        t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
+                        t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+                    }
+                    else{
+                        step_length_x_(step) = 0.;
+                        step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+                        step_yaw_(step) = 0.;
+                        foot_height_(step) = 0.1;
+                        t_dsp_(step) = std::floor(0.1* hz_);
+                        t_dsp_seconds(step) = 0.1;
+                        t_ssp_(step) = std::floor(0.7 * hz_);
+                        t_ssp_seconds(step) =0.7;
+                        t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+    
+                    }
+                }
             }
-            else{
+            else {
                 step_length_x_(step) = 0.;
                 step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
                 step_yaw_(step) = 0.;
@@ -1848,11 +1900,7 @@ void CustomController::updateFootstepCommand(){
 
             }
 
-            // step_length_x_(0) += x_error;
-            // step_length_y_(0) += y_error;
-            // step_yaw_(0) += yaw_error;
-
-        }
+        }        
 
         calculateFootStepTotal();
 
@@ -1958,6 +2006,18 @@ void CustomController::getRobotState()
         y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
     }
 
+    // Compute Global Foot States, estimates
+
+    Eigen::Vector3d &stance = (phase_indicator_(0)) ? rfoot_global_state : lfoot_global_state;
+    Eigen::Vector3d &swing = (phase_indicator_(0)) ? lfoot_global_state : rfoot_global_state;
+    Eigen::Isometry3d &swing_stance = (phase_indicator_(0)) ? lfoot_support_current_ : rfoot_support_current_;
+    
+    double swing_yaw_stance = DyrosMath::rot2Euler(swing_stance.linear())(2);
+    swing(0) = stance(0) + cos(stance(2))*swing_stance.translation()(0) - sin(stance(2))*swing_stance.translation()(1);
+    swing(1) = stance(1) + sin(stance(2))*swing_stance.translation()(0) + cos(stance(2))*swing_stance.translation()(1);
+    swing(2) = stance(2) + swing_yaw_stance;
+
+  
 }
 
 void CustomController::calculateFootStepTotal()
