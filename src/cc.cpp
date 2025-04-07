@@ -11,12 +11,15 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
         if (is_on_robot_)
         {
             writeFile.open("/home/dyros/catkin_ws/src/tocabi_cc/result/data.csv", std::ofstream::out);
+            evalFile.open("/home/dyros/catkin_ws/src/tocabi_cc/result/eval_data.csv", std::ofstream::out);
         }
         else
         {
             writeFile.open("/home/cha/catkin_ws/src/tocabi_cc/result/data.csv", std::ofstream::out);
+            evalFile.open("/home/cha/catkin_ws/src/tocabi_cc/result/eval_data.csv", std::ofstream::out);
         }
         writeFile << std::fixed << std::setprecision(8);
+        evalFile << std::fixed << std::setprecision(8);
     }
     initVariable();
     std::cout << "Load network start\n" << std::endl;
@@ -372,50 +375,28 @@ void CustomController::initVariable()
                     10, 10,
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
-
     if (com_height_ == 0.68){
-
         q_init_ << 0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-
                     0.0, 0.0, -0.46, 1.04, -0.58, 0.0,
-
                     0.0, 0.0, 0.0,
-
                     0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
-
                     0.0, 0.0,
-
                     -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
-
     }
-
     else if (com_height_ == 0.728){
-
         q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
-
                     0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
-
                     0.0, 0.0, 0.0,
-
                     0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
-
                     0.0, 0.0,
-
                     -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
 
-
-
     }
-
     else {
-
         std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
         exit(0);
-
     }
-                
-                
+
     kp_.setZero();
     kv_.setZero();
     kp_.diagonal() <<   2000.0, 5000.0, 4000.0, 3700.0, 3200.0, 3200.0,
@@ -449,7 +430,20 @@ void CustomController::initVariable()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
     }
 
-    // loadCommand(cur_path + "commands.txt");
+
+    if (eval_mode){
+        foothold_x_planned.setZero(planned_step_number);
+        foothold_y_planned.setZero(planned_step_number);
+        foothold_yaw_planned.setZero(planned_step_number);
+        t_dsp_planned.setZero(planned_step_number);
+        t_ssp_planned.setZero(planned_step_number);
+        foot_height_planned.setZero(planned_step_number);
+        lfoot_global_state.setZero(3);
+        rfoot_global_state.setZero(3);
+        lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
+        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
+        loadCommand(cur_path + "commands.txt");
+    }
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -622,101 +616,40 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    // state_cur_(data_idx) = swing_state_stance_frame_(0);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(1);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(2);
-    // data_idx++;
-    // // state_cur_(data_idx) = target_swing_state_stance_frame_(3);
-    // // data_idx++;
-    // // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-    // // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(5);
-   // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(4);
-    // data_idx++;
-    // state_cur_(data_idx) = swing_state_stance_frame_(6);
-    // data_idx++;
-
     // state_cur_(data_idx) = com_state_stance_frame_(0);
     // data_idx++;
     // state_cur_(data_idx) = com_state_stance_frame_(1);
     // data_idx++;
     // state_cur_(data_idx) = com_state_stance_frame_(2);
     // data_idx++;
-     // state_cur_(data_idx) = target_com_state_stance_frame_(3);
+    // state_cur_(data_idx) = com_state_stance_frame_(3);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(4);
+    // state_cur_(data_idx) = com_state_stance_frame_(4);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
+    // state_cur_(data_idx) = com_state_stance_frame_(5);
     // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
+    // state_cur_(data_idx) = com_state_stance_frame_(6);
     // data_idx++;
-
-    // Eigen::Isometry3d &swing_foot_traj             = (is_lfoot_support == true && is_rfoot_support == false) ? rfoot_trajectory_support_ : lfoot_trajectory_support_;
-    // state_cur_(data_idx) = DyrosMath::rot2Euler(swing_foot_traj.linear())(2);
+    // state_cur_(data_idx) = swing_state_stance_frame_(0);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
+    // state_cur_(data_idx) = swing_state_stance_frame_(1);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
+    // state_cur_(data_idx) = swing_state_stance_frame_(2);
     // data_idx++;
-
-
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(0);
+    // state_cur_(data_idx) = swing_state_stance_frame_(3);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(1);
+    // state_cur_(data_idx) = swing_state_stance_frame_(4);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(2);
+    // state_cur_(data_idx) = swing_state_stance_frame_(5);
     // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(5);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(6);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(7);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(8);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(9);
-    // data_idx++;
-    // state_cur_(data_idx) = target_swing_state_stance_frame_(12);
-    // data_idx++;
-
-
-    // state_cur_(data_idx) = target_com_state_stance_frame_(0);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(1);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(5);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(6);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(7);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(8);
-    // data_idx++;
-    // state_cur_(data_idx) = target_com_state_stance_frame_(12);
-    // data_idx++;
-
-
-
-    // std::cout << "Swing and Com state" << std::endl;
-    // std::cout << setprecision(3) << "Walking tick : " << walking_tick / hz_ << std::endl;
-    // std::cout << setprecision(3) << target_swing_state_stance_frame_.transpose() << std::endl;
-    // std::cout << setprecision(3) << target_com_state_stance_frame_.transpose() << std::endl;
-
-    // state_cur_(data_idx) = walking_tick;
-
+    // state_cur_(data_idx) = swing_state_stance_frame_(6);
     // data_idx++;
 
 
 
     state_cur_(data_idx) = cos(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
-
     data_idx++;
-
     state_cur_(data_idx) = sin(float(walking_tick) / float(t_total_(0)) * 2 * M_PI);
-
     data_idx++;
 
     state_cur_(data_idx) = step_length_x_(0);
@@ -737,6 +670,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
         data_idx++;
     }
+
     state_buffer_.block(0, 0, num_cur_state*(num_state_skip*num_state_hist-1),1) = state_buffer_.block(num_cur_state, 0, num_cur_state*(num_state_skip*num_state_hist-1),1);
     state_history_.block(0, 0, num_cur_state, history_skip_*history_len_-1) = state_history_.block(0, 1, num_cur_state,history_skip_*history_len_-1);
 
@@ -1145,7 +1079,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             Lcommand_step_length_x_ = joy_length;
             Rcommand_step_length_x_ = joy_length;
         }else if(joy_x < 0.0){
-            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.3, 0.0);
+            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.2, 0.0);
             // joy_length_l =joy_length_temp*-joy_x;
             // joy_length_r =joy_length_temp*-joy_x;
                 // std::cout<<joy_length<<std::endl;
@@ -1177,17 +1111,17 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     if(joy->axes[7] == -1.0 && Lcommand_t_dsp_ < 0.2 && Lcommand_t_ssp_<1.0){ //long step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
             Lcommand_t_dsp_ = DyrosMath::minmax_cut(Lcommand_t_dsp_+0.01, 0.05, 0.2);
-            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_+0.05, 0.5, 1.0);
+            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_+0.05, 0.6, 1.0);
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
             ROS_INFO("%f",Lcommand_t_ssp_);
         }
 
-    }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.05 && Lcommand_t_ssp_> 0.5){//short step
+    }else if(joy->axes[7] == 1.0 && Lcommand_t_dsp_> 0.05 && Lcommand_t_ssp_> 0.6){//short step
         if(last_buttons_7[last_buttons_7.size()-2]==0.0){
             Lcommand_t_dsp_ = DyrosMath::minmax_cut(Lcommand_t_dsp_-0.01, 0.05, 0.2);
-            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_-0.05, 0.5, 1.0);
+            Lcommand_t_ssp_ = DyrosMath::minmax_cut(Lcommand_t_ssp_-0.05, 0.6, 1.0);
             Rcommand_t_dsp_ = Lcommand_t_dsp_;
             Rcommand_t_ssp_ = Lcommand_t_ssp_;
             ROS_INFO("%f",Lcommand_t_dsp_);
@@ -1206,8 +1140,8 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
             joy_length_temp+=0.06;//보폭
             joy_length_y_temp +=0.04;
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.45);
-            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.45);
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
 
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
@@ -1274,6 +1208,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     // target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
     // std::cout << "Rcommand_step_yaw_ :" << Rcommand_step_yaw_ << std::endl;
 }
+
 
 void CustomController::computeSlow()
 
@@ -1454,74 +1389,151 @@ void CustomController::computeSlow()
 
 
 
+
+
+
+
             {
+
+
+
+
 
 
 
                 writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
 
+
+
                 for (int i = 0; i < 6; i++)
+
                 writeFile << rd_cc_.LF_FT(i) << "\t";
 
+
+
                 for (int i = 0; i < 6; i++)
+
                 writeFile << rd_cc_.RF_FT(i) << "\t";
 
+
+
                 for (int i = 0; i < 33; i++)
+
                 writeFile << rd_cc_.torque_desired(i)  << "\t";
 
+
+
                 for (int i = 0; i < 33; i++)
+
                 writeFile << q_noise_(i) << "\t";
 
+
+
                 for (int i = 0; i < 33; i++)
+
                 writeFile << q_dot_lpf_(i) << "\t";
 
+
+
                 for (int i = 0; i < 3; i++)
+
                 writeFile << base_lin_vel(i) << "\t" ;
 
+
+
                 for (int i = 0; i < 3; i++)
+
                 writeFile << base_ang_vel(i) << "\t" ;
 
+
+
                 for (int i = 0; i < 33; i++)
+
                 writeFile << rd_cc_.q_dot_virtual_(6+i) << "\t";
 
+
+
                 for (int i = 0; i < 40; i++)
+
                 writeFile << rd_cc_.q_virtual_(i) << "\t";
+
+
 
                 writeFile << heading << "\t";
 
+
+
                 writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
 
+
+
                 for (int i = 0; i < 13; i++)
+
                 writeFile << target_swing_state_stance_frame_(i) << "\t";
 
+
+
                 for (int i = 0; i < 13; i++)
+
                 writeFile << target_com_state_stance_frame_(i) << "\t";
 
+
+
                 for (int i = 0; i < 13; i++)
+
                 writeFile << swing_state_stance_frame_(i) << "\t";
 
+
+
                 for (int i = 0; i < 13; i++)
+
                 writeFile << com_state_stance_frame_(i) << "\t";
 
+
+
                 for (int i = 0; i < 12; i++)
+
                 writeFile << q_leg_desired_(i) << "\t";
+
+
 
                 writeFile << ref_zmp_(walking_tick,0) << "\t";
 
+
+
                 writeFile << ref_zmp_(walking_tick, 1) << "\t";
+
+
 
                 // else writeFile << hidden_layer2_.transpose() << "\t";
 
 
 
+
+
+
+
                 writeFile << std::endl;
+
+
 
                 time_write_pre_ = rd_cc_.control_time_us_;
 
+
+
+
             }
+
+            
+
             time_inference_pre_ = rd_cc_.control_time_us_;
 
         }
+
+
+
+
+
 
 
         for (int i = 0; i < num_actuator_action; i++)
@@ -1646,89 +1658,51 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
     throw std::runtime_error("weights_path not found in configuration file.");
 }
 
-std::string CustomController::loadCommand(const std::string &command_file)
-{
-    std::ifstream file(command_file);
-    if (!file.is_open())
+void CustomController::loadCommand(const std::string &command_file)
     {
-        throw std::runtime_error("Cannot open command file: " + command_file);
-    }
-
-    std::string line, key, value;
-    while (std::getline(file, line))
-    {
-        // Skip empty lines (optional)
-        if (line.empty()) 
-            continue;
-
-        std::istringstream line_stream(line);
-        if (std::getline(line_stream, key, '=') && std::getline(line_stream, value))
+        std::ifstream file(command_file);
+        if (!file)
         {
-            // Convert 'value' string to double
-            double numericVal = std::stod(value);
-
-            // Now compare strings in if-else statements
-            if (key == "Lcommand_step_length_x_") {
-                Lcommand_step_length_x_ = numericVal;
-            } 
-            else if (key == "Lcommand_step_length_y_") {
-                Lcommand_step_length_y_ = numericVal;
-            } 
-            else if (key == "Lcommand_step_yaw_") {
-                Lcommand_step_yaw_ = numericVal;
-            } 
-            else if (key == "Lcommand_t_dsp_") {
-                Lcommand_t_dsp_ = numericVal;
-            }
-            else if (key == "Lcommand_t_ssp_") {
-                Lcommand_t_ssp_ = numericVal;
-            } 
-            else if (key == "Lcommand_foot_height_") {
-                Lcommand_foot_height_ = numericVal;
-            }
-            else if (key == "Rcommand_step_length_x_") {
-                Rcommand_step_length_x_ = numericVal;
-            }
-            else if (key == "Rcommand_step_length_y_") {
-                Rcommand_step_length_y_ = numericVal;
-            } 
-            else if (key == "Rcommand_step_yaw_") {
-                Rcommand_step_yaw_ = numericVal;
-            } 
-            else if (key == "Rcommand_t_dsp_") {
-                Rcommand_t_dsp_ = numericVal;
-            } 
-            else if (key == "Rcommand_t_ssp_") {
-                Rcommand_t_ssp_ = numericVal;
-            }
-            else if (key == "Rcommand_foot_height_") {
-                Rcommand_foot_height_ = numericVal;
-            }
-            else if (key == "weights_path") {
-                // If you have some string variable to store
-                // a path, you'd do something like:
-                // weights_path_ = value;
-            }
-            else
-            {
-                // Unrecognized key; you can ignore or warn, etc.
-                std::cerr << "Warning: unknown key '" << key << "' in " 
-                          << command_file << std::endl;
-            }
+        throw std::runtime_error("Cannot open command file: " + command_file);
         }
-    }
+
+        std::string line;
+        while (std::getline(file, line))
+        {
+        if (line.empty())
+        continue;
+
+        std::istringstream iss(line);
+        std::string key;
+        iss >> key;
+
+        Vector12d vec;
+        for (int i = 0; i < 12; i++)
+        {
+        if(!(iss >> vec(i)))
+        {
+        throw std::runtime_error("Error parsing 12 values for key: " + key);
+        }
+        }
+
+        if (key == "foothold_x_planned")
+        foothold_x_planned = vec;
+        else if (key == "foothold_y_planned")
+        foothold_y_planned = vec;
+        else if (key == "foothold_yaw_planned")
+        foothold_yaw_planned = vec;
+        else if (key == "t_dsp_planned")
+        t_dsp_planned = vec;
+        else if (key == "t_ssp_planned")
+        t_ssp_planned = vec;
+        else if (key == "foot_height_planned")
+        foot_height_planned = vec;
+        else
+        std::cerr << "Warning: Unknown key '" << key << "' in file " << command_file << std::endl;
+        }
 
     file.close();
-
-    // If you specifically require "weights_path" but haven't read it,
-    // you could throw here. Otherwise, remove this exception or change its logic.
-    // throw std::runtime_error("weights_path not found in configuration file.");
-    
-    // Return something if your function demands a std::string; 
-    // else you can make it void.
-    return {}; 
-}
-
+    }
 
 void CustomController::updateInitialState()
 {
@@ -1783,7 +1757,6 @@ void CustomController::updateInitialState()
     rfoot_support_init_yaw_ = DyrosMath::multiplyIsometry3d(DyrosMath::inverseIsometry3d(ref_frame), rfoot_global_init_);
     rfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(rfoot_support_init_yaw_.linear());
     lfoot_support_euler_init_yaw_ = DyrosMath::rot2Euler(lfoot_support_init_yaw_.linear());
-
 }
 
 
@@ -1795,6 +1768,12 @@ void CustomController::updateFootstepCommand(){
 
     if (walking_tick == 0){
 
+        // Compute Global Foot States, estimatesy
+
+        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
+        rfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm)(2);
+        lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
+        lfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm)(2);
 
         for (int step = 0; step < number_of_foot_step; step++){
             if (step == 0) phase_indicator_(step) = first_stance_foot_;
@@ -1811,6 +1790,40 @@ void CustomController::updateFootstepCommand(){
             t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
             
+        }
+
+        if (eval_mode){
+
+
+            for (int step = 0; step < number_of_foot_step; step++){
+
+                if (step == 0) phase_indicator_(step) = first_stance_foot_;
+                else phase_indicator_(step) = 1-phase_indicator_(step-1);
+
+                foot_height_(step) = foot_height_planned(step);
+                t_dsp_(step) = std::floor(t_dsp_planned(step) * hz_);
+                t_dsp_seconds(step) = t_dsp_planned(step);
+                t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
+                t_ssp_seconds(step) = t_ssp_planned(step);
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+            }
+
+            Eigen::Vector3d &stance = (first_stance_foot_) ? rfoot_global_state : lfoot_global_state;
+            Eigen::Vector3d &swing = (first_stance_foot_) ? lfoot_global_state : rfoot_global_state;
+            double x_len = foothold_x_planned(0) - stance(0);
+            double y_len = foothold_y_planned(0) - stance(1);
+            step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+            step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+            step_yaw_(0) = foothold_yaw_planned(0) - stance(2);
+
+            for (int step = 1; step < number_of_foot_step; step++){
+                x_len = foothold_x_planned(step) - foothold_x_planned(step-1);
+                y_len = foothold_y_planned(step) - foothold_y_planned(step-1);
+                step_length_x_(step) = cos(-foothold_yaw_planned(step-1))*x_len - sin(-foothold_yaw_planned(step-1))*y_len;
+                step_length_y_(step) = sin(-foothold_yaw_planned(step-1))*x_len + cos(-foothold_yaw_planned(step-1))*y_len;
+                step_yaw_(step) = foothold_yaw_planned(step) - foothold_yaw_planned(step-1);
+
+            }
         }
 
 
@@ -1848,6 +1861,27 @@ void CustomController::updateFootstepCommand(){
         std::cout << "Foot Position error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
         std::cout << ">> X error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << " [m]" << std::endl;
         std::cout << ">> Y error : " << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
+        Eigen::Quaterniond q1(swing_state_stance_frame_(6), swing_state_stance_frame_(3), swing_state_stance_frame_(4), swing_state_stance_frame_(5));
+        double swing_yaw = std::atan2(2.0 * (q1.w() * q1.z() + q1.x() * q1.y()),
+                             1.0 - 2.0 * (q1.y() * q1.y() + q1.z() * q1.z()));
+        std::cout << "Foot Yaw error : " << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
+        
+
+        x_error = (step_length_x_(0) - swing_state_stance_frame_(0)) ;
+        y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
+        yaw_error = (DyrosMath::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
+
+
+        if (eval_mode){
+            if (current_step_number < planned_step_number){
+                evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+                evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << "\t";
+                evalFile << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+                evalFile << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
+                evalFile << std::endl;
+
+            }
+        }
 
         step_length_x_.segment(0,number_of_foot_step-1) = step_length_x_.segment(1,number_of_foot_step-1);
 
@@ -1870,9 +1904,9 @@ void CustomController::updateFootstepCommand(){
         phase_indicator_(number_of_foot_step-1) = 1-phase_indicator_(number_of_foot_step-2);
 
         int step = number_of_foot_step-1;
-        step_length_x_(step) = phase_indicator_(step)*Lcommand_step_length_x_ + (1-phase_indicator_(step))*Rcommand_step_length_x_;
-        step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*Lcommand_step_length_y_ + (1-phase_indicator_(step))*Rcommand_step_length_y_);
-        step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*Lcommand_step_yaw_ + (1-phase_indicator_(step))*Rcommand_step_yaw_);
+        step_length_x_(step) = phase_indicator_(step)*(Lcommand_step_length_x_) + (1-phase_indicator_(step))*(Rcommand_step_length_x_);
+        step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*(Lcommand_step_length_y_) + (1-phase_indicator_(step))*(Rcommand_step_length_y_));
+        step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*(Lcommand_step_yaw_) + (1-phase_indicator_(step))*(Rcommand_step_yaw_));
         foot_height_(step) = phase_indicator_(step)*Lcommand_foot_height_ + (1-phase_indicator_(step))*Rcommand_foot_height_;
         t_dsp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_) * hz_);
         t_dsp_seconds(step) = phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_;
@@ -1882,8 +1916,62 @@ void CustomController::updateFootstepCommand(){
 
 
         walking_tick = 0;
+        current_step_number++;
 
+        if (eval_mode){
+            if (current_step_number < planned_step_number){
 
+                Eigen::Vector3d &stance = (phase_indicator_(0)) ? rfoot_global_state : lfoot_global_state;
+                Eigen::Vector3d &swing = (phase_indicator_(0)) ? lfoot_global_state : rfoot_global_state;
+                double x_len = foothold_x_planned(current_step_number) - stance(0);
+                double y_len = foothold_y_planned(current_step_number) - stance(1);
+                
+                step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+                step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+                step_yaw_(0) = foothold_yaw_planned(current_step_number) - stance(2);
+                for (int step = 1; step < number_of_foot_step; step++){
+                    if (step + current_step_number < planned_step_number){
+                        x_len = foothold_x_planned(step + current_step_number) - foothold_x_planned(step + current_step_number-1);
+                        y_len = foothold_y_planned(step + current_step_number) - foothold_y_planned(step + current_step_number-1);
+                        step_length_x_(step) = cos(-foothold_yaw_planned(step + current_step_number-1))*x_len - sin(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+                        step_length_y_(step) = sin(-foothold_yaw_planned(step + current_step_number-1))*x_len + cos(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+                        step_yaw_(step) = foothold_yaw_planned(step + current_step_number) - foothold_yaw_planned(step + current_step_number-1);
+    
+                        foot_height_(step) = foot_height_planned(step + current_step_number);
+                        t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
+                        t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
+                        t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
+                        t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
+                        t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+                    }
+                    else{
+                        step_length_x_(step) = 0.;
+                        step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+                        step_yaw_(step) = 0.;
+                        foot_height_(step) = 0.1;
+                        t_dsp_(step) = std::floor(0.1* hz_);
+                        t_dsp_seconds(step) = 0.1;
+                        t_ssp_(step) = std::floor(0.7 * hz_);
+                        t_ssp_seconds(step) =0.7;
+                        t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+    
+                    }
+                }
+            }
+            else {
+                step_length_x_(step) = 0.;
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+                step_yaw_(step) = 0.;
+                foot_height_(step) = 0.1;
+                t_dsp_(step) = std::floor(0.1* hz_);
+                t_dsp_seconds(step) = 0.1;
+                t_ssp_(step) = std::floor(0.7 * hz_);
+                t_ssp_seconds(step) =0.7;
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
+            }
+
+        }        
 
         calculateFootStepTotal();
 
@@ -1989,6 +2077,18 @@ void CustomController::getRobotState()
         y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
     }
 
+    // Compute Global Foot States, estimates
+
+    Eigen::Vector3d &stance = (phase_indicator_(0)) ? rfoot_global_state : lfoot_global_state;
+    Eigen::Vector3d &swing = (phase_indicator_(0)) ? lfoot_global_state : rfoot_global_state;
+    Eigen::Isometry3d &swing_stance = (phase_indicator_(0)) ? lfoot_support_current_ : rfoot_support_current_;
+    
+    double swing_yaw_stance = DyrosMath::rot2Euler(swing_stance.linear())(2);
+    swing(0) = stance(0) + cos(stance(2))*swing_stance.translation()(0) - sin(stance(2))*swing_stance.translation()(1);
+    swing(1) = stance(1) + sin(stance(2))*swing_stance.translation()(0) + cos(stance(2))*swing_stance.translation()(1);
+    swing(2) = stance(2) + swing_yaw_stance;
+
+  
 }
 
 void CustomController::calculateFootStepTotal()
@@ -2362,7 +2462,6 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
     Q_bar(0, 0) = Qe(0, 0);
 
     Eigen::Matrix4d K; K.setZero();
-
     if (com_height_ == 0.7){
         K(0, 0) = 68.7921510770868;
         K(0, 1) = 2331.78394937073;
@@ -2382,43 +2481,25 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
         K(3, 3) = 0.115349533788953;
     }
 
-
-
     else if (com_height_ == 0.728){
-
         K(0, 0) = 70.0813009391222;
-
         K(0, 1) = 2420.65372019101;
-
         K(0, 2) = 669.387885399937;
-
         K(0, 3) = 2.72127899669319;
-
         K(1, 0) = 2420.65372019101;
-
         K(1, 1) = 85969.0761591658;
-
         K(1, 2) = 23782.1340369413;
-
         K(1, 3) = 99.0855302680049;
-
         K(2, 0) = 669.387885399937;
-
         K(2, 1) = 23782.1340369413;
-
         K(2, 2) = 6579.12894080612;
-
         K(2, 3) = 27.4486400273521;
-
         K(3, 0) = 2.72127899669319;
-
         K(3, 1) = 99.0855302680049;
-
         K(3, 2) = 27.4486400273521;
-
         K(3, 3) = 0.125016968799296;
-
     }
+
     // // 0.65m
     else if (com_height_ == 0.65){
         K(0, 0) = 66.4281134896190;
@@ -2488,21 +2569,15 @@ void CustomController::preview_Parameter(double dt, int NL, Eigen::MatrixXd &Gi,
         Gx(0, 2) = 128.255400226113;
     }
 
-
     // 0.728m
-
     else if (com_height_ == 0.728){
-
         Gi(0, 0) = 556.382091536873; //Temp_mat_inv * B_bar_tran * K * I_bar ;
-
         //Gx = Temp_mat_inv * B_bar_tran * K * F_bar ;
-
         Gx(0, 0) = 38991.9807941560;
-
         Gx(0, 1) = 11086.4028841705;
-
         Gx(0, 2) = 130.234568101964;
     }
+
     // 0.65m
     else if (com_height_ == 0.65){
         Gi(0, 0) = 573.462734668883; //Temp_mat_inv * B_bar_tran * K * I_bar ;
@@ -2763,35 +2838,20 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(11) = 0.;
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick+1);
 
-
     if (com_height_ == 0.68){
-
         target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-
         DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
-
         DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
 
-
-
     }
-
     else if (com_height_ == 0.728){
-
         target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-
         DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.04, 0.04), 
-
         DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
-
     }
-
     else{
-
         std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-
         exit(0);
-
     }
     target_com_state_float_frame_.linear() = Eigen::Matrix3d::Identity();
 
