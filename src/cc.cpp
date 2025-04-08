@@ -431,19 +431,28 @@ void CustomController::initVariable()
     }
 
 
-    if (eval_mode){
+    if (ctrl_mode){
+
         foothold_x_planned.setZero(planned_step_number);
+
         foothold_y_planned.setZero(planned_step_number);
+
         foothold_yaw_planned.setZero(planned_step_number);
+
         t_dsp_planned.setZero(planned_step_number);
+
         t_ssp_planned.setZero(planned_step_number);
+
         foot_height_planned.setZero(planned_step_number);
+
         lfoot_global_state.setZero(3);
+
         rfoot_global_state.setZero(3);
-        lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
-        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
+
         loadCommand(cur_path + "commands.txt");
+
     }
+
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -1658,51 +1667,99 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
     throw std::runtime_error("weights_path not found in configuration file.");
 }
 
+
 void CustomController::loadCommand(const std::string &command_file)
+
     {
+
         std::ifstream file(command_file);
+
         if (!file)
+
         {
+
         throw std::runtime_error("Cannot open command file: " + command_file);
+
         }
+
+
 
         std::string line;
+
         while (std::getline(file, line))
+
         {
+
         if (line.empty())
+
         continue;
 
+
+
         std::istringstream iss(line);
+
         std::string key;
+
         iss >> key;
 
-        Vector12d vec;
-        for (int i = 0; i < 12; i++)
+
+
+        VectorXd vec;
+
+        vec.setZero(planned_step_number);
+
+        for (int i = 0; i < planned_step_number; i++)
+
         {
+
         if(!(iss >> vec(i)))
+
         {
-        throw std::runtime_error("Error parsing 12 values for key: " + key);
+
+        throw std::runtime_error("Error parsing values for key: " + key);
+
         }
+
         }
+
+
 
         if (key == "foothold_x_planned")
+
         foothold_x_planned = vec;
+
         else if (key == "foothold_y_planned")
+
         foothold_y_planned = vec;
+
         else if (key == "foothold_yaw_planned")
+
         foothold_yaw_planned = vec;
+
         else if (key == "t_dsp_planned")
+
         t_dsp_planned = vec;
+
         else if (key == "t_ssp_planned")
+
         t_ssp_planned = vec;
+
         else if (key == "foot_height_planned")
+
         foot_height_planned = vec;
+
         else
+
         std::cerr << "Warning: Unknown key '" << key << "' in file " << command_file << std::endl;
+
         }
 
+
+
     file.close();
+
     }
+
 
 void CustomController::updateInitialState()
 {
@@ -1766,234 +1823,519 @@ void CustomController::updateFootstepCommand(){
 
 
 
+
+
+
+
     if (walking_tick == 0){
+
+
 
         // Compute Global Foot States, estimatesy
 
-        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
-        rfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm)(2);
         lfoot_global_state.segment(0,2) = rd_cc_.link_[Left_Foot].xpos.segment(0,2);
+
+        rfoot_global_state.segment(0,2) = rd_cc_.link_[Right_Foot].xpos.segment(0,2);
+
         lfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Left_Foot].rotm)(2);
 
+        rfoot_global_state(2) = DyrosMath::rot2Euler(rd_cc_.link_[Right_Foot].rotm)(2);
+
+        lfoot_global_state(0) += 0.03;
+
+        rfoot_global_state(0) += 0.03;
+
         for (int step = 0; step < number_of_foot_step; step++){
+
             if (step == 0) phase_indicator_(step) = first_stance_foot_;
+
             else phase_indicator_(step) = 1-phase_indicator_(step-1);
 
+
+
             step_length_x_(step) = phase_indicator_(step)*Lcommand_step_length_x_ + (1-phase_indicator_(step))*Rcommand_step_length_x_;
+
             step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*Lcommand_step_length_y_ + (1-phase_indicator_(step))*Rcommand_step_length_y_);
+
             step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*Lcommand_step_yaw_ + (1-phase_indicator_(step))*Rcommand_step_yaw_);
+
             foot_height_(step) = phase_indicator_(step)*Lcommand_foot_height_ + (1-phase_indicator_(step))*Rcommand_foot_height_;
+
             t_dsp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_) * hz_);
+
             t_dsp_seconds(step) = phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_;
+
             t_ssp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_ssp_ + (1-phase_indicator_(step))*Rcommand_t_ssp_ )* hz_);
+
             t_ssp_seconds(step) = phase_indicator_(step)*Lcommand_t_ssp_ + (1-phase_indicator_(step))*Rcommand_t_ssp_;
+
             t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
+
+
             
+
         }
 
-        if (eval_mode){
 
+
+        switch (ctrl_mode)
+
+        {
+
+        case 0:
+
+            break;
+
+        case 1: // Stepping stone
+
+        {
 
             for (int step = 0; step < number_of_foot_step; step++){
 
+
+
                 if (step == 0) phase_indicator_(step) = first_stance_foot_;
+
                 else phase_indicator_(step) = 1-phase_indicator_(step-1);
 
+
+
                 foot_height_(step) = foot_height_planned(step);
+
                 t_dsp_(step) = std::floor(t_dsp_planned(step) * hz_);
+
                 t_dsp_seconds(step) = t_dsp_planned(step);
+
                 t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
+
                 t_ssp_seconds(step) = t_ssp_planned(step);
+
                 t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
-            }
+
+            }        
 
             Eigen::Vector3d &stance = (first_stance_foot_) ? rfoot_global_state : lfoot_global_state;
+
             Eigen::Vector3d &swing = (first_stance_foot_) ? lfoot_global_state : rfoot_global_state;
+
             double x_len = foothold_x_planned(0) - stance(0);
+
             double y_len = foothold_y_planned(0) - stance(1);
+
             step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+
             step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+
             step_yaw_(0) = foothold_yaw_planned(0) - stance(2);
 
+
+
             for (int step = 1; step < number_of_foot_step; step++){
+
                 x_len = foothold_x_planned(step) - foothold_x_planned(step-1);
+
                 y_len = foothold_y_planned(step) - foothold_y_planned(step-1);
+
                 step_length_x_(step) = cos(-foothold_yaw_planned(step-1))*x_len - sin(-foothold_yaw_planned(step-1))*y_len;
+
                 step_length_y_(step) = sin(-foothold_yaw_planned(step-1))*x_len + cos(-foothold_yaw_planned(step-1))*y_len;
+
                 step_yaw_(step) = foothold_yaw_planned(step) - foothold_yaw_planned(step-1);
 
+
+
             }
+
+            break;
+
+        }
+
+
+
+        case 2:
+
+        {
+
+            for (int step = 0; step < number_of_foot_step; step++){
+
+
+
+                if (step == 0) phase_indicator_(step) = first_stance_foot_;
+
+                else phase_indicator_(step) = 1-phase_indicator_(step-1);
+
+
+
+                step_length_x_(step) = foothold_x_planned(step);
+
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) * foothold_y_planned(step);
+
+                step_yaw_(step) = (2*phase_indicator_(step) - 1) * foothold_yaw_planned(step);
+
+                foot_height_(step) = foot_height_planned(step);
+
+                t_dsp_(step) = std::floor(t_dsp_planned(step) * hz_);
+
+                t_dsp_seconds(step) = t_dsp_planned(step);
+
+                t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
+
+                t_ssp_seconds(step) = t_ssp_planned(step);
+
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
+            }
+
+            break;
+
+        }
+
+
+
+        default:
+
+            break;
+
         }
 
 
 
         calculateFootStepTotal();
 
-
-
         getRobotState();
-
-
 
         updateInitialState();
 
-
-
         getZmpTrajectory();
-
-
 
         resetPreviewState();
 
-
-
     }
-
-
-
-
 
 
 
     else if (walking_tick > t_total_(0)){
 
+
+
         std::cout << "Foot Position error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
+
         std::cout << ">> X error : " << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << " [m]" << std::endl;
+
         std::cout << ">> Y error : " << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << " [m]" << std::endl;
+
         Eigen::Quaterniond q1(swing_state_stance_frame_(6), swing_state_stance_frame_(3), swing_state_stance_frame_(4), swing_state_stance_frame_(5));
+
         double swing_yaw = std::atan2(2.0 * (q1.w() * q1.z() + q1.x() * q1.y()),
+
                              1.0 - 2.0 * (q1.y() * q1.y() + q1.z() * q1.z()));
+
         std::cout << "Foot Yaw error : " << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
+
         
 
+
+
         x_error = (step_length_x_(0) - swing_state_stance_frame_(0)) ;
+
         y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
+
         yaw_error = (DyrosMath::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
 
 
-        if (eval_mode){
+
+
+
+        if (ctrl_mode){
+
             if (current_step_number < planned_step_number){
+
                 evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+
                 evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << "\t";
+
                 evalFile << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
+
                 evalFile << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
+
                 evalFile << std::endl;
 
+
+
             }
+
         }
+
+
 
         step_length_x_.segment(0,number_of_foot_step-1) = step_length_x_.segment(1,number_of_foot_step-1);
 
+
+
         step_length_y_.segment(0,number_of_foot_step-1) = step_length_y_.segment(1,number_of_foot_step-1);
+
+
 
         step_yaw_.segment(0,number_of_foot_step-1) = step_yaw_.segment(1,number_of_foot_step-1);
 
+
+
         t_dsp_.segment(0,number_of_foot_step-1) = t_dsp_.segment(1,number_of_foot_step-1);
+
         t_dsp_seconds.segment(0,number_of_foot_step-1) = t_dsp_seconds.segment(1,number_of_foot_step-1);
 
+
+
         t_ssp_.segment(0,number_of_foot_step-1) = t_ssp_.segment(1,number_of_foot_step-1);
+
         t_ssp_seconds.segment(0,number_of_foot_step-1) = t_ssp_seconds.segment(1,number_of_foot_step-1);
+
+
 
         t_total_.segment(0, number_of_foot_step-1) = t_total_.segment(1, number_of_foot_step-1);
 
+
+
         foot_height_.segment(0,number_of_foot_step-1) = foot_height_.segment(1,number_of_foot_step-1);
+
+
 
         phase_indicator_.segment(0,number_of_foot_step-1) = phase_indicator_.segment(1,number_of_foot_step-1);
 
+
+
         phase_indicator_(number_of_foot_step-1) = 1-phase_indicator_(number_of_foot_step-2);
 
+
+
         int step = number_of_foot_step-1;
+
         step_length_x_(step) = phase_indicator_(step)*(Lcommand_step_length_x_) + (1-phase_indicator_(step))*(Rcommand_step_length_x_);
+
         step_length_y_(step) = (2*phase_indicator_(step) - 1) *(phase_indicator_(step)*(Lcommand_step_length_y_) + (1-phase_indicator_(step))*(Rcommand_step_length_y_));
+
         step_yaw_(step) = (2*phase_indicator_(step) - 1) * (phase_indicator_(step)*(Lcommand_step_yaw_) + (1-phase_indicator_(step))*(Rcommand_step_yaw_));
+
         foot_height_(step) = phase_indicator_(step)*Lcommand_foot_height_ + (1-phase_indicator_(step))*Rcommand_foot_height_;
+
         t_dsp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_) * hz_);
+
         t_dsp_seconds(step) = phase_indicator_(step)*Lcommand_t_dsp_ + (1-phase_indicator_(step))*Rcommand_t_dsp_;
+
         t_ssp_(step) = std::floor((phase_indicator_(step)*Lcommand_t_ssp_ + (1-phase_indicator_(step))*Rcommand_t_ssp_ )* hz_);
+
         t_ssp_seconds(step) = phase_indicator_(step)*Lcommand_t_ssp_ + (1-phase_indicator_(step))*Rcommand_t_ssp_;
+
         t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
 
+
+
+
         walking_tick = 0;
+
         current_step_number++;
 
-        if (eval_mode){
+
+
+        switch (ctrl_mode)
+
+        {
+
+        case 0:
+
+            break;
+
+        case 1:
+
+        {
+
             if (current_step_number < planned_step_number){
 
+
+
                 Eigen::Vector3d &stance = (phase_indicator_(0)) ? rfoot_global_state : lfoot_global_state;
+
                 Eigen::Vector3d &swing = (phase_indicator_(0)) ? lfoot_global_state : rfoot_global_state;
+
                 double x_len = foothold_x_planned(current_step_number) - stance(0);
+
                 double y_len = foothold_y_planned(current_step_number) - stance(1);
+
                 
+
                 step_length_x_(0) = cos(-stance(2))*x_len - sin(-stance(2))*y_len;
+
                 step_length_y_(0) = sin(-stance(2))*x_len + cos(-stance(2))*y_len;
+
                 step_yaw_(0) = foothold_yaw_planned(current_step_number) - stance(2);
+
                 for (int step = 1; step < number_of_foot_step; step++){
+
                     if (step + current_step_number < planned_step_number){
+
                         x_len = foothold_x_planned(step + current_step_number) - foothold_x_planned(step + current_step_number-1);
+
                         y_len = foothold_y_planned(step + current_step_number) - foothold_y_planned(step + current_step_number-1);
+
                         step_length_x_(step) = cos(-foothold_yaw_planned(step + current_step_number-1))*x_len - sin(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+
                         step_length_y_(step) = sin(-foothold_yaw_planned(step + current_step_number-1))*x_len + cos(-foothold_yaw_planned(step + current_step_number-1))*y_len;
+
                         step_yaw_(step) = foothold_yaw_planned(step + current_step_number) - foothold_yaw_planned(step + current_step_number-1);
-    
+
+
+
                         foot_height_(step) = foot_height_planned(step + current_step_number);
+
                         t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
+
                         t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
+
                         t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
+
                         t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
+
                         t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
                     }
+
                     else{
+
                         step_length_x_(step) = 0.;
+
                         step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+
                         step_yaw_(step) = 0.;
+
                         foot_height_(step) = 0.1;
+
                         t_dsp_(step) = std::floor(0.1* hz_);
+
                         t_dsp_seconds(step) = 0.1;
+
                         t_ssp_(step) = std::floor(0.7 * hz_);
+
                         t_ssp_seconds(step) =0.7;
+
                         t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
-    
+
+
+
                     }
+
                 }
+
             }
+
             else {
+
                 step_length_x_(step) = 0.;
+
                 step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+
                 step_yaw_(step) = 0.;
+
                 foot_height_(step) = 0.1;
+
                 t_dsp_(step) = std::floor(0.1* hz_);
+
                 t_dsp_seconds(step) = 0.1;
+
                 t_ssp_(step) = std::floor(0.7 * hz_);
+
                 t_ssp_seconds(step) =0.7;
+
                 t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
+
+
             }
 
-        }        
+            break;            
+
+        }
+
+
+
+        case 2:
+
+        {
+
+            if (step + current_step_number < planned_step_number){
+
+                step_length_x_(step) = foothold_x_planned(step + current_step_number);
+
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) * foothold_y_planned(step + current_step_number);
+
+                step_yaw_(step) = (2*phase_indicator_(step) - 1) * (foothold_yaw_planned(step + current_step_number) );
+
+                foot_height_(step) = foot_height_planned(step + current_step_number);
+
+                t_dsp_(step) = std::floor(t_dsp_planned(step + current_step_number) * hz_);
+
+                t_dsp_seconds(step) = t_dsp_planned(step + current_step_number);
+
+                t_ssp_(step) = std::floor(t_ssp_planned(step + current_step_number) * hz_);
+
+                t_ssp_seconds(step) = t_ssp_planned(step + current_step_number);
+
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
+
+
+            }
+
+            else{
+
+                step_length_x_(step) = 0.;
+
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) *0.21;
+
+                step_yaw_(step) = 0.;
+
+                foot_height_(step) = 0.1;
+
+                t_dsp_(step) = std::floor(0.1* hz_);
+
+                t_dsp_seconds(step) = 0.1;
+
+                t_ssp_(step) = std::floor(0.7 * hz_);
+
+                t_ssp_seconds(step) =0.7;
+
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+
+
+
+            }
+
+            break;
+
+        }
+
+
+
+        default:
+
+            break;
+
+        }
 
         calculateFootStepTotal();
 
-
-
         getRobotState();
-
-
 
         updateInitialState();
 
-
-
         getZmpTrajectory();
-
-
 
         resetPreviewState();
 
-
-
     }
+
+
 
 }
 
