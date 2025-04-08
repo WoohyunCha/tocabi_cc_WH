@@ -351,24 +351,27 @@ public:
 
     // USER COMMAND
     double Lcommand_step_length_x_ = 0.;
-    double Lcommand_step_length_y_ = 0.22;
+    double Lcommand_step_length_y_ = 0.21;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = .8;
+    double Lcommand_t_ssp_ = .7;
     double Lcommand_foot_height_ = 0.12;
 
     double Rcommand_step_length_x_ = 0.;
-    double Rcommand_step_length_y_ = 0.22;
+    double Rcommand_step_length_y_ = 0.21;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = .8;
+    double Rcommand_t_ssp_ = .7;
     double Rcommand_foot_height_ = 0.12;
 
     bool ideal_preview = false;
 
-    bool eval_mode = true; // Genearate a fixed set of commands. For comparison between methods.
+
+    int ctrl_mode = 2; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
+
     int current_step_number = 0;
-    int planned_step_number = 12;
+
+    int planned_step_number = 30;
     Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
     Eigen::VectorXd foothold_y_planned;
     Eigen::VectorXd foothold_yaw_planned;
@@ -402,7 +405,7 @@ public:
     double joy_y;
     double joy_height = 0.12;
     double joy_length =0.0;
-    double joy_length_y =0.22;
+    double joy_length_y =0.21;
     double joy_length_temp =0.2;
     double joy_length_y_temp =0.35;
     double joy_length_command =0.;
@@ -411,12 +414,12 @@ public:
     double joy_length_previous=0.0;
     double joy_length_r =0.;
     double joy_length_l =0.;
-    double joy_length_y_l =0.22;
-    double joy_length_y_r =0.22;
-    double joy_length_y_r_temp =0.22;
-    double joy_length_y_l_temp =0.22;
-    double joy_length_y_l_previous =0.22;
-    double joy_length_y_r_previous =0.22;
+    double joy_length_y_l =0.21;
+    double joy_length_y_r =0.21;
+    double joy_length_y_r_temp =0.21;
+    double joy_length_y_l_temp =0.21;
+    double joy_length_y_l_previous =0.21;
+    double joy_length_y_r_previous =0.21;
     double joy_yaw_r =0.;
     double joy_yaw_l =0.;
     double joy_yaw_l_previous =0.;
@@ -451,8 +454,8 @@ public:
     std::vector<double> swing_previous_l_vec;
     std::vector<double> joy_yaw_l_previous_vec = std::vector<double>(10,0.0);
     std::vector<double> joy_yaw_r_previous_vec= std::vector<double>(10,0.0);
-    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.22);;
-    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.22);
+    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.21);;
+    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.21);
     std::vector<double> last_buttons_7;
 
     double x_error = 0;
