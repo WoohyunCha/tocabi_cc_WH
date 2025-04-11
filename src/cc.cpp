@@ -584,11 +584,11 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     projected_grav = q.conjugate()*grav;
 
     // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    // state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(0));
     // data_idx++;
-    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    // state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(1));
     // data_idx++;
-    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+    // state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(2));
     // data_idx++;
     state_cur_(data_idx) = q.x();
     data_idx++;
@@ -2031,7 +2031,7 @@ void CustomController::updateFootstepCommand(){
 
                              1.0 - 2.0 * (q1.y() * q1.y() + q1.z() * q1.z()));
 
-        std::cout << "Foot Yaw error : " << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
+        std::cout << "Foot Yaw error : " << sqrt(pow(CustomController::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
 
         
 
@@ -2041,7 +2041,7 @@ void CustomController::updateFootstepCommand(){
 
         y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
 
-        yaw_error = (DyrosMath::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
+        yaw_error = (CustomController::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
 
 
 
@@ -2057,7 +2057,7 @@ void CustomController::updateFootstepCommand(){
 
                 evalFile << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
 
-                evalFile << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
+                evalFile << sqrt(pow(CustomController::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
 
                 evalFile << std::endl;
 
