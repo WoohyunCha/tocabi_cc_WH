@@ -491,7 +491,13 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
-
+    double wrap_to_pi(double angles){
+        angles = fmod(angles, 2*M_PI);
+        if (angles > M_PI){
+          angles -= 2*M_PI;    
+        }
+        return angles;
+      }
 private:
     Eigen::VectorQd ControlVal_;
     unsigned int walking_tick = 0;
