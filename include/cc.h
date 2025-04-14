@@ -371,7 +371,7 @@ public:
 
     int current_step_number = 0;
 
-    int planned_step_number = 7;
+    int planned_step_number = 12;
     Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
     Eigen::VectorXd foothold_y_planned;
     Eigen::VectorXd foothold_yaw_planned;
