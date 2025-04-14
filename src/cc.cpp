@@ -2306,6 +2306,7 @@ void CustomController::getComTrajectory()
 
     com_desired_(0) = x_preview_(0);
     com_desired_(1) = y_preview_(0);
+
     com_desired_(2) = com_height_;
     com_desired_dot_(0) = x_preview_(1);
     com_desired_dot_(1) = y_preview_(1);
