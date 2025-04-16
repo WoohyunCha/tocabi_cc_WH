@@ -1,10 +1,8 @@
 close all; clc;
 d1 = load('data.csv');
-d2 = load('data_yongarry.txt');
-d3 = load('data_yongarry_standstill.txt');
 
 plot_start_time = 2;
-plot_end_time = 8;
+plot_end_time = 12;
 
 torque_data_yongarry = d2(:, 13:20);
 plot_indices_yongarry = 250*plot_start_time:250*plot_end_time;
@@ -75,13 +73,6 @@ command_len = 3;
 end_index = start_index + command_len - 1;
 command_data = d1(:, start_index:end_index);
 
-start_index = end_index+1;
-latent_len = 512;
-end_index = start_index + latent_len - 1;
-latent_data = d1(:, start_index:end_index);
-
-writematrix(latent_data, 'latent3.csv');
-
 data_len = size(d1, 1); % number of rows in d1
 time = zeros(data_len);
 for i=2:size(d1,1)-1
@@ -121,16 +112,12 @@ for i = 1:foot_force_len
 end
 
 
-% figure(2)
-% sgtitle('Morph params')
-% start_index = end_index+1;
-% end_index = start_index+3;
-% morph_params = d1(:, start_index:end_index);
-% for i = 1:4
-%     subplot(1,4,i);
-%     smoothed_data = smooth(morph_params(:, i), 0.05, 'moving');
-%     plot(time(plot_indices), smoothed_data(plot_indices, :));
-% end
+figure(7)
+sgtitle('joint pose')
+for i = 1:12
+    subplot(2,6,i);
+    plot(time(plot_indices), q_noise_(plot_indices, i));
+end
 
 figure(3)
 sgtitle('Velocity and Heading');

@@ -41,7 +41,7 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 66;
+    static const int num_cur_state = 54;
     static const int num_cur_internal_state = 80;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
@@ -366,9 +366,9 @@ public:
 
     bool ideal_preview = false;
 
-    int ctrl_mode = 1; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
+    int ctrl_mode = 2; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
     int current_step_number = 0;
-    int planned_step_number = 12; // 30
+    int planned_step_number = 30; // 30
     Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
     Eigen::VectorXd foothold_y_planned;
     Eigen::VectorXd foothold_yaw_planned;
