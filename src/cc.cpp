@@ -1246,8 +1246,11 @@ void CustomController::copyRobotData(RobotData &rd_l)
 
 void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-    target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], -0.2, 0.5);
-    target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
+    target_vel_x_ = DyrosMath::minmax_cut(0.5*sqrt(pow(joy->axes[1],2) + pow(joy->axes[0],2)), 0., 0.5);
+    if ((abs(joy->axes[0]) > 0.1) && (abs(joy->axes[1]) > 0.1))
+    target_heading_ = DyrosMath::minmax_cut(DyrosMath::wrap_to_pi(atan2(joy->axes[0], joy->axes[1])) , -3.14, 3.14);
+    else
+    target_heading_ = 0.0;
 }
 
 void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
