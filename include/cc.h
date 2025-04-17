@@ -367,7 +367,7 @@ public:
     bool ideal_preview = false;
 
 
-    int ctrl_mode = 1; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
+    int ctrl_mode = 0; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
 
     int current_step_number = 0;
 
