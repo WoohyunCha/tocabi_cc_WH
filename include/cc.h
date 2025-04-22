@@ -41,7 +41,7 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 54;
+    static const int num_cur_state = 66;
     static const int num_cur_internal_state = 80;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
@@ -156,6 +156,8 @@ public:
     double time_pre_;
     double action_dt_accumulate_ = 0.0;
 
+    Vector3_t base_lin_vel, base_ang_vel;
+    double heading;
     Eigen::Vector3d euler_angle_;
 
     // Joystick
@@ -164,16 +166,6 @@ public:
     void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
     ros::Subscriber joy_sub_;
 
-    // slider command
-    Vector3_t base_lin_vel, base_ang_vel;
-
-    double target_vel_x_ = 0.0;
-    double pre_target_vel_x_ = 0.0;
-    double target_vel_y_ = 0.0;
-    double pre_target_vel_y_ = 0.0;
-    double target_heading_ = 0.0;
-    double pre_target_vel_yaw_ = 0.0;
-    double heading = 0.0;
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
@@ -355,18 +347,18 @@ public:
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.1;
     double Lcommand_t_ssp_ = .7;
-    double Lcommand_foot_height_ = 0.12;
+    double Lcommand_foot_height_ = 0.08;
 
     double Rcommand_step_length_x_ = 0.;
     double Rcommand_step_length_y_ = 0.21;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.1;
     double Rcommand_t_ssp_ = .7;
-    double Rcommand_foot_height_ = 0.12;
+    double Rcommand_foot_height_ = 0.08;
 
     bool ideal_preview = false;
 
-    int ctrl_mode = 2; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command
+    int ctrl_mode = 0; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command, 3 for Data Collection
     int current_step_number = 0;
     int planned_step_number = 30; // 30
     Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
@@ -488,6 +480,16 @@ public:
     void getComTrajectory_mpc();
     void getFootTrajectory(); 
     void getTargetState(); 
+
+    // Data Collection
+    double step_length_x_fixed = 0.45;
+    double step_length_y_fixed = 0.21;
+    double target_heading = 0.0;
+    double heading_error = 0.0;
+    double t_dsp_fixed = 0.05;
+    double t_ssp_fixed = 0.5;
+    double foot_height_fixed = 0.06;
+
 
 private:
     Eigen::VectorQd ControlVal_;

@@ -527,7 +527,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     q.y() = rd_cc_.q_virtual_(4);
     q.z() = rd_cc_.q_virtual_(5);
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
-
+    
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
     base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
 
@@ -546,6 +546,10 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     grav << 0, 0, -1.;
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
+
+    Vector3_t forward = q * forward_vec;
+    double heading = atan2(forward(1), forward(0));
+    heading_error = target_heading - heading;
 
     state_cur_(data_idx) = q.x();
     data_idx++;
@@ -575,12 +579,12 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    // for (int i = 0; i < num_actuator_action; i++)
-    // {
-    //     // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
-    //     state_cur_(data_idx) = q_leg_desired_(i);
-    //     data_idx++;
-    // }
+    for (int i = 0; i < num_actuator_action; i++)
+    {
+        // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
+        state_cur_(data_idx) = q_leg_desired_(i);
+        data_idx++;
+    }
 
     // state_cur_(data_idx) = com_state_stance_frame_(0);
     // data_idx++;
@@ -1297,7 +1301,7 @@ void CustomController::computeSlow()
             feedforwardPolicy();
 
 
-
+            
             updateNextStepTime();
 
 
@@ -1355,51 +1359,51 @@ void CustomController::computeSlow()
 
             {
 
-                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+                    // writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
 
-                    // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
-
-
-
-                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
-
-                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
-
-                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
-
-                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+                    // // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
 
 
-                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+                    // // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+
+                    // // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+
+                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+
+                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+
+
+
+                    // writeFile << rd_cc_.torque_desired.transpose()  << "\t";
 
                     writeFile << q_noise_.transpose() << "\t";
 
-                    writeFile << q_dot_lpf_.transpose() << "\t";
+                    // writeFile << q_dot_lpf_.transpose() << "\t";
 
-                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+                    // writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
 
-                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
 
-                    writeFile << heading << "\t";
+                    // writeFile << heading << "\t";
 
 
 
-                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                    // writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
 
-                    writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+                    // writeFile << target_swing_state_stance_frame_.transpose() << "\t";
 
-                    writeFile << target_com_state_stance_frame_.transpose() << "\t";
+                    // writeFile << target_com_state_stance_frame_.transpose() << "\t";
 
-                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    // writeFile << swing_state_stance_frame_.transpose() << "\t";
 
-                    writeFile << com_state_stance_frame_.transpose() << "\t";
+                    // writeFile << com_state_stance_frame_.transpose() << "\t";
 
-                    writeFile << q_leg_desired_.transpose() << "\t";
+                    // writeFile << q_leg_desired_.transpose() << "\t";
 
-                    writeFile << ref_zmp_(walking_tick,0) << "\t";
+                    // writeFile << ref_zmp_(walking_tick,0) << "\t";
 
-                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
+                    // writeFile << ref_zmp_(walking_tick, 1) << "\t";
 
                     
 
@@ -1657,8 +1661,6 @@ void CustomController::updateInitialState()
 // // Stepping stones version
 void CustomController::updateFootstepCommand(){
 
-
-
     if (walking_tick == 0){
 
         // Compute Global Foot States, estimatesy
@@ -1737,6 +1739,25 @@ void CustomController::updateFootstepCommand(){
                 t_dsp_seconds(step) = t_dsp_planned(step);
                 t_ssp_(step) = std::floor(t_ssp_planned(step) * hz_);
                 t_ssp_seconds(step) = t_ssp_planned(step);
+                t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
+            }
+            break;
+        }
+        case 3:
+        {
+            for (int step = 0; step < number_of_foot_step; step++){
+
+                if (step == 0) phase_indicator_(step) = first_stance_foot_;
+                else phase_indicator_(step) = 1-phase_indicator_(step-1);
+
+                step_length_x_(step) = step_length_x_fixed;
+                step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_fixed;
+                step_yaw_(step) = (heading_error > 0) ? (phase_indicator_(step)) * 2 * heading_error : (1-phase_indicator_(step)) * 2 * heading_error;
+                foot_height_(step) = foot_height_fixed;
+                t_dsp_(step) = std::floor(t_dsp_fixed * hz_);
+                t_dsp_seconds(step) = t_dsp_fixed;
+                t_ssp_(step) = std::floor(t_ssp_fixed * hz_);
+                t_ssp_seconds(step) = t_ssp_fixed;
                 t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
             }
             break;
@@ -1901,6 +1922,20 @@ void CustomController::updateFootstepCommand(){
                 t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
 
             }
+            break;
+        }
+
+        case 3:
+        {
+            step_length_x_(step) = step_length_x_fixed;
+            step_length_y_(step) = (2*phase_indicator_(step) - 1) * step_length_y_fixed;
+            step_yaw_(step) = (heading_error > 0) ? (phase_indicator_(step)) * 2 * heading_error : (1-phase_indicator_(step)) * 2 * heading_error;
+            foot_height_(step) = foot_height_fixed;
+            t_dsp_(step) = std::floor(t_dsp_fixed * hz_);
+            t_dsp_seconds(step) = t_dsp_fixed;
+            t_ssp_(step) = std::floor(t_ssp_fixed * hz_);
+            t_ssp_seconds(step) = t_ssp_fixed;
+            t_total_(step) = 2*t_dsp_(step) + t_ssp_(step);
             break;
         }
 
@@ -2758,9 +2793,9 @@ void CustomController::getTargetState(){
     target_com_state_stance_frame_(12) = ref_com_yawvel_(walking_tick+1);
 
     if (com_height_ == 0.68){
-        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.02, 0.02), 
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+        target_com_state_float_frame_.translation() << (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0),
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), 
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2);
 
     }
     else if (com_height_ == 0.728){
@@ -2796,6 +2831,7 @@ void CustomController::windupPreview(){
 void CustomController::updateNextStepTime()
 {       
     // std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
+    
     walking_tick++;
 }
 
