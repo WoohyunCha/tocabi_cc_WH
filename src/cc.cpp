@@ -566,6 +566,22 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
+    state_cur_(data_idx) = q_noise_(15) - q_init_(15);
+    data_idx++;
+    state_cur_(data_idx) = q_noise_(16) - q_init_(16);
+    data_idx++;
+    state_cur_(data_idx) = q_noise_(19) - q_init_(19);
+    data_idx++;
+
+
+    state_cur_(data_idx) = q_noise_(25) - q_init_(25);
+    data_idx++;
+    state_cur_(data_idx) = q_noise_(26) - q_init_(26);
+    data_idx++;
+    state_cur_(data_idx) = q_noise_(29) - q_init_(29);
+    data_idx++;
+    
+
     for (int i = 0; i < num_actuator_action; i++)
     {
         if (is_on_robot_)
@@ -578,6 +594,21 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         }
         data_idx++;
     }
+
+    state_cur_(data_idx) = q_vel_noise_(15); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(16); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(19); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+
+    state_cur_(data_idx) = q_vel_noise_(25); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(26); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(29); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+
 
     for (int i = 0; i < num_actuator_action; i++)
     {
@@ -635,7 +666,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     state_cur_(data_idx) = foot_height_(0);
     data_idx++;
 
-    for (int i = 0; i <num_actuator_action; i++) 
+    for (int i = 0; i <num_action; i++) 
     {
         state_cur_(data_idx) = DyrosMath::minmax_cut(rl_action_(i), -1.0, 1.0);
         data_idx++;
@@ -683,18 +714,18 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
 
 
-// RELU
+// // RELU
 // void CustomController::feedforwardPolicy()
 // {
 //     hidden_layer1_ = policy_net_w0_ * state_ + policy_net_b0_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden1; i++) 
 //     {
 //         if (hidden_layer1_(i) < 0)
 //             hidden_layer1_(i) = 0.0;
 //     }
 
 //     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden2; i++) 
 //     {
 //         if (hidden_layer2_(i) < 0)
 //             hidden_layer2_(i) = 0.0;
@@ -703,14 +734,14 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 //     rl_action_ = action_net_w_ * hidden_layer2_ + action_net_b_;
 
 //     value_hidden_layer1_ = value_net_w0_ * state_ + value_net_b0_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden1; i++) 
 //     {
 //         if (value_hidden_layer1_(i) < 0)
 //             value_hidden_layer1_(i) = 0.0;
 //     }
 
 //     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
-//     for (int i = 0; i < num_hidden; i++) 
+//     for (int i = 0; i < num_hidden2; i++) 
 //     {
 //         if (value_hidden_layer2_(i) < 0)
 //             value_hidden_layer2_(i) = 0.0;
@@ -1274,7 +1305,7 @@ void CustomController::computeSlow()
 
         {
 
-            // auto start_time = std::chrono::high_resolution_clock::now();
+            auto start_time = std::chrono::high_resolution_clock::now();
 
 
 
@@ -1308,13 +1339,13 @@ void CustomController::computeSlow()
 
             // End time measurement
 
-            // auto end_time = std::chrono::high_resolution_clock::now();
+            auto end_time = std::chrono::high_resolution_clock::now();
 
 
 
             // // Calculate the duration in microseconds
 
-            // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
 
 
 
@@ -1456,7 +1487,13 @@ void CustomController::computeSlow()
 
         }
 
-        
+        torque_rl_(15) = DyrosMath::minmax_cut(rl_action_(12), -1., 1.) *torque_bound_(15);
+        torque_rl_(16) = DyrosMath::minmax_cut(rl_action_(13), -1., 1.) *torque_bound_(16);
+        torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(19);
+
+        torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(25);
+        torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(26);
+        torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(29);
 
         if (rd_cc_.control_time_us_ < start_time_ + 0.1e6)
 

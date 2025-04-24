@@ -39,10 +39,10 @@ public:
 
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
-    static const int num_action = 12;
+    static const int num_action = 18;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 66;
-    static const int num_cur_internal_state = 80;
+    static const int num_cur_state = 84;
+    static const int num_cur_internal_state = 84;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -193,7 +193,7 @@ public:
     double t_temp_;  
     double t_double1_;
     double t_double2_;
-    double zmp_offset = 0.02;
+    double zmp_offset = 0.0;
 
 
 
@@ -360,7 +360,7 @@ public:
 
     int ctrl_mode = 0; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command, 3 for Data Collection
     int current_step_number = 0;
-    int planned_step_number = 30; // 30
+    int planned_step_number = 12; // 30
     Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
     Eigen::VectorXd foothold_y_planned;
     Eigen::VectorXd foothold_yaw_planned;
