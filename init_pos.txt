@@ -25,4 +25,48 @@
 'R_AnkleRoll_Joint': 0.0,
 
 
-base_pos = 0.8672 [m]
+
+"Waist1_Joint" : 0.,
+
+"Waist2_Joint" : 0.,
+
+"Upperbody_Joint" : 0.,
+
+"L_Shoulder1_Joint" : 0.3,
+
+"L_Shoulder2_Joint" : 0.,
+
+"L_Shoulder3_Joint" : 1.5,
+
+"L_Armlink_Joint" : -1.27,
+
+"L_Elbow_Joint" : -0.3,
+
+"L_Forearm_Joint" : 0.,
+
+"L_Wrist1_Joint" : -1.,
+
+"L_Wrist2_Joint" : 0.,
+
+"Neck_Joint" : 0.,
+
+"Head_Joint" : 0.,
+
+"R_Shoulder1_Joint" : -0.3,
+
+"R_Shoulder2_Joint" : -0.,
+
+"R_Shoulder3_Joint" : -1.5,
+
+"R_Armlink_Joint" : 1.27,
+
+"R_Elbow_Joint" : 0.3,
+
+"R_Forearm_Joint" : 0,
+
+"R_Wrist1_Joint" : 1,
+
+"R_Wrist2_Joint" : 0,
+
+
+base_pos = 0.865 [m]

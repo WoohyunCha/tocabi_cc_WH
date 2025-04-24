@@ -361,12 +361,12 @@ void CustomController::initVariable()
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
     if (com_height_ == 0.68){
-        q_init_ << 0.0, 0.0, -0.5, 1.06, -0.56, 0.0,
-                    0.0, 0.0, -0.5, 1.06, -0.56, 0.0,
+        q_init_ << 0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
+                    0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
                     0.0, 0.0, 0.0,
-                    0.3, 0.3, 1.5, -1.27, -1.0, 0.0, -1.0, 0.0,
+                    0.3, 0., 1.5, -1.27, -0.3, 0.0, -1.0, 0.0,
                     0.0, 0.0,
-                    -0.3, -0.3, -1.5, 1.27, 1.0, 0.0, 1.0, 0.0;
+                    -0.3, -0., -1.5, 1.27, 0.3, 0.0, 1.0, 0.0;
     }
     else if (com_height_ == 0.728){
         q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
@@ -570,6 +570,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_noise_(16) - q_init_(16);
     data_idx++;
+    state_cur_(data_idx) = q_noise_(17) - q_init_(17);
+    data_idx++;
     state_cur_(data_idx) = q_noise_(19) - q_init_(19);
     data_idx++;
 
@@ -577,6 +579,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     state_cur_(data_idx) = q_noise_(25) - q_init_(25);
     data_idx++;
     state_cur_(data_idx) = q_noise_(26) - q_init_(26);
+    data_idx++;
+    state_cur_(data_idx) = q_noise_(27) - q_init_(27);
     data_idx++;
     state_cur_(data_idx) = q_noise_(29) - q_init_(29);
     data_idx++;
@@ -599,12 +603,16 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_vel_noise_(16); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(17); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
     state_cur_(data_idx) = q_vel_noise_(19); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
 
     state_cur_(data_idx) = q_vel_noise_(25); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
     state_cur_(data_idx) = q_vel_noise_(26); //rd_cc_.q_dot_virtual_(i+6);
+    data_idx++;
+    state_cur_(data_idx) = q_vel_noise_(27); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
     state_cur_(data_idx) = q_vel_noise_(29); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
@@ -1489,11 +1497,13 @@ void CustomController::computeSlow()
 
         torque_rl_(15) = DyrosMath::minmax_cut(rl_action_(12), -1., 1.) *torque_bound_(15);
         torque_rl_(16) = DyrosMath::minmax_cut(rl_action_(13), -1., 1.) *torque_bound_(16);
-        torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(19);
+        torque_rl_(17) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(17);
+        torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(19);
 
-        torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(25);
-        torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(26);
-        torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(29);
+        torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(25);
+        torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(26);
+        torque_rl_(27) = DyrosMath::minmax_cut(rl_action_(18), -1., 1.) *torque_bound_(27);
+        torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(19), -1., 1.) *torque_bound_(29);
 
         if (rd_cc_.control_time_us_ < start_time_ + 0.1e6)
 
