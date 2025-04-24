@@ -1819,12 +1819,12 @@ void CustomController::updateFootstepCommand(){
         Eigen::Quaterniond q1(swing_state_stance_frame_(6), swing_state_stance_frame_(3), swing_state_stance_frame_(4), swing_state_stance_frame_(5));
         double swing_yaw = std::atan2(2.0 * (q1.w() * q1.z() + q1.x() * q1.y()),
                              1.0 - 2.0 * (q1.y() * q1.y() + q1.z() * q1.z()));
-        std::cout << "Foot Yaw error : " << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
+        std::cout << "Foot Yaw error : " << sqrt(pow(CustomController::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << " [rad]" << std::endl;
         
 
         x_error = (step_length_x_(0) - swing_state_stance_frame_(0)) ;
         y_error = (step_length_y_(0) - swing_state_stance_frame_(1)) ;
-        yaw_error = (DyrosMath::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
+        yaw_error = (CustomController::wrap_to_pi(step_yaw_(0) - swing_yaw)) ;
 
 
         if (ctrl_mode){
@@ -1832,7 +1832,7 @@ void CustomController::updateFootstepCommand(){
                 evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2) + pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
                 evalFile << sqrt(pow(swing_state_stance_frame_(0) - step_length_x_(0), 2)) << "\t";
                 evalFile << sqrt(pow(swing_state_stance_frame_(1) - step_length_y_(0), 2)) << "\t";
-                evalFile << sqrt(pow(DyrosMath::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
+                evalFile << sqrt(pow(CustomController::wrap_to_pi(swing_yaw - step_yaw_(0)), 2)) << "\t";
                 evalFile << std::endl;
 
             }

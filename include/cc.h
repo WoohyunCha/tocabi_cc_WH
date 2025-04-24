@@ -490,6 +490,13 @@ public:
     double t_ssp_fixed = 0.5;
     double foot_height_fixed = 0.06;
 
+    double wrap_to_pi(double angles){
+        angles = fmod(angles, 2*M_PI);
+        if (angles > M_PI){
+          angles -= 2*M_PI;    
+        }
+        return angles;
+      }
 
 private:
     Eigen::VectorQd ControlVal_;
