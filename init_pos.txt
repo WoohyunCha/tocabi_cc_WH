@@ -1,0 +1,28 @@
+'L_HipYaw_Joint': 0.0,
+
+'L_HipRoll_Joint': 0.0,
+
+'L_HipPitch_Joint': -0.56,
+
+'L_Knee_Joint': 1.06,
+
+'L_AnklePitch_Joint': -0.5,
+
+'L_AnkleRoll_Joint': 0.0,
+
+
+
+'R_HipYaw_Joint': 0.0,
+
+'R_HipRoll_Joint': 0.0,
+
+'R_HipPitch_Joint': -0.56,
+
+'R_Knee_Joint': 1.06,
+
+'R_AnklePitch_Joint': -0.5,
+
+'R_AnkleRoll_Joint': 0.0,
+
+
+base_pos = 0.8672 [m]
