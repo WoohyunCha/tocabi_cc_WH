@@ -364,9 +364,9 @@ void CustomController::initVariable()
         q_init_ << 0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
                     0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
                     0.0, 0.0, 0.0,
-                    0.3, 0., 1.5, -1.27, -0.3, 0.0, -1.0, 0.0,
+                    0.3, 0.1, 1.5, -1.27, -0.3, 0.0, -0.0, 0.0,
                     0.0, 0.0,
-                    -0.3, -0., -1.5, 1.27, 0.3, 0.0, 1.0, 0.0;
+                    -0.3, -0.1, -1.5, 1.27, 0.3, 0.0, 0.0, 0.0;
     }
     else if (com_height_ == 0.728){
         q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
@@ -2878,7 +2878,6 @@ void CustomController::windupPreview(){
 void CustomController::updateNextStepTime()
 {       
     // std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
-    
     walking_tick++;
 }
 
