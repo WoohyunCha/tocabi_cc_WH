@@ -34,7 +34,7 @@
 
 "L_Shoulder1_Joint" : 0.3,
 
-"L_Shoulder2_Joint" : 0.,
+"L_Shoulder2_Joint" : 0.1,
 
 "L_Shoulder3_Joint" : 1.5,
 
@@ -44,7 +44,7 @@
 
 "L_Forearm_Joint" : 0.,
 
-"L_Wrist1_Joint" : -1.,
+"L_Wrist1_Joint" : 0.,
 
 "L_Wrist2_Joint" : 0.,
 
@@ -54,7 +54,7 @@
 
 "R_Shoulder1_Joint" : -0.3,
 
-"R_Shoulder2_Joint" : -0.,
+"R_Shoulder2_Joint" : -0.1,
 
 "R_Shoulder3_Joint" : -1.5,
 
@@ -64,7 +64,7 @@
 
 "R_Forearm_Joint" : 0,
 
-"R_Wrist1_Joint" : 1,
+"R_Wrist1_Joint" : 0.,
 
 "R_Wrist2_Joint" : 0,
 
