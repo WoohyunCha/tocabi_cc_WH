@@ -345,15 +345,15 @@ public:
     double Lcommand_step_length_x_ = 0.;
     double Lcommand_step_length_y_ = 0.21;
     double Lcommand_step_yaw_ = 0.;
-    double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = .7;
+    double Lcommand_t_dsp_ = 0.04;
+    double Lcommand_t_ssp_ = .6;
     double Lcommand_foot_height_ = 0.08;
 
     double Rcommand_step_length_x_ = 0.;
     double Rcommand_step_length_y_ = 0.21;
     double Rcommand_step_yaw_ = 0.;
-    double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = .7;
+    double Rcommand_t_dsp_ = 0.04;
+    double Rcommand_t_ssp_ = .6;
     double Rcommand_foot_height_ = 0.08;
 
     bool ideal_preview = false;

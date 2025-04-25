@@ -1171,16 +1171,16 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         }            
     }
 
-    if(joy->buttons[3]==1 && Lcommand_foot_height_<0.2){
+    if(joy->buttons[3]==1 && Lcommand_foot_height_<0.16){
         if(last_buttons_3[last_buttons_3.size()-2]==0){
-            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_+0.02, 0.05, 0.2);
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_+0.02, 0.05, 0.16);
             Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
             ROS_INFO("%f",joy_height);
         }
 
     }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.05){
         if(last_buttons_2[last_buttons_2.size()-2]==0){
-            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_-0.02, 0.05, 0.2);
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_-0.02, 0.05, 0.16);
         Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
         ROS_INFO("%f",joy_height);
         }
@@ -1190,7 +1190,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
 
     if(joy->buttons[4] == 1){
-        joy_yaw_l_command =0.3;
+        joy_yaw_l_command =0.4;
         joy_yaw_r_command =0.0;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
@@ -1198,7 +1198,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
     if(joy->buttons[5] == 1){
         joy_yaw_l_command =0.0;
-        joy_yaw_r_command =0.3;
+        joy_yaw_r_command =0.4;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
         Rcommand_step_yaw_ = joy_yaw_r_command;
