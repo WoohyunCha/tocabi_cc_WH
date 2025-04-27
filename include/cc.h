@@ -39,10 +39,10 @@ public:
 
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
-    static const int num_action = 20;
+    static const int num_action = 18;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 90;
-    static const int num_cur_internal_state = 90;
+    static const int num_cur_state = 84;
+    static const int num_cur_internal_state = 84;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -342,19 +342,19 @@ public:
     Eigen::VectorXd com_state_stance_frame_;
 
     // USER COMMAND
-    double Lcommand_step_length_x_ = 0.;
+    double Lcommand_step_length_x_ = 0.4;
     double Lcommand_step_length_y_ = 0.21;
     double Lcommand_step_yaw_ = 0.;
     double Lcommand_t_dsp_ = 0.04;
     double Lcommand_t_ssp_ = .6;
-    double Lcommand_foot_height_ = 0.12;
+    double Lcommand_foot_height_ = 0.08;
 
-    double Rcommand_step_length_x_ = 0.;
+    double Rcommand_step_length_x_ = 0.4;
     double Rcommand_step_length_y_ = 0.21;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.04;
     double Rcommand_t_ssp_ = .6;
-    double Rcommand_foot_height_ = 0.12;
+    double Rcommand_foot_height_ = 0.08;
 
     bool ideal_preview = false;
 
