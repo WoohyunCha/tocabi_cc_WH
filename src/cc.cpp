@@ -361,12 +361,12 @@ void CustomController::initVariable()
                     64, 64, 64, 64, 23, 23, 10, 10;  
                     
     if (com_height_ == 0.68){
-        q_init_ << 0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
-                    0.0, 0.0, -0.56, 1.06, -0.5, 0.0,
+        q_init_ << 0.0, 0.0, -0.5, 1.06, -0.56, 0.0,
+                    0.0, 0.0, -0.5, 1.06, -0.56, 0.0,
                     0.0, 0.0, 0.0,
-                    0.3, 0., 1.5, -1.27, -0.3, 0.0, -0.0, 0.0,
+                    0.3, 0.1, 1.5, -1.27, -0.3, 0.0, -0.0, 0.0,
                     0.0, 0.0,
-                    -0.3, -0., -1.5, 1.27, 0.3, 0.0, 0.0, 0.0;
+                    -0.3, -0.1, -1.5, 1.27, 0.3, 0.0, 0.0, 0.0;
     }
     else if (com_height_ == 0.728){
         q_init_ << 0.0, 0.0, -0.24, 0.6, -0.36, 0.0,
@@ -570,8 +570,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_noise_(16) - q_init_(16);
     data_idx++;
-    state_cur_(data_idx) = q_noise_(17) - q_init_(17);
-    data_idx++;
+    // state_cur_(data_idx) = q_noise_(17) - q_init_(17);
+    // data_idx++;
     state_cur_(data_idx) = q_noise_(19) - q_init_(19);
     data_idx++;
 
@@ -580,8 +580,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_noise_(26) - q_init_(26);
     data_idx++;
-    state_cur_(data_idx) = q_noise_(27) - q_init_(27);
-    data_idx++;
+    // state_cur_(data_idx) = q_noise_(27) - q_init_(27);
+    // data_idx++;
     state_cur_(data_idx) = q_noise_(29) - q_init_(29);
     data_idx++;
     
@@ -603,8 +603,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_vel_noise_(16); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
-    state_cur_(data_idx) = q_vel_noise_(17); //rd_cc_.q_dot_virtual_(i+6);
-    data_idx++;
+    // state_cur_(data_idx) = q_vel_noise_(17); //rd_cc_.q_dot_virtual_(i+6);
+    // data_idx++;
     state_cur_(data_idx) = q_vel_noise_(19); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
 
@@ -612,8 +612,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     data_idx++;
     state_cur_(data_idx) = q_vel_noise_(26); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
-    state_cur_(data_idx) = q_vel_noise_(27); //rd_cc_.q_dot_virtual_(i+6);
-    data_idx++;
+    // state_cur_(data_idx) = q_vel_noise_(27); //rd_cc_.q_dot_virtual_(i+6);
+    // data_idx++;
     state_cur_(data_idx) = q_vel_noise_(29); //rd_cc_.q_dot_virtual_(i+6);
     data_idx++;
 
@@ -1144,12 +1144,12 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         Rcommand_t_ssp_ = Lcommand_t_ssp_;
     }
     
-    if(joy->buttons[1] == 1 && joy_length_temp < 0.5 && joy_length_y_temp < 0.5){ 
+    if(joy->buttons[1] == 1 && joy_length_temp < 0.6 && joy_length_y_temp < 0.5){ 
         if(last_buttons_1[last_buttons_1.size()-2]==0){
 
-            joy_length_temp+=0.06;//보폭
-            joy_length_y_temp +=0.04;
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_temp+=0.08;//보폭
+            joy_length_y_temp +=0.02;
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
 
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
@@ -1161,9 +1161,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             // 0.06 0.12 0.18 0.24 0.30 0.36
             // 0.25 0.29 0.33 0.37 0.41 0.45         
 
-            joy_length_temp-=0.06;//보폭
-            joy_length_y_temp-=0.04;//보폭
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_temp-=0.08;//보폭
+            joy_length_y_temp-=0.02;//보폭
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
@@ -1171,16 +1171,16 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         }            
     }
 
-    if(joy->buttons[3]==1 && Lcommand_foot_height_<0.16){
+    if(joy->buttons[3]==1 && Lcommand_foot_height_<0.2){
         if(last_buttons_3[last_buttons_3.size()-2]==0){
-            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_+0.02, 0.05, 0.16);
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_+0.02, 0.05, 0.2);
             Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
             ROS_INFO("%f",joy_height);
         }
 
     }else if(joy->buttons[2]==1 && Lcommand_foot_height_>0.05){
         if(last_buttons_2[last_buttons_2.size()-2]==0){
-            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_-0.02, 0.05, 0.16);
+            joy_height= DyrosMath::minmax_cut(Lcommand_foot_height_-0.02, 0.05, 0.2);
         Lcommand_foot_height_= Rcommand_foot_height_ = joy_height;
         ROS_INFO("%f",joy_height);
         }
@@ -1190,7 +1190,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
 
     if(joy->buttons[4] == 1){
-        joy_yaw_l_command =0.4;
+        joy_yaw_l_command =0.3;
         joy_yaw_r_command =0.0;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
@@ -1198,7 +1198,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
     if(joy->buttons[5] == 1){
         joy_yaw_l_command =0.0;
-        joy_yaw_r_command =0.4;
+        joy_yaw_r_command =0.3;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
         Rcommand_step_yaw_ = joy_yaw_r_command;
@@ -1398,56 +1398,53 @@ void CustomController::computeSlow()
 
             {
 
-                    // writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
 
-                    // // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
-
-
-
-                    // // writeFile << rd_cc_.LF_FT.transpose() << "\t";
-
-                    // // writeFile << rd_cc_.RF_FT.transpose() << "\t";
-
-                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
-
-                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+                    // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
 
 
-                    // writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+
+                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+
+                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+
+                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+
+
+
+                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
 
                     writeFile << q_noise_.transpose() << "\t";
 
-                    // writeFile << q_dot_lpf_.transpose() << "\t";
+                    writeFile << q_dot_lpf_.transpose() << "\t";
 
-                    // writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
 
-                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
 
-                    // writeFile << heading << "\t";
+                    writeFile << heading << "\t";
 
 
 
-                    // writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
 
-                    // writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << target_swing_state_stance_frame_.transpose() << "\t";
 
-                    // writeFile << target_com_state_stance_frame_.transpose() << "\t";
+                    writeFile << target_com_state_stance_frame_.transpose() << "\t";
 
-                    // writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    writeFile << swing_state_stance_frame_.transpose() << "\t";
 
-                    // writeFile << com_state_stance_frame_.transpose() << "\t";
+                    writeFile << com_state_stance_frame_.transpose() << "\t";
 
-                    // writeFile << q_leg_desired_.transpose() << "\t";
+                    writeFile << q_leg_desired_.transpose() << "\t";
 
-                    // writeFile << ref_zmp_(walking_tick,0) << "\t";
+                    writeFile << ref_zmp_(walking_tick,0) << "\t";
 
-                    // writeFile << ref_zmp_(walking_tick, 1) << "\t";
+                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
 
                     
-
-                    // else writeFile << hidden_layer2_.transpose() << "\t";
-
                     writeFile << std::endl;
 
 
@@ -1495,15 +1492,23 @@ void CustomController::computeSlow()
 
         }
 
+        // torque_rl_(15) = DyrosMath::minmax_cut(rl_action_(12), -1., 1.) *torque_bound_(15);
+        // torque_rl_(16) = DyrosMath::minmax_cut(rl_action_(13), -1., 1.) *torque_bound_(16);
+        // // torque_rl_(17) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(17);
+        // torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(19);
+
+        // torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(25);
+        // torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(26);
+        // // torque_rl_(27) = DyrosMath::minmax_cut(rl_action_(18), -1., 1.) *torque_bound_(27);
+        // torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(19), -1., 1.) *torque_bound_(29);
+
         torque_rl_(15) = DyrosMath::minmax_cut(rl_action_(12), -1., 1.) *torque_bound_(15);
         torque_rl_(16) = DyrosMath::minmax_cut(rl_action_(13), -1., 1.) *torque_bound_(16);
-        torque_rl_(17) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(17);
-        torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(19);
+        torque_rl_(19) = DyrosMath::minmax_cut(rl_action_(14), -1., 1.) *torque_bound_(19);
 
-        torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(25);
-        torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(26);
-        torque_rl_(27) = DyrosMath::minmax_cut(rl_action_(18), -1., 1.) *torque_bound_(27);
-        torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(19), -1., 1.) *torque_bound_(29);
+        torque_rl_(25) = DyrosMath::minmax_cut(rl_action_(15), -1., 1.) *torque_bound_(25);
+        torque_rl_(26) = DyrosMath::minmax_cut(rl_action_(16), -1., 1.) *torque_bound_(26);
+        torque_rl_(29) = DyrosMath::minmax_cut(rl_action_(17), -1., 1.) *torque_bound_(29);
 
         if (rd_cc_.control_time_us_ < start_time_ + 0.1e6)
 
@@ -1818,7 +1823,8 @@ void CustomController::updateFootstepCommand(){
         getRobotState();
         updateInitialState();
         getZmpTrajectory();
-        resetPreviewState();
+        if (ideal_preview)
+            resetPreviewState();
     }
 
     else if (walking_tick > t_total_(0)){
@@ -1993,7 +1999,8 @@ void CustomController::updateFootstepCommand(){
         getRobotState();
         updateInitialState();
         getZmpTrajectory();
-        resetPreviewState();
+        if (ideal_preview)
+            resetPreviewState();
     }
 
 }
@@ -2119,15 +2126,8 @@ void CustomController::calculateFootStepTotal()
         foot_step_support_frame_(i, 0) = foot_step_support_frame_(i-1, 0) + cos(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) - sin(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
         foot_step_support_frame_(i, 1) = foot_step_support_frame_(i-1, 1) + sin(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) + cos(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
         foot_step_support_frame_(i, 5) = foot_step_support_frame_(i-1, 5) + step_yaw_(i);
-        foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
-        foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
         foot_step_support_frame_(i, 6) = 1-phase_indicator_(i);
     }
-
-
-
-
-
 }
 
 
@@ -2140,9 +2140,13 @@ void CustomController::addZmpOffset()
     for (int i = 0; i < number_of_foot_step; i++){
         foot_step_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
         foot_step_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 0) += zmp_offset_x*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 1) += zmp_offset_x*sin(foot_step_(i, 5));
 
         foot_step_support_frame_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
         foot_step_support_frame_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 0) += zmp_offset_x*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 1) += zmp_offset_x*sin(foot_step_support_frame_(i, 5));
     }
 }
 
@@ -2352,10 +2356,14 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
 
 void CustomController::resetPreviewState(){
     x_preview_.setZero(); y_preview_.setZero(); 
-    x_preview_(0) = com_support_init_yaw_(0);
-    y_preview_(0) = com_support_init_yaw_(1);
-    x_preview_(1) = com_support_init_dot_yaw_(0);
-    y_preview_(1) = com_support_init_dot_yaw_(1);
+    x_preview_(0) = com_support_current_(0);
+    y_preview_(0) = com_support_current_(1);
+    
+    x_preview_(1) = com_support_current_dot_(0);
+    y_preview_(1) = com_support_current_dot_(1);
+
+    x_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(0) * hz_;
+    y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
     UX_preview_ = 0;
     UY_preview_ = 0;
     windupPreview();
@@ -2878,7 +2886,6 @@ void CustomController::windupPreview(){
 void CustomController::updateNextStepTime()
 {       
     // std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
-    
     walking_tick++;
 }
 

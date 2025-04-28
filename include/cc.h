@@ -39,10 +39,10 @@ public:
 
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
-    static const int num_action = 20;
+    static const int num_action = 18;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 90;
-    static const int num_cur_internal_state = 90;
+    static const int num_cur_state = 84;
+    static const int num_cur_internal_state = 84;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -193,7 +193,8 @@ public:
     double t_temp_;  
     double t_double1_;
     double t_double2_;
-    double zmp_offset = 0.0;
+    double zmp_offset = 0.02;
+    double zmp_offset_x = 0.0;
 
 
 
@@ -392,11 +393,11 @@ public:
     int iter_end_yaw_r=0;
     double joy_x;
     double joy_y;
-    double joy_height = 0.12;
+    double joy_height = 0.08;
     double joy_length =0.0;
     double joy_length_y =0.21;
     double joy_length_temp =0.2;
-    double joy_length_y_temp =0.35;
+    double joy_length_y_temp =0.4;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
     double joy_length_y_l_command =0.;
