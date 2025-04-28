@@ -393,11 +393,11 @@ public:
     int iter_end_yaw_r=0;
     double joy_x;
     double joy_y;
-    double joy_height = 0.12;
+    double joy_height = 0.08;
     double joy_length =0.0;
     double joy_length_y =0.21;
     double joy_length_temp =0.2;
-    double joy_length_y_temp =0.35;
+    double joy_length_y_temp =0.4;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
     double joy_length_y_l_command =0.;

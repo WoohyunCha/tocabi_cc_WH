@@ -1148,7 +1148,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         if(last_buttons_1[last_buttons_1.size()-2]==0){
 
             joy_length_temp+=0.08;//보폭
-            joy_length_y_temp +=0.04;
+            joy_length_y_temp +=0.02;
             joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
 
@@ -1162,7 +1162,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             // 0.25 0.29 0.33 0.37 0.41 0.45         
 
             joy_length_temp-=0.08;//보폭
-            joy_length_y_temp-=0.04;//보폭
+            joy_length_y_temp-=0.02;//보폭
             joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
