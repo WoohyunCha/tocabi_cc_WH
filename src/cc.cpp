@@ -1144,12 +1144,12 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         Rcommand_t_ssp_ = Lcommand_t_ssp_;
     }
     
-    if(joy->buttons[1] == 1 && joy_length_temp < 0.5 && joy_length_y_temp < 0.5){ 
+    if(joy->buttons[1] == 1 && joy_length_temp < 0.6 && joy_length_y_temp < 0.5){ 
         if(last_buttons_1[last_buttons_1.size()-2]==0){
 
-            joy_length_temp+=0.06;//보폭
+            joy_length_temp+=0.08;//보폭
             joy_length_y_temp +=0.04;
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
 
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
@@ -1161,9 +1161,9 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             // 0.06 0.12 0.18 0.24 0.30 0.36
             // 0.25 0.29 0.33 0.37 0.41 0.45         
 
-            joy_length_temp-=0.06;//보폭
+            joy_length_temp-=0.08;//보폭
             joy_length_y_temp-=0.04;//보폭
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.5);
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
             joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
@@ -1823,7 +1823,8 @@ void CustomController::updateFootstepCommand(){
         getRobotState();
         updateInitialState();
         getZmpTrajectory();
-        resetPreviewState();
+        if (ideal_preview)
+            resetPreviewState();
     }
 
     else if (walking_tick > t_total_(0)){
@@ -1998,7 +1999,8 @@ void CustomController::updateFootstepCommand(){
         getRobotState();
         updateInitialState();
         getZmpTrajectory();
-        resetPreviewState();
+        if (ideal_preview)
+            resetPreviewState();
     }
 
 }
@@ -2124,15 +2126,8 @@ void CustomController::calculateFootStepTotal()
         foot_step_support_frame_(i, 0) = foot_step_support_frame_(i-1, 0) + cos(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) - sin(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
         foot_step_support_frame_(i, 1) = foot_step_support_frame_(i-1, 1) + sin(foot_step_support_frame_(i-1, 5)) * step_length_x_(i) + cos(foot_step_support_frame_(i-1, 5)) * step_length_y_(i);
         foot_step_support_frame_(i, 5) = foot_step_support_frame_(i-1, 5) + step_yaw_(i);
-        foot_step_support_frame_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
-        foot_step_support_frame_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
         foot_step_support_frame_(i, 6) = 1-phase_indicator_(i);
     }
-
-
-
-
-
 }
 
 
@@ -2145,9 +2140,13 @@ void CustomController::addZmpOffset()
     for (int i = 0; i < number_of_foot_step; i++){
         foot_step_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
         foot_step_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 0) += zmp_offset_x*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 1) += zmp_offset_x*sin(foot_step_(i, 5));
 
         foot_step_support_frame_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
         foot_step_support_frame_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 0) += zmp_offset_x*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 1) += zmp_offset_x*sin(foot_step_support_frame_(i, 5));
     }
 }
 
@@ -2357,10 +2356,14 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
 
 void CustomController::resetPreviewState(){
     x_preview_.setZero(); y_preview_.setZero(); 
-    x_preview_(0) = com_support_init_yaw_(0);
-    y_preview_(0) = com_support_init_yaw_(1);
-    x_preview_(1) = com_support_init_dot_yaw_(0);
-    y_preview_(1) = com_support_init_dot_yaw_(1);
+    x_preview_(0) = com_support_current_(0);
+    y_preview_(0) = com_support_current_(1);
+    
+    x_preview_(1) = com_support_current_dot_(0);
+    y_preview_(1) = com_support_current_dot_(1);
+
+    x_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(0) * hz_;
+    y_preview_(2) = DyrosMath::multiplyIsometry3dVector3d(DyrosMath::inverseIsometry3d(supportfoot_global_current_), com_global_current_dot_ - com_global_current_dot_prev_)(1) * hz_;
     UX_preview_ = 0;
     UY_preview_ = 0;
     windupPreview();
