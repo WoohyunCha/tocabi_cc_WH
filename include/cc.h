@@ -350,7 +350,7 @@ public:
     double Lcommand_t_ssp_ = .6;
     double Lcommand_foot_height_ = 0.08;
 
-    double Rcommand_step_length_x_ = 0.;
+    double Rcommand_step_length_x_ = 0.0;
     double Rcommand_step_length_y_ = 0.21;
     double Rcommand_step_yaw_ = 0.;
     double Rcommand_t_dsp_ = 0.04;
