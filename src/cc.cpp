@@ -1088,7 +1088,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             Lcommand_step_length_x_ = joy_length;
             Rcommand_step_length_x_ = joy_length;
         }else if(joy_x < 0.0){
-            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.3, 0.0);
+            joy_length = DyrosMath::minmax_cut(joy_length_temp*joy_x, -0.2, 0.0);
             // joy_length_l =joy_length_temp*-joy_x;
             // joy_length_r =joy_length_temp*-joy_x;
                 // std::cout<<joy_length<<std::endl;
@@ -1144,13 +1144,13 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
         Rcommand_t_ssp_ = Lcommand_t_ssp_;
     }
     
-    if(joy->buttons[1] == 1 && joy_length_temp < 0.6 && joy_length_y_temp < 0.5){ 
+    if(joy->buttons[1] == 1 && joy_length_temp < 0.35 && joy_length_y_temp < 0.45){ 
         if(last_buttons_1[last_buttons_1.size()-2]==0){
 
-            joy_length_temp+=0.08;//보폭
-            joy_length_y_temp +=0.02;
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
-            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
+            joy_length_temp+=0.05;//보폭
+            joy_length_y_temp +=0.05;
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.35);
+            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.45);
 
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
@@ -1161,10 +1161,10 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
             // 0.06 0.12 0.18 0.24 0.30 0.36
             // 0.25 0.29 0.33 0.37 0.41 0.45         
 
-            joy_length_temp-=0.08;//보폭
-            joy_length_y_temp-=0.02;//보폭
-            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.6);
-            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.5);
+            joy_length_temp-=0.05;//보폭
+            joy_length_y_temp-=0.05;//보폭
+            joy_length_temp = DyrosMath::minmax_cut(joy_length_temp, 0.1, 0.35);
+            joy_length_y_temp = DyrosMath::minmax_cut(joy_length_y_temp, 0.25, 0.45);
             ROS_INFO("step_length_x_ : %f",joy_length_temp);
             ROS_INFO("step_length_y_ : %f",joy_length_y_temp);
             
@@ -1370,7 +1370,7 @@ void CustomController::computeSlow()
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
 
-            if (value_ < -100.0)
+            if (value_ < 60.0)
 
             {
 
@@ -2854,9 +2854,9 @@ void CustomController::getTargetState(){
 
     }
     else if (com_height_ == 0.728){
-        target_com_state_float_frame_.translation() << DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0), -0.15, 0.),
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), -0.04, 0.04), 
-        DyrosMath::minmax_cut((rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2), 0., 0.04);
+        target_com_state_float_frame_.translation() << (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(0),
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(1), 
+        (rd_cc_.link_[Pelvis].rotm.transpose() * (rd_cc_.link_[Pelvis].xpos-rd_cc_.link_[COM_id].xpos))(2);
     }
     else{
         std::cout << "WRONG COM HEIGHT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";

@@ -186,7 +186,7 @@ public:
     Eigen::Vector3d foot_height_;
     Eigen::Vector3d t_total_;
     int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
-    const double com_height_ = 0.68;
+    const double com_height_ = 0.728;
 
     double t_last_;
     double t_start_;
@@ -397,7 +397,7 @@ public:
     double joy_length =0.0;
     double joy_length_y =0.21;
     double joy_length_temp =0.2;
-    double joy_length_y_temp =0.4;
+    double joy_length_y_temp =0.3;
     double joy_length_command =0.;
     double joy_length_y_r_command =0.;
     double joy_length_y_l_command =0.;
