@@ -2482,9 +2482,13 @@ void CustomController::addZmpOffset()
     for (int i = 0; i < number_of_foot_step; i++){
         foot_step_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_(i, 5));
         foot_step_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 0) += zmp_offset_x*cos(foot_step_(i, 5));
+        foot_step_offset_(i, 1) += zmp_offset_x*sin(foot_step_(i, 5));
 
         foot_step_support_frame_offset_(i, 0) += phase_indicator_(i)*zmp_offset*sin(foot_step_support_frame_(i, 5)) - (1 - phase_indicator_(i))*zmp_offset*sin(foot_step_support_frame_(i, 5));
         foot_step_support_frame_offset_(i, 1) += -phase_indicator_(i)*zmp_offset*cos(foot_step_support_frame_(i, 5)) + (1 - phase_indicator_(i))*zmp_offset*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 0) += zmp_offset_x*cos(foot_step_support_frame_(i, 5));
+        foot_step_support_frame_offset_(i, 1) += zmp_offset_x*sin(foot_step_support_frame_(i, 5));
     }
 }
 
