@@ -1190,7 +1190,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
 
     if(joy->buttons[4] == 1){
-        joy_yaw_l_command =0.3;
+        joy_yaw_l_command =0.4;
         joy_yaw_r_command =0.0;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
@@ -1198,7 +1198,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
     }
     if(joy->buttons[5] == 1){
         joy_yaw_l_command =0.0;
-        joy_yaw_r_command =0.3;
+        joy_yaw_r_command =0.4;
 
         Lcommand_step_yaw_ = joy_yaw_l_command;           
         Rcommand_step_yaw_ = joy_yaw_r_command;
