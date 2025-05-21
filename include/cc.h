@@ -41,7 +41,7 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 54;
+    static const int num_cur_state = 66;
     static const int num_cur_internal_state = 80;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;

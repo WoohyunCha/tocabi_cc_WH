@@ -579,12 +579,12 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         data_idx++;
     }
 
-    // for (int i = 0; i < num_actuator_action; i++)
-    // {
-    //     // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
-    //     state_cur_(data_idx) = q_leg_desired_(i);
-    //     data_idx++;
-    // }
+    for (int i = 0; i < num_actuator_action; i++)
+    {
+        // state_cur_(data_idx) = q_leg_desired_(i) - q_noise_(i);
+        state_cur_(data_idx) = q_leg_desired_(i);
+        data_idx++;
+    }
 
     // state_cur_(data_idx) = com_state_stance_frame_(0);
     // data_idx++;
