@@ -2258,7 +2258,7 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
         vT_yaw_ssp = foot_step_support_frame_offset_(current_step_number - 0, 5) / 2.0;
 
         v0_x_dsp2 = vT_x_ssp;
-        vT_x_dsp2 = zmp_offset_x + (foot_step_support_frame_offset_(current_step_number - 0, 0)) / 2.0;
+        vT_x_dsp2 = (vT_x_ssp + foot_step_support_frame_offset_(current_step_number - 0, 0)) / 2.0;
         v0_y_dsp2 = vT_y_ssp;
         vT_y_dsp2 = ((2*phase_indicator_(current_step_number - 0)-1)*zmp_offset + foot_step_support_frame_offset_(current_step_number - 0, 1)) / 2.0;
         v0_yaw_dsp2 = vT_yaw_ssp;
@@ -2268,7 +2268,7 @@ void CustomController::onestepZmp(unsigned int current_step_number, Eigen::Vecto
     }
     else if (current_step_number == 1)
     { 
-        v0_x_dsp1 = zmp_offset_x + (foot_step_support_frame_offset_(current_step_number - 1, 0) ) / 2.0;
+        v0_x_dsp1 = (zmp_offset_x + foot_step_support_frame_offset_(current_step_number - 1, 0) ) / 2.0;
         vT_x_dsp1 =  foot_step_support_frame_offset_(current_step_number - 1, 0);
         v0_y_dsp1 = ((2*phase_indicator_(current_step_number - 1)-1)*zmp_offset + foot_step_support_frame_offset_(current_step_number - 1, 1)) / 2.0;
         vT_y_dsp1 =  foot_step_support_frame_offset_(current_step_number - 1, 1);
