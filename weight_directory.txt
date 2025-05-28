@@ -1,1 +1,1 @@
-weights_path=/home/dyros/catkin_ws/src/tocabi_cc/weight/
+weights_path=/home/cha/isaac_ws/AMP_for_hardware/logs/

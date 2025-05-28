@@ -357,7 +357,7 @@ public:
     double Rcommand_t_ssp_ = .6;
     double Rcommand_foot_height_ = 0.08;
 
-    bool ideal_preview = false;
+    bool ideal_preview = true;
 
     int ctrl_mode = 0; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command, 3 for Data Collection
     int current_step_number = 0;
