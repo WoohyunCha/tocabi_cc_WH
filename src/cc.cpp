@@ -23,10 +23,13 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
         if (actuator_net_log) actuator_data_file << "START OF EPISODE\n";  // Mark the end of the data stream
     }
     initVariable();
+    std::cout << "Load network start\n" << std::endl;
+
     loadNetwork();
+    std::cout << "Load network end\n" << std::endl;
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
-    // rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
+    rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
 }
 
 Eigen::VectorQd CustomController::getControl()
@@ -49,6 +52,7 @@ void CustomController::loadNetwork()
 
     base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
 
+
     std::ifstream file[14];
     // file[0].open(cur_path+"weight/a2c_network_actor_mlp_0_weight.txt", std::ios::in);
     // file[1].open(cur_path+"weight/a2c_network_actor_mlp_0_bias.txt", std::ios::in);
@@ -64,20 +68,20 @@ void CustomController::loadNetwork()
     // file[11].open(cur_path+"weight/a2c_network_critic_mlp_2_bias.txt", std::ios::in);
     // file[12].open(cur_path+"weight/a2c_network_value_weight.txt", std::ios::in);
     // file[13].open(cur_path+"weight/a2c_network_value_bias.txt", std::ios::in);
-    file[0].open(base_path  + "policy/0_weight.txt", std::ios::in);
-    file[1].open(base_path  + "policy/0_bias.txt", std::ios::in);
-    file[2].open(base_path  + "policy/2_weight.txt", std::ios::in);
-    file[3].open(base_path  + "policy/2_bias.txt", std::ios::in);
-    file[4].open(base_path  + "policy/4_weight.txt", std::ios::in);
-    file[5].open(base_path  + "policy/4_bias.txt", std::ios::in);
-    file[6].open(base_path  + "normalizer/running_mean.txt", std::ios::in);
-    file[7].open(base_path  + "normalizer/running_var.txt", std::ios::in);
-    file[8].open(base_path  + "critic/0_weight.txt", std::ios::in);
-    file[9].open(base_path  + "critic/0_bias.txt", std::ios::in);
-    file[10].open(base_path  + "critic/2_weight.txt", std::ios::in);
-    file[11].open(base_path  + "critic/2_bias.txt", std::ios::in);
-    file[12].open(base_path  + "critic/4_weight.txt", std::ios::in);
-    file[13].open(base_path  + "critic/4_bias.txt", std::ios::in);
+    file[0].open(base_path + "policy/0_weight.txt", std::ios::in);
+    file[1].open(base_path + "policy/0_bias.txt", std::ios::in);
+    file[2].open(base_path + "policy/2_weight.txt", std::ios::in);
+    file[3].open(base_path + "policy/2_bias.txt", std::ios::in);
+    file[4].open(base_path + "policy/4_weight.txt", std::ios::in);
+    file[5].open(base_path + "policy/4_bias.txt", std::ios::in);
+    file[6].open(base_path + "normalizer/running_mean.txt", std::ios::in);
+    file[7].open(base_path + "normalizer/running_var.txt", std::ios::in);
+    file[8].open(base_path + "critic/0_weight.txt", std::ios::in);
+    file[9].open(base_path + "critic/0_bias.txt", std::ios::in);
+    file[10].open(base_path + "critic/2_weight.txt", std::ios::in);
+    file[11].open(base_path + "critic/2_bias.txt", std::ios::in);
+    file[12].open(base_path + "critic/4_weight.txt", std::ios::in);
+    file[13].open(base_path + "critic/4_bias.txt", std::ios::in);
 
     if(!file[0].is_open())
     {
@@ -316,7 +320,8 @@ void CustomController::loadNetwork()
 
 void CustomController::initVariable()
 {    
-    
+    // Load the path from the configuration file
+
     policy_net_w0_.resize(num_hidden1, policy_input_dim_);
     policy_net_b0_.resize(num_hidden1, 1);
     policy_net_w2_.resize(num_hidden2, num_hidden1);
@@ -419,6 +424,8 @@ void CustomController::initVariable()
 
     // Woohyun
     initBias();
+    base_lin_vel.setZero();
+    base_ang_vel.setZero();
 }
 
 Eigen::Vector3d CustomController::mat2euler(Eigen::Matrix3d mat)
@@ -519,9 +526,7 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     q.z() = rd_cc_.q_virtual_(5);
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
 
-    Vector3_t base_lin_vel, base_ang_vel;
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
-    // base_ang_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(3,3));
     base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
 
     // for (int i=0; i<6; i++)
@@ -546,11 +551,11 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     projected_grav = q.conjugate()*grav;
     
     euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-    state_cur_(data_idx) = wrap_to_pi(euler_angle_(0));
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
     data_idx++;
-    state_cur_(data_idx) = wrap_to_pi(euler_angle_(1));
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
     data_idx++;
-    state_cur_(data_idx) = wrap_to_pi(euler_angle_(2));
+    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
     data_idx++;
 
     // state_cur_(data_idx) = projected_grav(0);
@@ -562,20 +567,19 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // state_cur_(data_idx) = projected_grav(2);
     // data_idx++;
 
-
     // std::cout << "start time : " << start_time_ << std::endl;
-    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, 0., .4, 0.0, 0.0);// .5;//target_vel_x_;
-    state_cur_(data_idx) = target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    state_cur_(data_idx) = 0.;
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = 0.; //target_vel_y_; //0.0;//target_vel_y_;
     data_idx++;
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(0.5*wrap_to_pi(target_heading_ - heading), -.5, .5);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
@@ -849,12 +853,12 @@ void CustomController::loadEncoderNetwork()
     }
 
     std::ifstream file[6];
-    file[0].open(base_path  + "encoder/conv1_weight.txt", std::ios::in);
-    file[1].open(base_path  + "encoder/conv1_bias.txt", std::ios::in);
-    file[2].open(base_path  + "encoder/conv2_weight.txt", std::ios::in);
-    file[3].open(base_path  + "encoder/conv2_bias.txt", std::ios::in);
-    file[4].open(base_path  + "encoder/fc2_weight.txt", std::ios::in);
-    file[5].open(base_path  + "encoder/fc2_bias.txt", std::ios::in);
+    file[0].open(base_path + "encoder/conv1_weight.txt", std::ios::in);
+    file[1].open(base_path + "encoder/conv1_bias.txt", std::ios::in);
+    file[2].open(base_path + "encoder/conv2_weight.txt", std::ios::in);
+    file[3].open(base_path + "encoder/conv2_bias.txt", std::ios::in);
+    file[4].open(base_path + "encoder/fc2_weight.txt", std::ios::in);
+    file[5].open(base_path + "encoder/fc2_bias.txt", std::ios::in);
 
     if (!file[0].is_open()) {
         std::cout << "Cannot find the weight file" << std::endl;
@@ -1138,7 +1142,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
             std::cout << "Value : " << value_ << std::endl;
-            if (value_ < 100.0)
+            if (value_ < 60.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -1151,43 +1155,37 @@ void CustomController::computeSlow()
 
             if (is_write_file_)
             {
-                    // writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
-                    // // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
+                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+                    // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
-                    // // writeFile << rd_cc_.LF_FT.transpose() << "\t";
-                    // // writeFile << rd_cc_.RF_FT.transpose() << "\t";
-                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
-                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
 
-                    // writeFile << rd_cc_.torque_desired.transpose()  << "\t";
-                    // writeFile << q_noise_.transpose() << "\t";
-                    // writeFile << q_dot_lpf_.transpose() << "\t";
-                    // writeFile << rd_cc_.q_dot_virtual_.transpose() << "\t";
-                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
-                    // writeFile << heading << "\t";
+                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+                    writeFile << q_noise_.transpose() << "\t";
+                    writeFile << q_dot_lpf_.transpose() << "\t";
+                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+                    writeFile << heading << "\t";
 
-                    // writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
-                    // writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
-                    // if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
-                    // writeFile << rd_cc_.imu_lin_acc.transpose() << "\t";
-                    // writeFile << rd_cc_.imu_ang_vel.transpose() << "\t";
-
-                    for (int i = 0; i < num_cur_state; i++){
-                        writeFile << state_cur_(i) << "\t";
-                    }
-
+                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                    writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
+                    if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
+                    // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
 
                     time_write_pre_ = rd_cc_.control_time_us_;
 
                     // Data for actuator net training
-                    // if (actuator_net_log){
-                    //     actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
-                    //     actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
-                    //     actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
-                    //     actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
-                    //     actuator_data_file << std::endl;
-                    // }
+                    if (actuator_net_log){
+                        actuator_data_file << rd_cc_.torque_elmo_.segment(0,12).transpose() << "\t";
+                        actuator_data_file << rd_cc_.q_dot_virtual_.segment(6, 12).transpose() << "\t";
+                        actuator_data_file << rd_cc_.q_virtual_.segment(7,12).transpose() << "\t";
+                        actuator_data_file << rd_cc_.torque_input_.segment(0,12).transpose() << "\t";
+                        actuator_data_file << std::endl;
+                    }
 
             }
             
@@ -1248,27 +1246,29 @@ void CustomController::copyRobotData(RobotData &rd_l)
 
 void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-    target_vel_x_ = DyrosMath::minmax_cut(0.5*joy->axes[1], 0.0, 0.5);
-    target_vel_y_ = DyrosMath::minmax_cut(0.5*joy->axes[0], -0.2, 0.2);
-    target_heading_ = DyrosMath::minmax_cut(joy->axes[3]*3.14, -3.14, 3.14);
+    target_vel_x_ = DyrosMath::minmax_cut(0.5*sqrt(pow(joy->axes[1],2) + pow(joy->axes[0],2)), 0., 0.5);
+    if ((abs(joy->axes[0]) > 0.1) && (abs(joy->axes[1]) > 0.1))
+    target_heading_ = DyrosMath::minmax_cut(DyrosMath::wrap_to_pi(atan2(joy->axes[0], joy->axes[1])) , -3.14, 3.14);
+    else
+    target_heading_ = 0.0;
 }
 
-double CustomController::wrap_to_pi(double angles){
-    angles = fmod(angles, 2*M_PI);
-    if (angles > M_PI){
-        angles -= 2*M_PI;
-    }
-    return angles;
+void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
+    target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
+    target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
+    target_heading_ = DyrosMath::minmax_cut(command->heading * 1.5, -1.5, 1.5);
+
+    if (target_vel_x_ <= 0.2) target_vel_x_ = 0.;
+    if (abs(target_vel_y_) <= 0.2) target_vel_y_ = 0.;
+    if (abs(target_heading_) <= 0.2) target_heading_ = 0.;
+
+    pre_target_vel_x_ = state_cur_(9);
+    pre_target_vel_y_ = state_cur_(10);
+    pre_target_vel_yaw_ = state_cur_(11);
+
+
 }
 
-// void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
-//     target_vel_x_ = DyrosMath::minmax_cut(command->forward, 0., 1.);
-//     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
-//     target_heading_ = DyrosMath::minmax_cut(command->heading * 3.14, -3.14, 3.14);
-//     pre_target_vel_x_ = state_cur_(9);
-//     pre_target_vel_y_ = state_cur_(10);
-//     pre_target_vel_yaw_ = state_cur_(11);
-// }
 
 
 std::string CustomController::loadPathFromConfig(const std::string &config_file)
