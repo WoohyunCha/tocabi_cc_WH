@@ -5,7 +5,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
-// #include <tocabi_msgs/RLCommand.h>
+#include <tocabi_msgs/RLCommand.h>
 
 class CustomController
 {
@@ -91,7 +91,6 @@ public:
     static const bool morphnet = false;
     void loadMorphnet();
     void feedforwardMorphnet();
-    double wrap_to_pi(double angles);
 
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
@@ -183,9 +182,9 @@ public:
     ros::Subscriber joy_sub_;
 
     // slider command
-    // void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
+    void rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command);
     ros::Subscriber rl_command_sub_;
-
+    Vector3_t base_lin_vel, base_ang_vel;
 
     double target_vel_x_ = 0.0;
     double pre_target_vel_x_ = 0.0;
@@ -195,8 +194,15 @@ public:
     double pre_target_vel_yaw_ = 0.0;
     double heading = 0.0;
 
-    std::string base_path;
+    std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
+    static double wrap_to_pi(double angles){
+        angles = fmod(angles, 2*M_PI);
+        if (angles > M_PI){
+          angles -= 2*M_PI;    
+        }
+        return angles;
+      }
 
 private:
     Eigen::VectorQd ControlVal_;
