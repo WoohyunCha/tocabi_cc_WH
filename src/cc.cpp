@@ -551,11 +551,11 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     projected_grav = q.conjugate()*grav;
     
     euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(0));
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(1));
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+    state_cur_(data_idx) = CustomController::wrap_to_pi(euler_angle_(2));
     data_idx++;
 
     // state_cur_(data_idx) = projected_grav(0);
@@ -579,8 +579,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
-    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
+    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*CustomController::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*CustomController::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
     // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
@@ -1248,7 +1248,7 @@ void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
     target_vel_x_ = DyrosMath::minmax_cut(0.5*sqrt(pow(joy->axes[1],2) + pow(joy->axes[0],2)), 0., 0.5);
     if ((abs(joy->axes[0]) > 0.1) && (abs(joy->axes[1]) > 0.1))
-    target_heading_ = DyrosMath::minmax_cut(DyrosMath::wrap_to_pi(atan2(joy->axes[0], joy->axes[1])) , -3.14, 3.14);
+    target_heading_ = DyrosMath::minmax_cut(CustomController::wrap_to_pi(atan2(joy->axes[0], joy->axes[1])) , -3.14, 3.14);
     else
     target_heading_ = 0.0;
 }
