@@ -194,7 +194,7 @@ public:
     double t_double1_;
     double t_double2_;
     double zmp_offset = 0.02;
-    double zmp_offset_x = 0.03;
+    double zmp_offset_x = 0.0;
 
 
 

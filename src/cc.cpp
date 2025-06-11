@@ -26,7 +26,7 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
     loadNetwork();
     std::cout << "Load network end\n" << std::endl;
 
-    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
+    joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy_wh", 10, &CustomController::joyCallback, this);
 }
 
 Eigen::VectorQd CustomController::getControl()
@@ -1370,7 +1370,7 @@ void CustomController::computeSlow()
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
 
-            if (value_ < 60.0)
+            if (value_ < 30.0)
 
             {
 
