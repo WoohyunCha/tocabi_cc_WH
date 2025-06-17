@@ -1120,7 +1120,7 @@ void CustomController::computeSlow()
 
         // processObservation and feedforwardPolicy mean time: 15 us, max 53 us
         // With encoder, 
-        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/125.0 - 4/10000.0) // 125 is the control frequency
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/125.0) // 125 is the control frequency
         // if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/250.0 - 1/10000.0) // 250 is the control frequency
         {
             // auto start_time = std::chrono::high_resolution_clock::now();
