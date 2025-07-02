@@ -1398,54 +1398,84 @@ void CustomController::computeSlow()
 
             {
 
-                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+                    writeFile << global_tick << "\t";
+                    for (int i = 0; i < 3; i++)
+                        writeFile << rd_cc_.q_virtual_(i) << "\t";                        
+                    Eigen::Quaterniond q;
+                    q.x() = rd_cc_.q_virtual_(3);
+                    q.y() = rd_cc_.q_virtual_(4);
+                    q.z() = rd_cc_.q_virtual_(5);
+                    q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);  
+                    Eigen::Vector3d euler_angle_;
+                    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+                    for (int i = 0; i < 3; i++)
+                        writeFile << euler_angle_(i) << "\t";
+                    for (int i = 0; i < 6; i++)
+                        writeFile << rd_cc_.q_dot_virtual_(i) << "\t";
+                    for (int i = 0; i < 33; i++)
+                        writeFile << q_noise_(i) << "\t";
+                    for (int i = 0; i < 33; i++)
+                        writeFile << q_vel_noise_(i) << "\t";
+                    for (int i = 0; i < 3; i++)
+                        writeFile << rd_cc_.link_[Left_Foot].xpos(i) << "\t";
+                    euler_angle_ = DyrosMath::rot2Euler_tf(rd_cc_.link_[Left_Foot].rotm);
+                    for (int i = 0; i < 3; i++)
+                        writeFile << euler_angle_(i) << "\t";
+                    for (int i = 0; i < 3; i++)
+                        writeFile << rd_cc_.link_[Right_Foot].xpos(i) << "\t";
+                    euler_angle_ = DyrosMath::rot2Euler_tf(rd_cc_.link_[Right_Foot].rotm);
+                    for (int i = 0; i < 3; i++)
+                        writeFile << euler_angle_(i) << "\t";
+                    writeFile << std::endl;
 
-                    // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
+                    // writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+
+                    // // writeFile << DyrosMath::minmax_cut(rl_action_(num_action-1)*1/100.0, 0.0, 1/100.0) << "\t";
 
 
 
-                    // writeFile << rd_cc_.LF_FT.transpose() << "\t";
+                    // // writeFile << rd_cc_.LF_FT.transpose() << "\t";
 
-                    // writeFile << rd_cc_.RF_FT.transpose() << "\t";
+                    // // writeFile << rd_cc_.RF_FT.transpose() << "\t";
 
-                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+                    // writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
 
-                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
-
-
-
-                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
-
-                    writeFile << q_noise_.transpose() << "\t";
-
-                    writeFile << q_dot_lpf_.transpose() << "\t";
-
-                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
-
-                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
-
-                    writeFile << heading << "\t";
+                    // writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
 
 
 
-                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+                    // writeFile << rd_cc_.torque_desired.transpose()  << "\t";
 
-                    writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+                    // writeFile << q_noise_.transpose() << "\t";
 
-                    writeFile << target_com_state_stance_frame_.transpose() << "\t";
+                    // writeFile << q_dot_lpf_.transpose() << "\t";
 
-                    writeFile << swing_state_stance_frame_.transpose() << "\t";
+                    // writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
 
-                    writeFile << com_state_stance_frame_.transpose() << "\t";
+                    // writeFile << rd_cc_.q_virtual_.transpose() << "\t";
 
-                    writeFile << q_leg_desired_.transpose() << "\t";
+                    // writeFile << heading << "\t";
 
-                    writeFile << ref_zmp_(walking_tick,0) << "\t";
 
-                    writeFile << ref_zmp_(walking_tick, 1) << "\t";
+
+                    // writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+
+                    // writeFile << target_swing_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << target_com_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << swing_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << com_state_stance_frame_.transpose() << "\t";
+
+                    // writeFile << q_leg_desired_.transpose() << "\t";
+
+                    // writeFile << ref_zmp_(walking_tick,0) << "\t";
+
+                    // writeFile << ref_zmp_(walking_tick, 1) << "\t";
 
                     
-                    writeFile << std::endl;
+                    // writeFile << std::endl;
 
 
 
@@ -2887,6 +2917,7 @@ void CustomController::updateNextStepTime()
 {       
     // std::cout << "walking time : " << (walking_tick) / hz_ <<  ", Value : " << value_ << std::endl;
     walking_tick++;
+    global_tick++;
 }
 
 void CustomController::walkingStateMachine()
