@@ -51,6 +51,7 @@ void CustomController::loadNetwork()
     }
 
     base_path = loadPathFromConfig(cur_path + "weight_directory.txt");
+    loadCommandFromConfig(cur_path + "command.txt");
 
 
     std::ifstream file[14];
@@ -579,7 +580,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     Vector3_t forward = q * forward_vec;
     heading = atan2(forward(1), forward(0));
-    state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    // state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_yaw_, target_vel_yaw_, 0.0, 0.0);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
@@ -749,7 +751,6 @@ void CustomController::feedforwardPolicy()
     else policy_input_ = state_;    
     // First hidden layer for policy network
     hidden_layer1_ = policy_net_w0_ * policy_input_ + policy_net_b0_;
-    std::cout << "hidden layer 1" << std::endl;
     for (int i = 0; i < num_hidden1; i++) 
     {
         if (hidden_layer1_(i) < 0)
@@ -758,7 +759,6 @@ void CustomController::feedforwardPolicy()
 
     // Second hidden layer for policy network
     hidden_layer2_ = policy_net_w2_ * hidden_layer1_ + policy_net_b2_;
-    std::cout << "hidden layer 2" << std::endl;
     for (int i = 0; i < num_hidden2; i++) 
     {
         if (hidden_layer2_(i) < 0)
@@ -767,11 +767,9 @@ void CustomController::feedforwardPolicy()
 
     // Output layer for policy network
     rl_action_ = action_net_w_ * hidden_layer2_ + action_net_b_;
-    std::cout << "action" << std::endl;
 
     // First hidden layer for value network
     value_hidden_layer1_ = value_net_w0_ * policy_input_ + value_net_b0_;
-    std::cout << "value layer 1" << std::endl;
     for (int i = 0; i < num_hidden1; i++) 
     {
         if (value_hidden_layer1_(i) < 0)
@@ -780,7 +778,6 @@ void CustomController::feedforwardPolicy()
 
     // Second hidden layer for value network
     value_hidden_layer2_ = value_net_w2_ * value_hidden_layer1_ + value_net_b2_;
-    std::cout << "value layer 2" << std::endl;
 
     for (int i = 0; i < num_hidden2; i++) 
     {
@@ -790,7 +787,6 @@ void CustomController::feedforwardPolicy()
 
     // Output layer for value network
     value_ = (value_net_w_ * value_hidden_layer2_ + value_net_b_)(0);
-    std::cout << "value " << std::endl;
 
 }
 
@@ -1141,8 +1137,8 @@ void CustomController::computeSlow()
             
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
-            std::cout << "Value : " << value_ << std::endl;
-            if (value_ < 60.0)
+            // std::cout << "Value : " << value_ << std::endl;
+            if (value_ < 0.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -1246,11 +1242,22 @@ void CustomController::copyRobotData(RobotData &rd_l)
 
 void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
-    target_vel_x_ = DyrosMath::minmax_cut(0.5*sqrt(pow(joy->axes[1],2) + pow(joy->axes[0],2)), 0., 0.5);
+    target_vel_x_ = DyrosMath::minmax_cut(vel_scale_*sqrt(pow(joy->axes[1],2) + pow(joy->axes[0],2)), 0., 0.6);
     if ((abs(joy->axes[0]) > 0.1) && (abs(joy->axes[1]) > 0.1))
     target_heading_ = DyrosMath::minmax_cut(DyrosMath::wrap_to_pi(atan2(joy->axes[0], joy->axes[1])) , -3.14, 3.14);
     else
     target_heading_ = 0.0;
+
+    if (joy->buttons[1] == 1.0 && vel_scale_ < 0.6){
+        vel_scale_ += 0.02;
+        ROS_INFO("Velocity : %f", vel_scale_);
+    }
+
+    if (joy->buttons[0] == 1.0 && vel_scale_ > 0.2){
+        vel_scale_ -= 0.02;
+        ROS_INFO("Velocity : %f", vel_scale_);
+    }
+
 }
 
 void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr& command){
@@ -1295,4 +1302,45 @@ std::string CustomController::loadPathFromConfig(const std::string &config_file)
 
     file.close();
     throw std::runtime_error("weights_path not found in configuration file.");
+}
+
+void CustomController::loadCommandFromConfig(const std::string &command_file)
+{
+    std::ifstream file(command_file);
+    if (!file.is_open()) {
+        throw std::runtime_error("Cannot open configuration file: " + command_file);
+    }
+
+    std::string line;
+    bool got_x = false, got_yaw = false;
+    while (std::getline(file, line)) {
+        // skip empty/comment lines
+        if (line.empty() || line[0] == '#') continue;
+
+        auto pos = line.find('=');
+        if (pos == std::string::npos) continue;
+
+        std::string key   = line.substr(0, pos);
+        std::string value = line.substr(pos + 1);
+
+        try {
+            if (key == "target_vel_x") {
+                target_vel_x_ = std::stof(value);
+                got_x = true;
+            }
+            else if (key == "target_vel_yaw") {
+                target_vel_yaw_ = std::stof(value);
+                got_yaw = true;
+            }
+        }
+        catch (const std::invalid_argument &) {
+            throw std::runtime_error("Invalid numeric value for '" + key + "': " + value);
+        }
+    }
+
+    file.close();
+
+    if (!got_x || !got_yaw) {
+        throw std::runtime_error("Missing required parameters in config file: " + command_file);
+    }
 }

@@ -186,16 +186,19 @@ public:
     ros::Subscriber rl_command_sub_;
     Vector3_t base_lin_vel, base_ang_vel;
 
-    double target_vel_x_ = 0.0;
+    double target_vel_x_ = 0.2;
     double pre_target_vel_x_ = 0.0;
     double target_vel_y_ = 0.0;
     double pre_target_vel_y_ = 0.0;
     double target_heading_ = 0.0;
+    double target_vel_yaw_ = 0.0;
     double pre_target_vel_yaw_ = 0.0;
     double heading = 0.0;
+    double vel_scale_ = 0.2;
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);
+    void loadCommandFromConfig(const std::string &command_file);
 
 
 private:

@@ -1,10 +1,10 @@
-close all; clc;
+    close all; clc;
 d1 = load('data.csv');
 d2 = load('data_yongarry.txt');
 d3 = load('data_yongarry_standstill.txt');
 
-plot_start_time = 2;
-plot_end_time = 8;
+plot_start_time = 10;
+plot_end_time = 15;
 
 torque_data_yongarry = d2(:, 13:20);
 plot_indices_yongarry = 250*plot_start_time:250*plot_end_time;
