@@ -38,8 +38,8 @@ public:
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 48;
-    static const int num_cur_internal_state = 36;
+    static const int num_cur_state = 49;
+    static const int num_cur_internal_state = 49;
     static const int num_state_skip = 2;
     static const int num_state_hist = 10;
     static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
@@ -186,7 +186,7 @@ public:
     ros::Subscriber rl_command_sub_;
     Vector3_t base_lin_vel, base_ang_vel;
 
-    double target_vel_x_ = 0.2;
+    double target_vel_x_ = 0.0;
     double pre_target_vel_x_ = 0.0;
     double target_vel_y_ = 0.0;
     double pre_target_vel_y_ = 0.0;
@@ -194,7 +194,7 @@ public:
     double target_vel_yaw_ = 0.0;
     double pre_target_vel_yaw_ = 0.0;
     double heading = 0.0;
-    double vel_scale_ = 0.2;
+    double vel_scale_ = 0.3;
 
     std::string base_path = "";
     std::string loadPathFromConfig(const std::string &config_file);

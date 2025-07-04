@@ -29,7 +29,6 @@ CustomController::CustomController(RobotData &rd) : rd_(rd) //, wbc_(dc.wbc_)
     std::cout << "Load network end\n" << std::endl;
 
     joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &CustomController::joyCallback, this);
-    rl_command_sub_ = nh_.subscribe<tocabi_msgs::RLCommand>("/tocabi/rlcommand", 10, &CustomController::rlcommandCallback, this);
 }
 
 Eigen::VectorQd CustomController::getControl()
@@ -551,13 +550,29 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
     
-    euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+
+    state_cur_(data_idx) = q.x();
+    std::cout << state_cur_(data_idx) << "\t";
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+
+    state_cur_(data_idx) = q.y();
+    std::cout << state_cur_(data_idx) << "\t";
     data_idx++;
-    state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
-    data_idx++;
+
+    state_cur_(data_idx) = q.z();
+    std::cout << state_cur_(data_idx) << "\t";
+    data_idx++;    
+
+    state_cur_(data_idx) = q.w();
+    std::cout << state_cur_(data_idx) << std::endl;
+    data_idx++;    
+    // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
+    // data_idx++;
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(1));
+    // data_idx++;
+    // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
+    // data_idx++;
 
     // state_cur_(data_idx) = projected_grav(0);
     // data_idx++;
@@ -569,24 +584,25 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // data_idx++;
 
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    // state_cur_(data_idx) = target_vel_x_;// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
-    state_cur_(data_idx) = 0.; //target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    // state_cur_(data_idx) = target_vel_y_; //target_vel_y_; //0.0;//target_vel_y_;
     data_idx++;
 
     Vector3_t forward = q * forward_vec;
-    heading = atan2(forward(1), forward(0));
+    heading = DyrosMath::wrap_to_pi(atan2(forward(1), forward(0)));
     // state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_yaw_, target_vel_yaw_, 0.0, 0.0);
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, target_vel_yaw_, 0.0, 0.0);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
     // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
-    // state_cur_(data_idx) = 0.0;//target_vel_yaw;
+    state_cur_(data_idx) = target_vel_yaw_;
     data_idx++;
 
     for (int i = 0; i < num_actuator_action; i++)
@@ -1167,7 +1183,7 @@ void CustomController::computeSlow()
                     writeFile << heading << "\t";
 
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
-                    writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
+                    writeFile << state_cur_(10) << "\t" << state_cur_(12) << "\t" << target_heading_ << "\t";
                     if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
@@ -1265,8 +1281,8 @@ void CustomController::rlcommandCallback(const tocabi_msgs::RLCommand::ConstPtr&
     target_vel_y_ = DyrosMath::minmax_cut(command->lateral * 0.5, -.5, .5);
     target_heading_ = DyrosMath::minmax_cut(command->heading * 1.5, -1.5, 1.5);
 
-    if (target_vel_x_ <= 0.2) target_vel_x_ = 0.;
-    if (abs(target_vel_y_) <= 0.2) target_vel_y_ = 0.;
+    if (target_vel_x_ <= 0.1) target_vel_x_ = 0.;
+    if (abs(target_vel_y_) <= 0.1) target_vel_y_ = 0.;
     if (abs(target_heading_) <= 0.2) target_heading_ = 0.;
 
     pre_target_vel_x_ = state_cur_(9);
@@ -1312,7 +1328,7 @@ void CustomController::loadCommandFromConfig(const std::string &command_file)
     }
 
     std::string line;
-    bool got_x = false, got_yaw = false;
+    bool got_x = false, got_yaw = false, got_y = false;
     while (std::getline(file, line)) {
         // skip empty/comment lines
         if (line.empty() || line[0] == '#') continue;
@@ -1328,8 +1344,16 @@ void CustomController::loadCommandFromConfig(const std::string &command_file)
                 target_vel_x_ = std::stof(value);
                 got_x = true;
             }
+            else if (key == "target_vel_y") {
+                target_vel_y_ = std::stof(value);
+                got_y = true;
+            }
             else if (key == "target_vel_yaw") {
                 target_vel_yaw_ = std::stof(value);
+                got_yaw = true;
+            }
+            else if (key == "target_heading") {
+                target_heading_ = std::stof(value);
                 got_yaw = true;
             }
         }
@@ -1340,7 +1364,7 @@ void CustomController::loadCommandFromConfig(const std::string &command_file)
 
     file.close();
 
-    if (!got_x || !got_yaw) {
+    if (!got_x || !got_yaw || !got_y) {
         throw std::runtime_error("Missing required parameters in config file: " + command_file);
     }
 }
