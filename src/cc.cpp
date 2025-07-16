@@ -551,13 +551,21 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     double heading = atan2(forward(1), forward(0));
     heading_error = target_heading - heading;
 
-    state_cur_(data_idx) = q.x();
+    // state_cur_(data_idx) = q.x();
+    // data_idx++;
+    // state_cur_(data_idx) = q.y();
+    // data_idx++;
+    // state_cur_(data_idx) = q.z();
+    // data_idx++;
+    // state_cur_(data_idx) = q.w();
+    // data_idx++;
+
+
+    state_cur_(data_idx) = projected_grav(0);
     data_idx++;
-    state_cur_(data_idx) = q.y();
+    state_cur_(data_idx) = projected_grav(1);
     data_idx++;
-    state_cur_(data_idx) = q.z();
-    data_idx++;
-    state_cur_(data_idx) = q.w();
+    state_cur_(data_idx) = projected_grav(2);
     data_idx++;
 
     for (int i = 0; i < num_actuator_action; i++)
