@@ -520,20 +520,15 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
 
     int data_idx = 0;
 
+
     Eigen::Quaterniond q;
     q.x() = rd_cc_.q_virtual_(3);
     q.y() = rd_cc_.q_virtual_(4);
     q.z() = rd_cc_.q_virtual_(5);
     q.w() = rd_cc_.q_virtual_(MODEL_DOF_QVIRTUAL-1);   
-
+    
     base_lin_vel = q.conjugate()*(rd_cc_.q_dot_virtual_.segment(0,3));
     base_ang_vel = (rd_cc_.q_dot_virtual_.segment(3,3));
-
-    // for (int i=0; i<6; i++)
-    // {
-    //     state_cur_(data_idx) = rd_cc_.q_dot_virtual_(i);
-    //     data_idx++;
-    // }
 
     for (int i = 0; i < 3; i++){
         state_cur_(data_idx) = base_lin_vel(i);
@@ -544,28 +539,24 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         state_cur_(data_idx) = base_ang_vel(i);
         data_idx++;
     }
- 
+
+
     Vector3_t grav, projected_grav, forward_vec;
     grav << 0, 0, -1.;
     forward_vec << 1., 0, 0;
     projected_grav = q.conjugate()*grav;
-    
 
-    state_cur_(data_idx) = q.x();
-    std::cout << state_cur_(data_idx) << "\t";
-    data_idx++;
+    Vector3_t forward = q * forward_vec;
+    double heading = DyrosMath::wrap_to_pi(atan2(forward(1), forward(0)));
 
-    state_cur_(data_idx) = q.y();
-    std::cout << state_cur_(data_idx) << "\t";
-    data_idx++;
-
-    state_cur_(data_idx) = q.z();
-    std::cout << state_cur_(data_idx) << "\t";
-    data_idx++;    
-
-    state_cur_(data_idx) = q.w();
-    std::cout << state_cur_(data_idx) << std::endl;
-    data_idx++;    
+    // state_cur_(data_idx) = q.x();
+    // data_idx++;
+    // state_cur_(data_idx) = q.y();
+    // data_idx++;
+    // state_cur_(data_idx) = q.z();
+    // data_idx++;
+    // state_cur_(data_idx) = q.w();
+    // data_idx++;
     // euler_angle_ = DyrosMath::rot2Euler_tf(q.toRotationMatrix());
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(0));
     // data_idx++;
@@ -574,34 +565,30 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
     // state_cur_(data_idx) = DyrosMath::wrap_to_pi(euler_angle_(2));
     // data_idx++;
 
-    // state_cur_(data_idx) = projected_grav(0);
-    // data_idx++;
+    state_cur_(data_idx) = projected_grav(0);
+    data_idx++;
 
-    // state_cur_(data_idx) = projected_grav(1);
-    // data_idx++;
+    state_cur_(data_idx) = projected_grav(1);
+    data_idx++;
 
-    // state_cur_(data_idx) = projected_grav(2);
-    // data_idx++;
-
+    state_cur_(data_idx) = projected_grav(2);
+    data_idx++;
     // std::cout << "start time : " << start_time_ << std::endl;
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
-    // state_cur_(data_idx) = target_vel_x_;// .5;//target_vel_x_;
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_x_, target_vel_x_, 0.0, 0.0);// .5;//target_vel_x_;
+    state_cur_(data_idx) = target_vel_x_;// .5;//target_vel_x_;
     // std::cout << "command : " << state_cur_(data_idx) << std::endl;
     // state_cur_(data_idx) = 0.5;//target_vel_x_;
     data_idx++;
 
-    state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
-    // state_cur_(data_idx) = target_vel_y_; //target_vel_y_; //0.0;//target_vel_y_;
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_y_, target_vel_y_, 0.0, 0.0); //target_vel_y_; //0.0;//target_vel_y_;
+    state_cur_(data_idx) = target_vel_y_; //target_vel_y_; //0.0;//target_vel_y_;
     data_idx++;
 
-    Vector3_t forward = q * forward_vec;
-    heading = DyrosMath::wrap_to_pi(atan2(forward(1), forward(0)));
     // state_cur_(data_idx) = DyrosMath::minmax_cut(4.*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.);
-    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, target_vel_yaw_, 0.0, 0.0);
+    // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 1e6, pre_target_vel_yaw_, target_vel_yaw_, 0.0, 0.0);
     // state_cur_(data_idx) = DyrosMath::cubic(rd_cc_.control_time_us_, start_time_, start_time_ + 3e6, pre_target_vel_yaw_, DyrosMath::minmax_cut(0.5*DyrosMath::wrap_to_pi(target_heading_ - heading), -1., 1.), 0.0, 0.0);
     // ROS_INFO("Current heading : %f\n", heading);
     // ROS_INFO("Target heading : %f\n", target_heading_);
-    // ROS_INFO("Target yaw vel : %f\n", state_cur_(data_idx));
     state_cur_(data_idx) = target_vel_yaw_;
     data_idx++;
 
@@ -1124,6 +1111,13 @@ void CustomController::computeSlow()
                 state_buffer_.block(num_cur_state*i, 0, num_cur_state, 1) = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
                 // state_buffer_.block(num_cur_state*i, 0, num_cur_state, 1).setZero();
             }
+            if (use_encoder_){
+                for (int i = 0; i < history_len_*history_skip_; i++) 
+                {
+                    state_history_.block(0, i, num_cur_state, 1) = (state_cur_ - state_mean_).array() / state_var_.cwiseSqrt().array();
+                    // state_buffer_.block(num_cur_state*i, 0, num_cur_state, 1).setZero();
+                }
+            }
         }
 
         processNoise();
@@ -1154,7 +1148,7 @@ void CustomController::computeSlow()
             // action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/250.0, 0.0, 5/250.0);
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/125.0, 0.0, 5/125.0);
             // std::cout << "Value : " << value_ << std::endl;
-            if (value_ < 0.0)
+            if (value_ < -100.0)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -1183,7 +1177,7 @@ void CustomController::computeSlow()
                     writeFile << heading << "\t";
 
                     writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
-                    writeFile << state_cur_(10) << "\t" << state_cur_(12) << "\t" << target_heading_ << "\t";
+                    writeFile << state_cur_(9) << "\t" << state_cur_(11) << "\t" << target_heading_ << "\t";
                     if (morphnet) writeFile << morphnet_output_.transpose() << "\t";
                     // else writeFile << hidden_layer2_.transpose() << "\t";
                     writeFile << std::endl;
