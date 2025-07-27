@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Joy.h>
+#include "onnxruntime_cxx_api.h"
 
 class CustomController
 {
@@ -26,109 +27,69 @@ public:
     RobotData &rd_;
     RobotData rd_cc_;
 
-    void loadNetwork();
+    void loadOnnX();
     void processNoise();
     void processBias();
     void initBias();
     Eigen::Matrix<double, MODEL_DOF, 1> q_bias_;
     void processObservation();
-    void feedforwardPolicy();
-    MatrixXd conv_layer(const MatrixXd &input, const MatrixXd &weights, const MatrixXd &biases, int kernel_size, int stride);
-    void feedforwardEncoder();
     void initVariable();
+    void feedforwardPolicy();
+    void updateNextStepTime();
 
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
 
+
+    /////////////////////////////////// ONNX Runtime by Yongarry ///////////////////////////////////////
+    size_t input_number, output_number;
+    std::vector<std::string> input_names, output_names;
+    std::vector<const char *> input_names_char, output_names_char;
+    std::vector<Ort::Value> input_tensors, output_tensors;
+    std::vector<std::vector<float>> input_states_buffer;
+
+    size_t input_number_n, output_number_n;
+    std::vector<std::string> input_names_n, output_names_n;
+    std::vector<const char *> input_names_char_n, output_names_char_n;
+    std::vector<Ort::Value> input_tensors_n, output_tensors_n;
+    std::vector<std::vector<float>> input_states_buffer_n;
+
+    size_t input_number_d, output_number_d;
+    std::vector<std::string> input_names_d, output_names_d;
+    std::vector<const char *> input_names_char_d, output_names_char_d;
+    std::vector<Ort::Value> input_tensors_d, output_tensors_d;
+    std::vector<std::vector<float>> input_states_buffer_d;
+
+    size_t input_number_c, output_number_c;
+    std::vector<std::string> input_names_c, output_names_c;
+    std::vector<const char *> input_names_char_c, output_names_char_c;
+    std::vector<Ort::Value> input_tensors_c, output_tensors_c;
+    std::vector<std::vector<float>> input_states_buffer_c;
+
+    std::vector<float> state_cur_, critic_state_cur_, latent_cur_, h_cur_;
+    std::vector<float> normalized_state_cur_;
+
+    int input_obs_idx_ = 0;
+    int input_h0_idx_ = 1;
+    int output_action_idx_ = 0;
+    int output_latent_idx_ = 1;
+    int output_hn_idx_ = 2;
+
     static const int num_action = 12;
     static const int num_actuator_action = 12;
-    static const int num_cur_state = 65;
-    static const int num_cur_internal_state = 80;
-    static const int num_state_skip = 2;
-    static const int num_state_hist = 10;
-    static const int num_state = num_cur_state * num_state_hist; // num_cur_internal_state*num_state_hist+num_action*(num_state_hist-1);
-    static const int num_hidden1 = 512;
-    static const int num_hidden2 = 512;
-    static const int num_hidden3 = 128;
+    static const int num_cur_state = 47;
+    static const int num_cur_critic_state = 166;
+    static const int num_cur_latent = 24;
+    static const int num_cur_h = 256;
 
-    Eigen::MatrixXd policy_net_w0_;
-    Eigen::MatrixXd policy_net_b0_;
-    Eigen::MatrixXd policy_net_w2_;
-    Eigen::MatrixXd policy_net_b2_;
-    Eigen::MatrixXd policy_net_w4_;
-    Eigen::MatrixXd policy_net_b4_;
-    Eigen::MatrixXd action_net_w_;
-    Eigen::MatrixXd action_net_b_;
-    Eigen::MatrixXd hidden_layer1_;
-    Eigen::MatrixXd hidden_layer2_;
-    Eigen::MatrixXd hidden_layer3_;
     Eigen::MatrixXd rl_action_;
-
-    Eigen::MatrixXd value_net_w0_;
-    Eigen::MatrixXd value_net_b0_;
-    Eigen::MatrixXd value_net_w2_;
-    Eigen::MatrixXd value_net_b2_;
-    Eigen::MatrixXd value_net_w4_;
-    Eigen::MatrixXd value_net_b4_;
-    Eigen::MatrixXd value_net_w_;
-    Eigen::MatrixXd value_net_b_;
-    Eigen::MatrixXd value_hidden_layer1_;
-    Eigen::MatrixXd value_hidden_layer2_;
-    Eigen::MatrixXd value_hidden_layer3_;
     double value_;
-
 
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
     float stop_start_time_;
-    
-    Eigen::MatrixXd state_;
-    Eigen::MatrixXd state_cur_;
-    Eigen::MatrixXd state_buffer_;
-    Eigen::MatrixXd state_mean_;
-    Eigen::MatrixXd state_var_;
 
-    // encoder
-    static const bool use_encoder_ = false;
-    bool encoder_initialized = false;
-    
-    Eigen::MatrixXd state_history_;
-    Eigen::MatrixXd encoder_input_;
-    Eigen::MatrixXd encoder_output_;
-    static const int history_len_ = 50;
-    static const int history_skip_ = 5;
-    static const int encoder_dim_ = 8;
-    static const int encoder_conv1_kernel_ = 6;
-    static const int encoder_conv1_stride_ = 3;
-    static const int encoder_conv1_output_channel_ = 32;
-    static const int encoder_conv1_input_channel_ = num_cur_state;
-    static const int encoder_conv1_output_size_ = (history_len_-encoder_conv1_kernel_) / encoder_conv1_stride_ + 1;
-
-    static const int encoder_conv2_kernel_ = 4;
-    static const int encoder_conv2_stride_ = 2;
-    static const int encoder_conv2_output_channel_ = 16;
-    static const int encoder_conv2_input_channel_ = encoder_conv1_output_channel_;
-    static const int encoder_conv2_output_size_ = (encoder_conv1_output_size_-encoder_conv2_kernel_) / encoder_conv2_stride_ + 1;
-
-    static const int encoder_fc_input_ = 16*encoder_conv2_output_size_;
-
-    Eigen::MatrixXd encoder_conv1_w_;
-    Eigen::MatrixXd encoder_conv1_b_;
-    Eigen::MatrixXd encoder_hidden_layer1_;
-    Eigen::MatrixXd encoder_conv2_w_;
-    Eigen::MatrixXd encoder_conv2_b_;
-    Eigen::MatrixXd encoder_hidden_layer2_;
-    Eigen::MatrixXd encoder_fc_w_;
-    Eigen::MatrixXd encoder_fc_b_;
-    void loadEncoderNetwork();
-
-    Eigen::MatrixXd policy_input_;
-    static const int policy_input_dim_ =  (use_encoder_) 
-                                       ? num_state + encoder_dim_
-                                       : num_state;
     std::ofstream writeFile;
     std::ofstream evalFile;
-
-    float phase_ = 0.0;
 
     bool is_on_robot_ = false;
     bool is_write_file_ = true;
@@ -144,6 +105,9 @@ public:
     Eigen::Matrix<double, MODEL_DOF, 1> torque_spline_;
     Eigen::Matrix<double, MODEL_DOF, 1> torque_rl_;
     Eigen::Matrix<double, MODEL_DOF, 1> torque_bound_;
+    Eigen::Matrix<double, num_action, 2> pd_limit;
+    const char ctrl_type = 'T';
+
 
     Eigen::Matrix<double, MODEL_DOF, MODEL_DOF> kp_;
     Eigen::Matrix<double, MODEL_DOF, MODEL_DOF> kv_;
@@ -166,335 +130,33 @@ public:
     void joyCallback(const sensor_msgs::Joy::ConstPtr& joy);
     ros::Subscriber joy_sub_;
 
-
     std::string base_path = "";
-    std::string loadPathFromConfig(const std::string &config_file);
     void loadCommand(const std::string &command_file);
 
-
     // BIPED WALKING PARAMETER
-    void walkingParameterSetting();
-    const int number_of_foot_step = 2;
-    Eigen::Vector3d phase_indicator_;
-    Eigen::Vector3d step_length_x_;
-    Eigen::Vector3d step_length_y_;
-    Eigen::Vector3d step_yaw_;
-    Eigen::Vector3d t_dsp_;
-    Eigen::Vector3d t_ssp_;
-    Eigen::Vector3d t_dsp_seconds;
-    Eigen::Vector3d t_ssp_seconds;
-    Eigen::Vector3d foot_height_;
-    Eigen::Vector3d t_total_;
-    int first_stance_foot_ = 1; // 1 means right foot stance, 0 means left foot stance
-    const double com_height_ = 0.68;
+    float phase_indicator_ = 0;
+    Eigen::Vector3d commands_;
+    double target_heading_;
+    bool heading_mode_ = true;
+    float step_period_ = 0.8;
+    float step_ticks_ = 0.0;
+    float max_stride_x = 0.4;
+    float max_stride_y = 0.2;
+    float max_stride_yaw = 0.6;
 
-    double t_last_;
-    double t_start_;
-    double t_temp_;  
-    double t_double1_;
-    double t_double2_;
-    double zmp_offset = 0.02;
-    double zmp_offset_x = 0.0;
-
-
-
-    // Policy input
-    Eigen::VectorXd target_com_state_stance_frame_;
-    Eigen::VectorXd target_swing_state_stance_frame_;
-
-
-    Eigen::MatrixXd foot_step_;
-    Eigen::MatrixXd foot_step_offset_;
-    Eigen::MatrixXd foot_step_support_frame_;
-    Eigen::MatrixXd foot_step_support_frame_offset_;
-
-    Eigen::Isometry3d pelv_support_start_;
-    // Eigen::Isometry3d pelv_support_init_;
-    Eigen::Isometry3d pelv_support_init_yaw_;
-
-    Eigen::Vector3d com_desired_;
-    Eigen::Vector3d com_desired_dot_;
-
-    Eigen::Vector3d com_support_init_yaw_;
-    Eigen::Vector3d com_support_init_dot_yaw_;
-
-    Eigen::Vector3d com_support_current_;
-    Eigen::Vector3d com_support_current_dot_;
-    Eigen::Vector3d com_support_current_dot_prev_;
-    Eigen::Vector3d com_global_current_;
-    Eigen::Vector3d com_global_current_dot_;
-    Eigen::Vector3d com_global_current_dot_prev_;
-
-    Eigen::Vector3d pelv_rpy_current_;
-    Eigen::Vector3d rfoot_rpy_current_;
-    Eigen::Vector3d lfoot_rpy_current_;
-    Eigen::Isometry3d pelv_yaw_rot_current_from_global_;
-    Eigen::Isometry3d rfoot_roll_rot_;
-    Eigen::Isometry3d lfoot_roll_rot_;
-    Eigen::Isometry3d rfoot_pitch_rot_;
-    Eigen::Isometry3d lfoot_pitch_rot_;
-    Eigen::Isometry3d rfoot_yaw_rot_;
-    Eigen::Isometry3d lfoot_yaw_rot_;
-
-    Eigen::Isometry3d pelv_global_current_;
-    Eigen::Isometry3d lfoot_global_current_;
-    Eigen::Isometry3d rfoot_global_current_;
-    Eigen::Isometry3d pelv_global_init_;
-    Eigen::Isometry3d lfoot_global_init_;
-    Eigen::Isometry3d rfoot_global_init_;
-
-    Eigen::Isometry3d pelv_trajectory_support_; //local frame
-    Eigen::Isometry3d pelv_trajectory_support_fast_; //local frame
-    Eigen::Isometry3d pelv_trajectory_support_slow_; //local frame
-    
-    Eigen::Isometry3d rfoot_trajectory_support_;  //local frame
-    Eigen::Isometry3d lfoot_trajectory_support_;
-    Eigen::Isometry3d lfoot_trajectory_support_fast_;
-    Eigen::Isometry3d lfoot_trajectory_support_slow_;
-
-    Eigen::Vector3d rfoot_trajectory_euler_support_;
-    Eigen::Vector3d lfoot_trajectory_euler_support_;
-
-    Eigen::Isometry3d pelv_trajectory_float_; //pelvis frame
-
-    Eigen::Vector3d com_trajectory_float_;
-
-    Eigen::Isometry3d lfoot_trajectory_float_;
-    Eigen::Isometry3d lfoot_trajectory_float_fast_;
-    Eigen::Isometry3d lfoot_trajectory_float_slow_;
-
-    Eigen::Isometry3d rfoot_trajectory_float_;
-    Eigen::Isometry3d rfoot_trajectory_float_fast_;
-    Eigen::Isometry3d rfoot_trajectory_float_slow_;
-
-    Eigen::Vector3d pelv_support_euler_init_yaw_;
-    Eigen::Vector3d lfoot_support_euler_init_yaw_;
-    Eigen::Vector3d rfoot_support_euler_init_yaw_;
-    double wn = sqrt(GRAVITY / com_height_);
-
-    double walking_end_flag = 0;
-    
-    Eigen::Isometry3d swingfoot_global_current_; 
-    Eigen::Isometry3d supportfoot_global_current_; // Only yaw is considered
-
-    Eigen::Isometry3d pelv_support_current_;
-    Eigen::Isometry3d lfoot_support_current_;
-    Eigen::Isometry3d rfoot_support_current_;
-
-    Eigen::Isometry3d lfoot_support_init_yaw_;
-    Eigen::Isometry3d rfoot_support_init_yaw_;
-    
-    Eigen::Isometry3d target_com_state_float_frame_, target_lfoot_state_float_frame_, target_rfoot_state_float_frame_;
-
-    
-    Eigen::MatrixXd ref_zmp_;
-    Eigen::MatrixXd ref_zmp_container;
-    Eigen::MatrixXd ref_zmp_thread3;
-    Eigen::VectorXd ref_com_yaw_;
-    Eigen::VectorXd ref_com_yawvel_;
-    // PREVIEW CONTROL
-    Eigen::Vector3d x_preview_;
-    Eigen::Vector3d y_preview_;
-
-    Eigen::Vector3d xs_preview_;
-    Eigen::Vector3d ys_preview_;
-    Eigen::Vector3d xd_preview_;
-    Eigen::Vector3d yd_preview_; 
-
-    Eigen::MatrixXd Gi_preview_;
-    Eigen::MatrixXd Gx_preview_;
-    Eigen::VectorXd Gd_preview_;
-    Eigen::MatrixXd A_preview_;
-    Eigen::VectorXd B_preview_;
-    Eigen::MatrixXd C_preview_;
-    double UX_preview_, UY_preview_, EX_preview_, EY_preview_;
-
-
-    Eigen::Vector6d l_ft_;
-    Eigen::Vector6d r_ft_;
-    Eigen::Vector6d l_ft_LPF;
-    Eigen::Vector6d r_ft_LPF;
-    Eigen::Vector2d zmp_measured_mj_;
-    Eigen::Vector2d zmp_measured_LPF_;
-
-    double P_angle_i = 0;
-    double P_angle = 0;
-    double P_angle_input_dot = 0;
-    double P_angle_input = 0;
-    double R_angle = 0;
-    double R_angle_input_dot = 0;
-    double R_angle_input = 0;
-    double aa = 0; 
-    double Y_angle_input = 0;
-
-    // BOOLEAN OPERATOR
-    bool walking_enable_;
-    bool is_lfoot_support = false;
-    bool is_rfoot_support = false;
-    bool is_dsp1 = false;
-    bool is_ssp  = false;
-    bool is_dsp2 = false;
-    bool is_preview_ctrl_init = true;
-
-    // Logging
-    Eigen::Isometry3d supportfoot_global_init_; // Used just to compute init_yaw_
-    Eigen::Isometry3d supportfoot_global_init_yaw_;
-    Eigen::VectorXd swing_state_stance_frame_;
-    Eigen::VectorXd com_state_stance_frame_;
-
-    // USER COMMAND
-    double Lcommand_step_length_x_ = 0.;
-    double Lcommand_step_length_y_ = 0.21;
-    double Lcommand_step_yaw_ = 0.;
-    double Lcommand_t_dsp_ = 0.1;
-    double Lcommand_t_ssp_ = .7;
-    double Lcommand_foot_height_ = 0.08;
-
-    double Rcommand_step_length_x_ = 0.;
-    double Rcommand_step_length_y_ = 0.21;
-    double Rcommand_step_yaw_ = 0.;
-    double Rcommand_t_dsp_ = 0.1;
-    double Rcommand_t_ssp_ = .7;
-    double Rcommand_foot_height_ = 0.08;
-
-    bool ideal_preview = false;
-
-    int ctrl_mode = 2; // 0 for Joystick Mode 1 for Stepping Stone, 2 for Random Command, 3 for Data Collection
-    int current_step_number = 0;
-    int planned_step_number = 30; // 30
-    Eigen::VectorXd foothold_x_planned; // These are the locations and desired yaw angles of the stepping stones, in global frame coordinates.
-    Eigen::VectorXd foothold_y_planned;
-    Eigen::VectorXd foothold_yaw_planned;
-    Eigen::VectorXd t_dsp_planned;
-    Eigen::VectorXd t_ssp_planned;
-    Eigen::VectorXd foot_height_planned;
-    Eigen::Vector3d lfoot_global_state; // These are (X,Y,yaw) info in global frame coordinates. Used for generating next foothold commands when stepping stone coordinates are given in global frame coordinates.
-    Eigen::Vector3d rfoot_global_state;
-
-
-    int iter_x_l=0;
-    int iter_x_r=0;
-    int iter_y_l_ls =0;
-    int iter_y_l_rs =0;
-    int iter_y_r_ls =0;
-    int iter_y_r_rs =0;
-    int iter_y_r =0;
-    int iter_yaw_l_ls=0;
-    int iter_yaw_l_rs=0;
-    int iter_yaw_r_ls=0;
-    int iter_yaw_r_rs=0;
-    int iter_end_x=0;
-    int iter_end_y_l_ls =0;
-    int iter_end_y_l_rs =0;
-    int iter_end_y_r_ls =0;
-    int iter_end_y_r_rs =0;
-    int iter_end_y_r =0;
-    int iter_end_yaw_l=0;
-    int iter_end_yaw_r=0;
-    double joy_x;
-    double joy_y;
-    double joy_height = 0.12;
-    double joy_length =0.0;
-    double joy_length_y =0.21;
-    double joy_length_temp =0.2;
-    double joy_length_y_temp =0.35;
-    double joy_length_command =0.;
-    double joy_length_y_r_command =0.;
-    double joy_length_y_l_command =0.;
-    double joy_length_previous=0.0;
-    double joy_length_r =0.;
-    double joy_length_l =0.;
-    double joy_length_y_l =0.21;
-    double joy_length_y_r =0.21;
-    double joy_length_y_r_temp =0.21;
-    double joy_length_y_l_temp =0.21;
-    double joy_length_y_l_previous =0.21;
-    double joy_length_y_r_previous =0.21;
-    double joy_yaw_r =0.;
-    double joy_yaw_l =0.;
-    double joy_yaw_l_previous =0.;
-    double joy_yaw_r_previous =0.;
-    double joy_yaw_r_command =0.;
-    double joy_yaw_l_command =0.;
-    double swing_previous_l =0.;
-    double swing_previous_r =0.;
-    double joy_temp;
-    
-    
-    double joy_left_foot_pos;
-    double joy_right_foot_pos;
-    double joy_walking_tick;
-    double previous_l =0.;
-    double previous_r =0.;
-    double current_l =0.;
-    double current_r =0.;
-    double previous_lswing =0.;
-    double previous_rswing =0.;
-    double current_lswing =0.;
-    double current_rswing =0.;
-
-
-    std::vector<int> last_buttons_0;
-    std::vector<int> last_buttons_1;
-    std::vector<int> last_buttons_2;
-    std::vector<int> last_buttons_3;
-    std::vector<double> joy_walking_tick_temp;
-    std::vector<double> joy_length_previous_vec= std::vector<double>(10,0.0);;
-    std::vector<double> swing_previous_r_vec;
-    std::vector<double> swing_previous_l_vec;
-    std::vector<double> joy_yaw_l_previous_vec = std::vector<double>(10,0.0);
-    std::vector<double> joy_yaw_r_previous_vec= std::vector<double>(10,0.0);
-    std::vector<double> joy_length_y_r_previous_vec= std::vector<double>(10,0.21);;
-    std::vector<double> joy_length_y_l_previous_vec= std::vector<double>(10,0.21);
-    std::vector<double> last_buttons_7;
-
-    double x_error = 0;
-    double y_error = 0;
-    double yaw_error = 0;
-
-    double norm;
-
-    // PREVIEW CONTROL
-    void updateInitialState();
-    void updateFootstepCommand();
-    void getRobotState();
-    void walkingStateMachine();
-    void calculateFootStepTotal();
-    void supportToFloatPattern();
-    void floatToSupportFootstep();
-    void updateNextStepTime();
-    void resetPreviewState();
-    void windupPreview();
-    void computeIkControl(const Eigen::Isometry3d &float_trunk_transform, const Eigen::Isometry3d &float_lleg_transform, const Eigen::Isometry3d &float_rleg_transform, Eigen::Vector12d &q_des);
-
-    void getZmpTrajectory();
-    void addZmpOffset();
-    void zmpGenerator(const unsigned int norm_size);
-    void onestepZmp(unsigned int current_step_number, Eigen::VectorXd &temp_px, Eigen::VectorXd &temp_py, Eigen::VectorXd& temp_yaw, Eigen::VectorXd &temp_yawvel);
-
-    void getComTrajectory(); 
-    void previewcontroller(double dt, int NL, int tick, 
-                           Eigen::Vector3d &x_k, Eigen::Vector3d &y_k, double &UX, double &UY,
-                           const Eigen::MatrixXd &Gi, const Eigen::VectorXd &Gd, const Eigen::MatrixXd &Gx, 
-                           const Eigen::MatrixXd &A,  const Eigen::VectorXd &B,  const Eigen::MatrixXd &C);
-    void preview_Parameter(double dt, int NL, Eigen::MatrixXd& Gi, Eigen::VectorXd& Gd, Eigen::MatrixXd& Gx, Eigen::MatrixXd& A, Eigen::VectorXd& B, Eigen::MatrixXd& C);
-    void getComTrajectory_mpc();
-    void getFootTrajectory(); 
-    void getTargetState(); 
-
-    // Data Collection
-    double step_length_x_fixed = 0.45;
-    double step_length_y_fixed = 0.21;
-    double target_heading = 0.0;
-    double heading_error = 0.0;
-    double t_dsp_fixed = 0.05;
-    double t_ssp_fixed = 0.5;
-    double foot_height_fixed = 0.06;
-
+    int ctrl_mode = 1; // 0 for joystick
 
 private:
     Eigen::VectorQd ControlVal_;
     unsigned int walking_tick = 0;
     unsigned int walking_tick_container = 0;
+
+    Ort::Env env;
+    Ort::Session session;
+    Ort::Session session_n;
+    Ort::Session session_d;
+    Ort::Session session_c;
+    Ort::MemoryInfo memory_info;
+
 
 };
