@@ -723,7 +723,7 @@ void CustomController::computeSlow()
 
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
-            if (value_ < 0.)
+            if (value_ < 1.)
             {
                 if (stop_by_value_thres_ == false)
                 {

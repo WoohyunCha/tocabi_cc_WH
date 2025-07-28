@@ -35,6 +35,7 @@ public:
     void processObservation();
     void initVariable();
     void feedforwardPolicy();
+    void processEverythingElse();
     void updateNextStepTime();
 
     Eigen::Vector3d mat2euler(Eigen::Matrix3d mat);
@@ -65,8 +66,14 @@ public:
     std::vector<Ort::Value> input_tensors_c, output_tensors_c;
     std::vector<std::vector<float>> input_states_buffer_c;
 
+    size_t input_number_dn, output_number_dn;
+    std::vector<std::string> input_names_dn, output_names_dn;
+    std::vector<const char *> input_names_char_dn, output_names_char_dn;
+    std::vector<Ort::Value> input_tensors_dn, output_tensors_dn;
+    std::vector<std::vector<float>> input_states_buffer_dn;
+
     std::vector<float> state_cur_, critic_state_cur_, latent_cur_, h_cur_;
-    std::vector<float> normalized_state_cur_;
+    std::vector<float> normalized_state_cur_, normalized_critic_state_cur_;
 
     int input_obs_idx_ = 0;
     int input_h0_idx_ = 1;
@@ -82,7 +89,7 @@ public:
     static const int num_cur_h = 256;
 
     Eigen::MatrixXd rl_action_;
-    double value_;
+    double value_ = 1;
 
     bool stop_by_value_thres_ = false;
     Eigen::Matrix<double, MODEL_DOF, 1> q_stop_;
@@ -91,7 +98,7 @@ public:
     std::ofstream writeFile;
     std::ofstream evalFile;
 
-    bool is_on_robot_ = false;
+    bool is_on_robot_ = true;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
@@ -134,20 +141,20 @@ public:
     void loadCommand(const std::string &command_file);
 
     // BIPED WALKING PARAMETER
-    float phase_indicator_ = 0;
+    float phase_indicator_ = 1;
     Eigen::Vector3d commands_;
     double target_heading_;
-    bool heading_mode_ = true;
+    bool heading_mode_ = false;
     float step_period_ = 0.8;
     float step_ticks_ = 0.0;
     float max_stride_x = 0.4;
-    float max_stride_y = 0.2;
+    float max_stride_y = 0.12;
     float max_stride_yaw = 0.6;
 
-    int ctrl_mode = 0; // 0 for joystick
+    float vel_scale_x_ = 0.3;
+    float vel_scale_y_ = 0.1;
 
-    float vel_scale_x_ = 0.6;
-    float vel_scale_y_ = 0.2;
+    int ctrl_mode = 0; // 0 for joystick
 
 private:
     Eigen::VectorQd ControlVal_;
@@ -157,6 +164,7 @@ private:
     Ort::Env env;
     Ort::Session session;
     Ort::Session session_n;
+    Ort::Session session_dn;
     Ort::Session session_d;
     Ort::Session session_c;
     Ort::MemoryInfo memory_info;
