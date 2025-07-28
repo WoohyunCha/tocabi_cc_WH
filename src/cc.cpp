@@ -8,7 +8,8 @@ CustomController::CustomController(RobotData &rd) : rd_(rd), //, wbc_(dc.wbc_)
         session(nullptr),
         session_n(nullptr),
         session_d(nullptr),
-        session_c(nullptr)
+        session_c(nullptr),
+        session_dn(nullptr)
 {
     ControlVal_.setZero();
 
@@ -39,6 +40,7 @@ void CustomController::initVariable()
     state_cur_.resize(num_cur_state, 1);
     critic_state_cur_.resize(num_cur_critic_state, 1);
     normalized_state_cur_.resize(num_cur_state, 1);
+    normalized_critic_state_cur_.resize(num_cur_critic_state, 1);
     h_cur_.resize(num_cur_h, 1);
     latent_cur_.resize(num_cur_latent, 1);
     std::fill(h_cur_.begin(), h_cur_.end(), 0.0f);
@@ -115,6 +117,7 @@ void CustomController::loadOnnX()
     string cur_path = "/home/cha/catkin_ws/src/tocabi_cc/";
     string actor_path = "/home/cha/isaac_ws/AMP_for_hardware/logs/onnx/actor.onnx";
     string normalizer_path = "/home/cha/isaac_ws/AMP_for_hardware/logs/onnx/normalizer.onnx";
+    string denormalizer_path = "/home/cha/isaac_ws/AMP_for_hardware/logs/onnx/denormalizer.onnx";
     string decoder_path = "/home/cha/isaac_ws/AMP_for_hardware/logs/onnx/decoder.onnx";
     string critic_path = "/home/cha/isaac_ws/AMP_for_hardware/logs/onnx/critic.onnx";
 
@@ -124,6 +127,7 @@ void CustomController::loadOnnX()
         cur_path = "/home/dyros/catkin_ws/src/tocabi_cc/";
         string actor_path = cur_path + "onnx_files/actor.onnx"; 
         string normalizer_path = cur_path + "onnx_files/normalizer.onnx";
+        string denormalizer_path = cur_path + "onnx_files/denormalizer.onnx";
         string decoder_path = cur_path + "onnx_files/decoder.onnx";
         string critic_path = cur_path + "onnx_files/critic.onnx";
     }
@@ -139,6 +143,7 @@ void CustomController::loadOnnX()
 
     session = Ort::Session(env, actor_path.c_str(), session_options);
     session_n = Ort::Session(env, normalizer_path.c_str(), session_options);
+    session_dn = Ort::Session(env, denormalizer_path.c_str(), session_options);
     session_d = Ort::Session(env, decoder_path.c_str(), session_options);
     session_c = Ort::Session(env, critic_path.c_str(), session_options);
 
@@ -148,6 +153,8 @@ void CustomController::loadOnnX()
     output_number = session.GetOutputCount();
     input_number_n = session_n.GetInputCount();
     output_number_n = session_n.GetOutputCount();
+    input_number_dn = session_dn.GetInputCount();
+    output_number_dn = session_dn.GetOutputCount();
     input_number_d = session_d.GetInputCount();
     output_number_d = session_d.GetOutputCount();
     input_number_c = session_c.GetInputCount();
@@ -157,6 +164,8 @@ void CustomController::loadOnnX()
     output_names.resize(output_number);
     input_names_n.resize(input_number_n);
     output_names_n.resize(output_number_n);
+    input_names_dn.resize(input_number_dn);
+    output_names_dn.resize(output_number_dn);
     input_names_d.resize(input_number_d);
     output_names_d.resize(output_number_d);
     input_names_c.resize(input_number_c);
@@ -166,6 +175,8 @@ void CustomController::loadOnnX()
     output_names_char.resize(output_names.size());
     input_names_char_n.resize(input_names_n.size());
     output_names_char_n.resize(output_names_n.size());
+    input_names_char_dn.resize(input_names_dn.size());
+    output_names_char_dn.resize(output_names_dn.size());
     input_names_char_d.resize(input_names_d.size());
     output_names_char_d.resize(output_names_d.size());
     input_names_char_c.resize(input_names_c.size());
@@ -187,6 +198,15 @@ void CustomController::loadOnnX()
     for (size_t i = 0; i < output_number_n; i++) {
         Ort::AllocatedStringPtr output_name_n = session_n.GetOutputNameAllocated(i, allocator);
         output_names_n[i] = output_name_n.get();
+    }
+
+    for (size_t i = 0; i < input_number_dn; i++) {
+        Ort::AllocatedStringPtr input_name_dn = session_dn.GetInputNameAllocated(i, allocator);
+        input_names_dn[i] = input_name_dn.get();
+    }
+    for (size_t i = 0; i < output_number_dn; i++) {
+        Ort::AllocatedStringPtr output_name_dn = session_dn.GetOutputNameAllocated(i, allocator);
+        output_names_dn[i] = output_name_dn.get();
     }
 
     for (size_t i = 0; i < input_number_d; i++) {
@@ -223,6 +243,15 @@ void CustomController::loadOnnX()
 
     std::cout << "Output names Normalizer: ";
     std::copy(output_names_n.begin(), output_names_n.end(), std::ostream_iterator<std::string>(std::cout, " "));
+    std::cout << std::endl;
+
+    // Print input/output names
+    std::cout << "Input names Normalizer: "; 
+    std::copy(input_names_dn.begin(), input_names_dn.end(), std::ostream_iterator<std::string>(std::cout, " "));
+    std::cout << std::endl;
+
+    std::cout << "Output names Normalizer: ";
+    std::copy(output_names_dn.begin(), output_names_dn.end(), std::ostream_iterator<std::string>(std::cout, " "));
     std::cout << std::endl;
 
     // Print input/output names
@@ -271,7 +300,6 @@ void CustomController::loadOnnX()
             input_shape.size()));
     }
 
-
     for (size_t i = 0; i < input_names_n.size(); ++i) { 
         input_names_char_n[i] = input_names_n[i].c_str();
     }
@@ -293,6 +321,29 @@ void CustomController::loadOnnX()
             input_states_buffer_n.back().size(),
             input_shape_n.data(),
             input_shape_n.size()));
+    }
+
+    for (size_t i = 0; i < input_names_dn.size(); ++i) { 
+        input_names_char_dn[i] = input_names_dn[i].c_str();
+    }
+    for (size_t i = 0; i < output_names_dn.size(); ++i) { 
+        output_names_char_dn[i] = output_names_dn[i].c_str();
+    }
+    // Initialize input tensors
+    for (size_t i = 0; i < input_number_dn; ++i) {
+        Ort::TypeInfo type_info = session_dn.GetInputTypeInfo(i);
+        auto tensor_info = type_info.GetTensorTypeAndShapeInfo();
+        std::vector<int64_t> input_shape_dn = tensor_info.GetShape();
+        cout << "Normalizer Input " << i << " shape: " << input_shape_dn.size() << endl;
+        std::vector<float> input_tensor_values(tensor_info.GetElementCount(), 0.0);
+        input_states_buffer_dn.push_back(std::move(input_tensor_values));
+
+        input_tensors_dn.emplace_back(Ort::Value::CreateTensor<float>(
+            memory_info,
+            input_states_buffer_dn.back().data(),
+            input_states_buffer_dn.back().size(),
+            input_shape_dn.data(),
+            input_shape_dn.size()));
     }
 
     for (size_t i = 0; i < input_names_d.size(); ++i) { 
@@ -474,7 +525,8 @@ void CustomController::processObservation() // [linvel, angvel, proj_grav, comma
         }
         data_idx++;
     }
-
+    // std::cout << "step ticks : " << step_ticks_ << std::endl;
+    // std::cout << "step period : " << step_period_ << std::endl;
     state_cur_[data_idx] = cos(2*M_PI*(step_ticks_+phase_indicator_*step_period_)/(2*step_period_));
     data_idx++;
     state_cur_[data_idx] = sin(2*M_PI*(step_ticks_+phase_indicator_*step_period_)/(2*step_period_));
@@ -525,6 +577,11 @@ void CustomController::feedforwardPolicy()
     for (size_t i = 0; i < num_actuator_action; i++) {
         rl_action_(i) = output_tensors[output_action_idx_].GetTensorMutableData<float>()[i];
     }
+
+}
+
+void CustomController::processEverythingElse()
+{
     for (size_t i = 0; i < num_cur_latent; i++) {
         latent_cur_[i] = output_tensors[output_latent_idx_].GetTensorMutableData<float>()[i];
     }
@@ -547,16 +604,64 @@ void CustomController::feedforwardPolicy()
     }
 
     for (size_t i = 0; i < num_cur_critic_state; i++) {
-        critic_state_cur_[i] = output_tensors_d[0].GetTensorMutableData<float>()[i];
+        normalized_critic_state_cur_[i] = output_tensors_d[0].GetTensorMutableData<float>()[i];
     }
 
-    std::copy(critic_state_cur_.begin(),
-                critic_state_cur_.begin() + num_cur_critic_state,
+    std::copy(normalized_critic_state_cur_.begin(),
+                normalized_critic_state_cur_.begin() + num_cur_critic_state,
                 input_states_buffer_c[0].begin());
+    std::copy(normalized_critic_state_cur_.begin(),
+                normalized_critic_state_cur_.begin() + num_cur_critic_state,
+                input_states_buffer_dn[0].begin());
     // output tensor to value_
     output_tensors_c = session_c.Run(Ort::RunOptions{nullptr}, input_names_char_c.data(), input_tensors_c.data(), input_number_c, output_names_char_c.data(), output_number_c);
+    output_tensors_dn = session_dn.Run(Ort::RunOptions{nullptr}, input_names_char_dn.data(), input_tensors_dn.data(), input_number_dn, output_names_char_dn.data(), output_number_dn);
     value_ = output_tensors_c[0].GetTensorMutableData<float>()[0];
+    for (size_t i = 0; i < num_cur_critic_state; i++) {
+        critic_state_cur_[i] = output_tensors_dn[0].GetTensorMutableData<float>()[i];
+    }
     // std::cout << "value : " << value_ << std::endl;
+    // int data_idx = 0;
+    // data_idx += num_cur_state;
+    // std::cout << "predicted lin vel : " << critic_state_cur_[data_idx] << "\t" << critic_state_cur_[data_idx+1] << "\t" << critic_state_cur_[data_idx+2] << std::endl;
+    // data_idx += 3;
+    // data_idx += 8;
+    // std::cout << "predicted reward : " << critic_state_cur_[data_idx] << std::endl;
+    // data_idx += 1;
+    // std::cout << "predicted z contact indicator : " << critic_state_cur_[data_idx] << "\t" << critic_state_cur_[data_idx+1] << std::endl;
+    // data_idx += 2;
+    // std::cout << "predicted injected torque : " ;
+    // for (int i = 0; i < 12; i++)
+    //    std::cout << critic_state_cur_[data_idx + i] << "\t";
+    // std::cout << std::endl;
+    // data_idx += 12;
+    // std::cout << "predicted injected force : ";
+    // for (int i = 0; i < 3; i++)
+    //    std::cout << critic_state_cur_[data_idx + i] << "\t";
+    // std::cout << std::endl;
+
+
+
+    if (is_write_file_)
+    {
+            writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
+            writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
+            writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
+
+            writeFile << rd_cc_.torque_desired.transpose()  << "\t";
+            writeFile << q_noise_.transpose() << "\t";
+            writeFile << q_dot_lpf_.transpose() << "\t";
+            writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
+            writeFile << rd_cc_.q_virtual_.transpose() << "\t";
+            writeFile << heading << "\t";
+
+            writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
+            writeFile << commands_(0) << "\t" << commands_(1) << "\t" << commands_(2) <<"\t";
+            writeFile << std::endl;
+            time_write_pre_ = rd_cc_.control_time_us_;
+        }
+    time_inference_pre_ = rd_cc_.control_time_us_;
+
 }
 
 void CustomController::computeSlow()
@@ -618,7 +723,7 @@ void CustomController::computeSlow()
 
             action_dt_accumulate_ += DyrosMath::minmax_cut(rl_action_(num_action-1)*5/hz_, 0.0, 5/hz_);
 
-            if (value_ < 1.)
+            if (value_ < 0.)
             {
                 if (stop_by_value_thres_ == false)
                 {
@@ -629,26 +734,6 @@ void CustomController::computeSlow()
                 }
             }
 
-            if (is_write_file_)
-            {
-                    writeFile << (rd_cc_.control_time_us_ - time_inference_pre_)/1e6 << "\t";
-                    writeFile << rd_cc_.LF_CF_FT.transpose() << "\t";
-                    writeFile << rd_cc_.RF_CF_FT.transpose() << "\t";
-
-                    writeFile << rd_cc_.torque_desired.transpose()  << "\t";
-                    writeFile << q_noise_.transpose() << "\t";
-                    writeFile << q_dot_lpf_.transpose() << "\t";
-                    writeFile << base_lin_vel.transpose() << "\t" << base_ang_vel.transpose() << "\t" << rd_cc_.q_dot_virtual_.segment(6,33).transpose() << "\t";
-                    writeFile << rd_cc_.q_virtual_.transpose() << "\t";
-                    writeFile << heading << "\t";
-
-                    writeFile << value_ << "\t" << stop_by_value_thres_ << "\t";
-                    writeFile << commands_(0) << "\t" << commands_(1) << "\t" << commands_(2) <<"\t";
-                    writeFile << std::endl;
-                    time_write_pre_ = rd_cc_.control_time_us_;
-                }
-
-            time_inference_pre_ = rd_cc_.control_time_us_;
         }
 
         for (int i = 0; i < num_actuator_action; i++){
@@ -677,6 +762,10 @@ void CustomController::computeSlow()
 
         if (stop_by_value_thres_)
             rd_.torque_desired = kp_ * (q_stop_ - q_noise_) - kv_*q_vel_noise_;
+        if ((rd_cc_.control_time_us_ - time_inference_pre_)/1.0e6 >= 1/hz_) // 125 is the control frequency
+            processEverythingElse();
+
+
     }
 
 }
@@ -736,8 +825,6 @@ void CustomController::updateNextStepTime()
         phase_indicator_ = 1-phase_indicator_;
     }
 }
-
-
 
 void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
