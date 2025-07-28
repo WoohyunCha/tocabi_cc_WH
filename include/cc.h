@@ -91,7 +91,7 @@ public:
     std::ofstream writeFile;
     std::ofstream evalFile;
 
-    bool is_on_robot_ = true;
+    bool is_on_robot_ = false;
     bool is_write_file_ = true;
     Eigen::Matrix<double, MODEL_DOF, 1> q_dot_lpf_;
 
@@ -145,6 +145,9 @@ public:
     float max_stride_yaw = 0.6;
 
     int ctrl_mode = 0; // 0 for joystick
+
+    float vel_scale_x_ = 0.6;
+    float vel_scale_y_ = 0.2;
 
 private:
     Eigen::VectorQd ControlVal_;

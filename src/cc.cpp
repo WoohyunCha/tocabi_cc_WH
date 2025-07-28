@@ -738,9 +738,34 @@ void CustomController::updateNextStepTime()
 }
 
 
-void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
-{   
 
+void CustomController::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+{
+    commands_(0) = DyrosMath::minmax_cut(vel_scale_x_*joy->axes[1], -0.5, 1.0);
+    commands_(1) = DyrosMath::minmax_cut(vel_scale_y_*joy->axes[0] , -0.8, 0.8);
+
+    if (joy->buttons[1] == 1.0 && vel_scale_x_ < 1.0 && vel_scale_y_ < 0.3){
+        vel_scale_x_ += 0.03;
+        vel_scale_y_ += 0.01;
+        ROS_INFO("Velocity X : %f", vel_scale_x_);
+        ROS_INFO("Velocity Y : %f", vel_scale_y_);
+    }
+
+    if (joy->buttons[0] == 1.0 && vel_scale_x_ > 0.1 && vel_scale_y_ > 0.03){
+        vel_scale_x_ -= 0.03;
+        vel_scale_y_ -= 0.01;
+        ROS_INFO("Velocity X : %f", vel_scale_x_);
+        ROS_INFO("Velocity Y : %f", vel_scale_y_);
+    }
+    if(joy->buttons[4] == 1){
+        commands_(2) = 0.6;
+    }
+    if(joy->buttons[5] == 1){
+        commands_(2) = -0.6;
+    }
+    if(joy->buttons[5] != 1 && joy->buttons[4] != 1){
+        commands_(2) = 0.;
+    }
 }
 
 
