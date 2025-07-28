@@ -154,7 +154,7 @@ public:
     float vel_scale_x_ = 0.3;
     float vel_scale_y_ = 0.1;
 
-    int ctrl_mode = 0; // 0 for joystick
+    int ctrl_mode = 1; // 0 for joystick
 
 private:
     Eigen::VectorQd ControlVal_;

@@ -737,8 +737,9 @@ void CustomController::computeSlow()
         }
 
         for (int i = 0; i < num_actuator_action; i++){
-            if (ctrl_type == 'T')
+            if (ctrl_type == 'T'){
                 torque_rl_(i) = DyrosMath::minmax_cut(rl_action_(i), -1., 1.) *torque_bound_(i) ;
+            }
             if (ctrl_type == 'P'){
                 float q_std = (pd_limit(i, 1) - pd_limit(i, 0)) / 2;
                 float q_bias = (pd_limit(i, 1) + pd_limit(i, 0)) / 2;
