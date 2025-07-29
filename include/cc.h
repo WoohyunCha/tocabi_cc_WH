@@ -78,8 +78,8 @@ public:
     int input_obs_idx_ = 0;
     int input_h0_idx_ = 1;
     int output_action_idx_ = 0;
-    int output_latent_idx_ = 1;
-    int output_hn_idx_ = 2;
+    int output_hn_idx_ = 1;
+    int output_latent_idx_ = 2;
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
