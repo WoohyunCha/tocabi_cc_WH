@@ -78,8 +78,8 @@ public:
     int input_obs_idx_ = 0;
     int input_h0_idx_ = 1;
     int output_action_idx_ = 0;
-    int output_latent_idx_ = 1;
-    int output_hn_idx_ = 2;
+    int output_hn_idx_ = 1;
+    int output_latent_idx_ = 2;
 
     static const int num_action = 12;
     static const int num_actuator_action = 12;
@@ -149,10 +149,10 @@ public:
     float step_ticks_ = 0.0;
     float max_stride_x = 0.4;
     float max_stride_y = 0.12;
-    float max_stride_yaw = 0.6;
+    float max_stride_yaw = 0.4;
 
-    float vel_scale_x_ = 0.3;
-    float vel_scale_y_ = 0.1;
+    float vel_scale_x_ = 0.6;
+    float vel_scale_y_ = 0.2;
 
     int ctrl_mode = 0; // 0 for joystick
 
