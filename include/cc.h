@@ -141,7 +141,7 @@ public:
     void loadCommand(const std::string &command_file);
 
     // BIPED WALKING PARAMETER
-    float phase_indicator_ = 1;
+    float phase_indicator_ = 0;
     Eigen::Vector3d commands_;
     double target_heading_;
     bool heading_mode_ = false;
@@ -151,10 +151,10 @@ public:
     float max_stride_y = 0.12;
     float max_stride_yaw = 0.6;
 
-    float vel_scale_x_ = 0.3;
-    float vel_scale_y_ = 0.1;
+    float vel_scale_x_ = 0.6;
+    float vel_scale_y_ = 0.2;
 
-    int ctrl_mode = 1; // 0 for joystick
+    int ctrl_mode = 0; // 0 for joystick
 
 private:
     Eigen::VectorQd ControlVal_;
