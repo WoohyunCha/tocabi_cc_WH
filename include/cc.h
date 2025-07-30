@@ -149,7 +149,7 @@ public:
     float step_ticks_ = 0.0;
     float max_stride_x = 0.4;
     float max_stride_y = 0.12;
-    float max_stride_yaw = 0.6;
+    float max_stride_yaw = 0.4;
 
     float vel_scale_x_ = 0.6;
     float vel_scale_y_ = 0.2;
