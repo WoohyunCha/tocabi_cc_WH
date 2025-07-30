@@ -585,41 +585,41 @@ void CustomController::processEverythingElse()
     for (size_t i = 0; i < num_cur_h; i++){
         h_cur_[i] = output_tensors[output_hn_idx_].GetTensorMutableData<float>()[i];
     }
-    // for (size_t i = 0; i < num_cur_latent; i++) {
-    //     latent_cur_[i] = output_tensors[output_latent_idx_].GetTensorMutableData<float>()[i];
-    // }
-    // // cout << "RL Action: " << rl_action_.transpose() << endl;
+    for (size_t i = 0; i < num_cur_latent; i++) {
+        latent_cur_[i] = output_tensors[output_latent_idx_].GetTensorMutableData<float>()[i];
+    }
+    // cout << "RL Action: " << rl_action_.transpose() << endl;
 
-    // std::copy(latent_cur_.begin(),
-    //             latent_cur_.begin() + num_cur_latent,
-    //             input_states_buffer_d[0].begin());
-    // // output tensor to critic obs
-    // output_tensors_d = session_d.Run(Ort::RunOptions{nullptr}, input_names_char_d.data(), input_tensors_d.data(), input_number_d, output_names_char_d.data(), output_number_d);
+    std::copy(latent_cur_.begin(),
+                latent_cur_.begin() + num_cur_latent,
+                input_states_buffer_d[0].begin());
+    // output tensor to critic obs
+    output_tensors_d = session_d.Run(Ort::RunOptions{nullptr}, input_names_char_d.data(), input_tensors_d.data(), input_number_d, output_names_char_d.data(), output_number_d);
 
-    // for (size_t i = 0; i < output_tensors_d.size(); i++) {
-    //     if (!output_tensors_d[i].IsTensor()) {
-    //         std::cerr << "Decoder output " << i << " is not a valid tensor." << std::endl;
-    //         continue;
-    //     }
-    // }
+    for (size_t i = 0; i < output_tensors_d.size(); i++) {
+        if (!output_tensors_d[i].IsTensor()) {
+            std::cerr << "Decoder output " << i << " is not a valid tensor." << std::endl;
+            continue;
+        }
+    }
 
-    // for (size_t i = 0; i < num_cur_critic_state; i++) {
-    //     normalized_critic_state_cur_[i] = output_tensors_d[0].GetTensorMutableData<float>()[i];
-    // }
+    for (size_t i = 0; i < num_cur_critic_state; i++) {
+        normalized_critic_state_cur_[i] = output_tensors_d[0].GetTensorMutableData<float>()[i];
+    }
 
-    // std::copy(normalized_critic_state_cur_.begin(),
-    //             normalized_critic_state_cur_.begin() + num_cur_critic_state,
-    //             input_states_buffer_c[0].begin());
-    // std::copy(normalized_critic_state_cur_.begin(),
-    //             normalized_critic_state_cur_.begin() + num_cur_critic_state,
-    //             input_states_buffer_dn[0].begin());
-    // // output tensor to value_
-    // output_tensors_c = session_c.Run(Ort::RunOptions{nullptr}, input_names_char_c.data(), input_tensors_c.data(), input_number_c, output_names_char_c.data(), output_number_c);
-    // output_tensors_dn = session_dn.Run(Ort::RunOptions{nullptr}, input_names_char_dn.data(), input_tensors_dn.data(), input_number_dn, output_names_char_dn.data(), output_number_dn);
-    // value_ = output_tensors_c[0].GetTensorMutableData<float>()[0];
-    // for (size_t i = 0; i < num_cur_critic_state; i++) {
-    //     critic_state_cur_[i] = output_tensors_dn[0].GetTensorMutableData<float>()[i];
-    // }
+    std::copy(normalized_critic_state_cur_.begin(),
+                normalized_critic_state_cur_.begin() + num_cur_critic_state,
+                input_states_buffer_c[0].begin());
+    std::copy(normalized_critic_state_cur_.begin(),
+                normalized_critic_state_cur_.begin() + num_cur_critic_state,
+                input_states_buffer_dn[0].begin());
+    // output tensor to value_
+    output_tensors_c = session_c.Run(Ort::RunOptions{nullptr}, input_names_char_c.data(), input_tensors_c.data(), input_number_c, output_names_char_c.data(), output_number_c);
+    output_tensors_dn = session_dn.Run(Ort::RunOptions{nullptr}, input_names_char_dn.data(), input_tensors_dn.data(), input_number_dn, output_names_char_dn.data(), output_number_dn);
+    value_ = output_tensors_c[0].GetTensorMutableData<float>()[0];
+    for (size_t i = 0; i < num_cur_critic_state; i++) {
+        critic_state_cur_[i] = output_tensors_dn[0].GetTensorMutableData<float>()[i];
+    }
     // std::cout << "value : " << value_ << std::endl;
     // int data_idx = 0;
     // data_idx += num_cur_state;
